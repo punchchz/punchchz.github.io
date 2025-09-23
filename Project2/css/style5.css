@@ -45,14 +45,14 @@ h1 {
     display: inline-block;
 }
 .sidebar {
-  position: absolute;        /* makes it float relative to the screen */
-  top: 50px;              /* distance from top */
-  left: 50px;             /* distance from left */
+  position: absolute;        
+  top: 50px;              
+  left: 50px;             
   width: 180px;
   border: 2px solid rgb(255, 255, 255);
-  border-radius: 12px;    /* rounded corners */
+  border-radius: 12px;    
   padding: 15px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* floating shadow */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);  
   
   background: linear-gradient(270deg, #1100ff, #5194ff, #e4ff16, #ff5900, #6f00ff);
   background-size: 1000% 1000%;

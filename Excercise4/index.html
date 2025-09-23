@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>CSS Letterform Demo</title>
+    <style>
+      .parent {
+          position: absolute;
+          width: 300px;
+          height: 300px;
+          border: dotted 10px rgb(255, 0, 0);
+          background-color: cornflowerblue;
+      }
+      .child {
+        position: absolute;
+        height: 60px;
+        background-color: green;
+        /* margin-bottom: 170px; */
+      }
+      .vertical {
+        width: 60px;
+        height: 300px;
+      }
+      .top {
+        width: 300px;
+        height: 60px;
+        top: 0;
+        left: 0;
+      }
+      .middle {
+        width: 300px;
+        height: 20px;
+        top: 140px;
+        left: 0;
+      }
+      .right {
+        width: 60px;
+        height: 150px;
+        top: 0;
+        left: 240px;
+        background-color: green;
+      }
+      #letterP {
+          top: 30px;
+          left: 100px;
+      }
+      #letterU {
+        top: 200px;
+        left: 300px;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div id="letterP" class="parent">
+      <div class="child vertical"></div>
+      <div class="child top"></div>
+      <div class="child middle"></div>
+      <div class="child right"></div>
+    </div>
+
+    <div id="letterU" class="parent">
+      <div class="child vertical"></div>
+      <div class="child top"></div>
+      <div class="child middle"></div>
+      <div class="child right"></div>
+    </div>
+  </body>
+</html>
