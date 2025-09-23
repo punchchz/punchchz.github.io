@@ -1,0 +1,44 @@
+body {
+  font-family: "Cossette Titre", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  padding: 20px;
+  text-align: center;
+    animation: backgroundColorChange 10s infinite alternate;
+}
+
+@keyframes backgroundColorChange {
+  0%   { background-color: #ff26cc; }
+  25%  { background-color: #e4ff35; }
+  50%  { background-color: #b1ffe6; }
+  75%  { background-color: #00ff40; }
+  100% { background-color: #99ff14; }
+}
+
+p {
+	color: blue;
+}
+p {
+	font-size:150px;
+	line-height:140px;
+}
+a:hover {
+	color:white;
+}
+h1 {
+  color: rgb(0, 0, 0); 
+  font-size: 3em; 
+  text-align: center; 
+}
+.arrow {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    text-decoration: none;
+    color: black;
+    animation: bounce 1.5s infinite;
+    display: inline-block;
+}
+
+.arrow:hover {
+    color: rgb(255, 255, 255);
+}

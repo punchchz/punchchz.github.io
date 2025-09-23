@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Molle&display=swap');
+
+body {
+  font-family: "Cossette Titre", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  margin: auto;
+  width: 50%;
+  border: 3px solid rgb(0, 0, 0);
+  border-radius: 20px;
+  padding: 20px;
+  text-align: center;
+      animation: backgroundColorChange 10s infinite alternate;
+}
+
+@keyframes backgroundColorChange {
+  0%   { background-color: #ff26cc; }
+  25%  { background-color: #e4ff35; }
+  50%  { background-color: #b1ffe6; }
+  75%  { background-color: #00ff40; }
+  100% { background-color: #99ff14; }
+}
+p {
+	color: rgb(129, 172, 245);
+}
+p {
+	font-size:35px;
+	line-height:35px;
+}
+a:hover {
+	color:white;
+}
+h1 {
+  color: rgb(174, 255, 0); 
+  font-size: 3em; 
+  text-align: center; 
+}
+h2 {
+  color: rgb(255, 0, 140); 
+  font-size: 3em; 
+  text-align: center; 
+  font-style: italic;
+}
+.arrow {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    text-decoration: none;
+    color: black;
+    animation: bounce 1.5s infinite;
+    display: inline-block;
+}
+
+.sidebar {
+  position: absolute;        /* makes it float relative to the screen */
+  top: 50px;              /* distance from top */
+  left: 50px;             /* distance from left */
+  width: 180px;
+  border: 2px solid rgb(255, 255, 255);
+  border-radius: 12px;    /* rounded corners */
+  padding: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* floating shadow */
+  
+  background: linear-gradient(270deg, #1100ff, #5194ff, #e4ff16, #ff5900, #6f00ff);
+  background-size: 1000% 1000%;
+  animation: gradientShift 15s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.sidebar a {
+  display: block;
+  padding: 8px 12px;
+  color: rgb(255, 255, 255);
+  border-radius: 12px;
+  text-decoration: none;
+}
+
+.sidebar a:hover {
+  box-shadow: 0 0 8px rgb(255, 255, 255);
+}
