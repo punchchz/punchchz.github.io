@@ -8,22 +8,22 @@
   
 
 
-/* Hover effect: rotates slightly and moves a bit */
+
 .stripe:hover {
   transform: rotate(10deg) translate(20px, -10px);
 }
 
   .small-square {
   position: absolute;
-  width: 20px;       /* size of each square */
+  width: 20px;       
   height: 20px;
-  background-color: rgb(208, 255, 37);  /* color of the square */
+  background-color: rgb(208, 255, 37); 
   border: 3px solid black;
 
     transition: transform 0.5s ease;
 }
 
-/* rotate 45 degrees on hover */
+
 .small-square:hover {
   transform: rotate(180deg);
 }
@@ -39,7 +39,7 @@
 
   /* creates tiny dots everywhere */
   background-image: radial-gradient(black 2px, transparent 2px);
-  background-size: 20px 20px;  /* spacing between dots */
+  background-size: 20px 20px;  
 }
 
 @keyframes gradientShift {
@@ -49,30 +49,30 @@
 }
       .big-square3 {
   position: absolute;
-  top: 350px;      /* move it down */
-  left: 1200px;     /* move it right */
-  width: 300px;    /* size */
+  top: 350px;      
+  left: 1200px;     
+  width: 300px;    
   height: 500px;
   background: rgb(40, 126, 27);
-  z-index: -1;     /* keeps it behind letters */
+  z-index: -1;     
 }
         .big-square2 {
   position: absolute;
-  top: 00px;      /* move it down */
-  left: 1200px;     /* move it right */
-  width: 300px;    /* size */
+  top: 00px;      
+  left: 1200px;     
+  width: 300px;    
   height: 500px;
   background: rgb(192, 255, 182);
-  z-index: -1;     /* keeps it behind letters */
+  z-index: -1;     
 }
       .big-square {
   position: absolute;
-  top: 100px;      /* move it down */
-  left: 200px;     /* move it right */
-  width: 600px;    /* size */
+  top: 100px;      
+  left: 200px;     
+  width: 600px;    
   height: 600px;
   background: rgb(248, 182, 255);
-  z-index: -1;     /* keeps it behind letters */
+  z-index: -1;     
 }
 
       .background {
@@ -81,7 +81,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        z-index: -1; /* keeps it behind the letters */
+        z-index: -1; 
       }
       .background div {
         position: absolute;
@@ -104,7 +104,7 @@
   border: 3px solid rgb(255, 255, 255);
 }
 
-      /* Example scattered square positions */
+      
       .background div:nth-child(1) { top: 50px; left: 50px; }
       .background div:nth-child(2) { top: 200px; left: 500px; }
       .background div:nth-child(3) { top: 400px; left: 150px; }
@@ -122,14 +122,11 @@
   align-items: center;
   z-index: -1;
 
-  /* static gradient background */
+  
   background: linear-gradient(270deg, #f34e1c, #ffaf6e, #5d533a, #ccff25);
 }
 
-/* Hover effect: moves randomly when you hover over the line */
-.blue-line:hover {
-  transform: rotate(calc(20deg + 30deg)) translate(20px, -10px);
-}
+
 
 .colorBox2 {
   position: absolute;
@@ -142,7 +139,7 @@
   align-items: center;
   z-index: -1;
 
-  /* static gradient background */
+  
   background: linear-gradient(270deg, #f34e1c, #ffaf6e, #5d533a, #ccff25);
 }
 
@@ -193,7 +190,7 @@
           left: 100px;
       }
       #letterP .vertical {
-      transition: height 0.3s ease; /* smooth animation */
+      transition: height 0.3s ease; 
       }
 
       #letterP:hover .vertical {
@@ -293,30 +290,30 @@
   position: absolute;
   background-color: rgb(163, 163, 163);
   border: 15px solid rgb(93, 37, 0);
-  transition: transform 0.5s ease; /* smooth animation */
-  transform-origin: center center; /* rotate around its center */
+  transition: transform 0.5s ease; 
+  transform-origin: center center; 
 }
 
 #letterN:hover {
-  transform: rotate(180deg); /* tilt on hover */
+  transform: rotate(180deg); 
 }
 #letterC {
   position: absolute;
-  top: 400px;       /* move it where you want */
+  top: 400px;       
   left: 900px;
   width: 200px;
   height: 200px;
   background-color: rgb(13, 159, 159);
-  border-radius: 50%;   /* makes it a circle */
+  border-radius: 50%;   
 }
 
 #letterC .cover {
   position: absolute;
   top: 30px;
-  right: -20px;    /* carve from the right side */
+  right: -20px;    
   width: 140px;
   height: 140px;
-  background-color: white;  /* same as your page background */
+  background-color: white;  
   border-radius: 50%;
 }
 #letterC {
@@ -327,11 +324,11 @@
   height: 200px;
   background-color: rgb(13, 159, 159);
   border-radius: 50%;
-  transition: background-color 0.5s ease; /* smooth color change */
+  transition: background-color 0.5s ease; 
 }
 
 #letterC:hover {
-  background-color: rgb(170, 255, 52); /* new color on hover */
+  background-color: rgb(170, 255, 52); 
 }
 
 #letterC .cover {
@@ -342,7 +339,7 @@
   height: 140px;
   background-color: white;
   border-radius: 50%;
-  pointer-events: none; /* so hover works over the cover too */
+  pointer-events: none; 
 }
 
 #letterH {
@@ -364,14 +361,14 @@
 }
 
 #letterH .right {
-  left: 100px;       /* spacing between verticals */
+  left: 100px;      
 }
 
 #letterH .middle {
   position: absolute;
-  top: 180px;        /* about halfway down */
+  top: 180px;        
   left: 0;
-  width: 230px;      /* connects the two sides */
+  width: 230px;      
   height: 40px;
   background-color: rgb(16, 115, 34);
 }
@@ -379,13 +376,13 @@
   position: absolute;
   top: 20px;
   left: 1100px;
-  transition: all 1s ease; /* smooth spreading */
+  transition: all 1s ease; 
 }
 
 #letterH .left,
 #letterH .right,
 #letterH .middle {
-  transition: all 1s ease; /* smooth animation for each part */
+  transition: all 1s ease; 
 }
 
 #letterH .left,
@@ -421,6 +418,7 @@
 #letterH:hover .middle {
   width: 100vw; /* stretch middle bar across the whole screen */
 }
+
 
     </style>
   </head>
