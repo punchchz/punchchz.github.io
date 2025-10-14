@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Providence Athenaeum - Mapping Knowledge</title>
+    <style>
+        /* Custom Fonts - Affairs and Monument Grotesk Mono */
+        @font-face {
+            font-family: 'Affairs';
+            src: url("fonts/AffairsTest-Regular.otf") format('opentype');
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Monument Grotesk Mono';
+            src: url("fonts/ABCMonumentGroteskMono-Regular-Trial.otf") format('opentype');
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+        }
+
+        :root {
+            --white: #ffffff;
+            --black: #000000;
+            --gray: #808080;
+        }
+
+        body {
+            font-family: 'Affairs', serif;
+            background: var(--black);
+            color: var(--white);
+            overflow-x: hidden;
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--white);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.2s ease;
+            mix-blend-mode: difference;
+        }
+
+        .cursor.hover {
+            transform: scale(1.5);
+        }
+
+        /* Noise Effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.03;
+            z-index: 1;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 2rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            z-index: 100;
+            mix-blend-mode: difference;
+        }
+
+        .nav-left, .nav-right {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.8;
+            font-family: 'Monument Grotesk Mono', monospace;
+        }
+
+        .menu-toggle {
+            cursor: pointer;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: none;
+            border: none;
+            color: var(--white);
+            padding: 0;
+            transition: opacity 0.3s ease;
+            font-family: 'Monument Grotesk Mono', monospace;
+        }
+
+        .menu-toggle:hover {
+            opacity: 0.5;
+        }
+
+        /* Fullscreen Menu */
+        .fullscreen-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: var(--white);
+            color: var(--black);
+            z-index: 99;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s ease;
+        }
+
+        .fullscreen-menu.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .menu-items {
+            list-style: none;
+        }
+
+        .menu-items li {
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+
+        .menu-items a {
+            color: var(--black);
+            text-decoration: none;
+            font-size: clamp(3rem, 8vw, 7rem);
+            font-weight: 300;
+            display: inline-block;
+            transition: transform 0.3s ease;
+            letter-spacing: -2px;
+            font-family: 'Affairs', serif;
+        }
+
+        .menu-items a:hover {
+            transform: skewX(-5deg);
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 6rem 3rem 3rem;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 9vw, 7rem);
+            font-weight: 400;
+            line-height: 1.1;
+            letter-spacing: 0.01em;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            font-family: 'Affairs', serif;
+            margin-bottom: 3rem;
+        }
+
+        .hero-title.kinetic {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .word-line {
+            display: flex;
+            overflow: visible;
+            position: relative;
+            white-space: nowrap;
+            justify-content: center;
+        }
+
+        /* Compositional offsets for more interesting layout */
+        .word-line.line-1 {
+            transform: translateX(0);
+        }
+
+        .word-line.line-2 {
+            margin-bottom: 1.5rem;
+            transform: translateX(0);
+            font-size: 0.85em;
+        }
+
+        .word-line.line-3 {
+            transform: translateX(0);
+        }
+
+        .word-line .char {
+            display: inline-block;
+            position: relative;
+            animation: floatUnique calc(10s + var(--random) * 6s) ease-in-out infinite,
+                       fadeInOut calc(10s + var(--random) * 6s) ease-in-out infinite;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation-fill-mode: backwards;
+            opacity: 1 !important;
+        }
+
+        /* Initial hold before any animation starts */
+        @keyframes initialHold {
+            0%, 100% {
+                opacity: 1;
+            }
+        }
+
+        /* Apply initial hold for first few seconds */
+        .hero-title.kinetic {
+            animation: initialHold 4s ease-in-out forwards;
+        }
+
+        /* Hover effect - letters scatter away from cursor like ryanyan.ca */
+        .word-line .char.hover-active {
+            animation: none !important;
+        }
+
+        /* Letters slowly drift apart and come back together - more compositional control */
+        @keyframes floatUnique {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+                letter-spacing: 0;
+            }
+            15% {
+                transform: translate(
+                    calc((var(--index) - 6) * 8px + sin(var(--random) * 6.28) * 15px),
+                    calc(cos(var(--random) * 3.14) * 25px)
+                ) rotate(calc(var(--random) * 6deg - 3deg));
+            }
+            30% {
+                transform: translate(
+                    calc((var(--index) - 6) * 12px + cos(var(--random) * 4.71) * 25px),
+                    calc(sin(var(--random) * 5.5) * 40px)
+                ) rotate(calc(var(--random) * -10deg + 5deg));
+            }
+            50% {
+                transform: translate(
+                    calc((var(--index) - 6) * 18px + sin(var(--random) * 7.85) * 35px),
+                    calc(cos(var(--random) * 2.35) * 60px)
+                ) rotate(calc(var(--random) * 15deg - 7deg));
+            }
+            70% {
+                transform: translate(
+                    calc((var(--index) - 6) * 12px + cos(var(--random) * 3.5) * 25px),
+                    calc(sin(var(--random) * 6.2) * 40px)
+                ) rotate(calc(var(--random) * -12deg + 6deg));
+            }
+            85% {
+                transform: translate(
+                    calc((var(--index) - 6) * 8px + sin(var(--random) * 4.2) * 15px),
+                    calc(cos(var(--random) * 1.8) * 25px)
+                ) rotate(calc(var(--random) * 8deg - 4deg));
+            }
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+                letter-spacing: 0;
+            }
+        }
+
+        /* Fade in and out animation like Common Dimensions */
+        @keyframes fadeInOut {
+            0% {
+                opacity: 1;
+            }
+            30% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+            55% {
+                opacity: 0;
+            }
+            55.01% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .hero-subtitle {
+            font-size: clamp(0.75rem, 1.2vw, 1rem);
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            opacity: 0.5;
+            font-weight: 400;
+            font-family: 'Monument Grotesk Mono', monospace;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            max-width: 90%;
+            display: block;
+        }
+
+        /* Scattered Text Animation */
+        .hero-title.scattered .char {
+            display: inline-block;
+            animation: floatIn 1.5s ease-out forwards;
+            opacity: 0;
+            animation-delay: var(--delay);
+        }
+
+        @keyframes floatIn {
+            0% {
+                opacity: 0;
+                transform: translate(
+                    calc(var(--delay) * 100px - 50px),
+                    calc(var(--delay) * -80px + 40px)
+                ) rotate(calc(var(--delay) * 180deg - 90deg));
+            }
+            100% {
+                opacity: 1;
+                transform: translate(0, 0) rotate(0deg);
+            }
+        }
+
+        /* Spiral Ornament */
+        .spiral-ornament {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            pointer-events: none;
+            opacity: 0.12;
+            z-index: 0;
+            animation: gentleFloat 20s ease-in-out infinite;
+        }
+
+        @keyframes gentleFloat {
+            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+            50% { transform: translate(-50%, -52%) rotate(5deg); }
+        }
+
+        .spiral-ornament svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .spiral-ornament .spiral-line {
+            stroke: var(--white);
+            fill: none;
+            stroke-width: 1;
+            stroke-linecap: round;
+        }
+
+        .spiral-ornament .spiral-dot {
+            fill: var(--white);
+        }
+
+        /* Hover ornament in viz cards */
+        .viz-ornament {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.5);
+            width: 200px;
+            height: 200px;
+            opacity: 0;
+            transition: all 0.6s ease;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .viz-item:hover .viz-ornament {
+            opacity: 0.15;
+            transform: translate(-50%, -50%) scale(1) rotate(180deg);
+        }
+
+        /* Animated Lines */
+        .lines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .line {
+            position: absolute;
+            background: var(--white);
+            opacity: 0.3;
+        }
+
+        .line.vertical {
+            width: 1px;
+            height: 100%;
+            animation: slideDown 20s infinite linear;
+        }
+
+        .line.horizontal {
+            height: 1px;
+            width: 100%;
+            animation: slideRight 25s infinite linear;
+        }
+
+        @keyframes slideDown {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100vh); }
+        }
+
+        @keyframes slideRight {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100vw); }
+        }
+
+        /* Blueprint Grid Background */
+        .blueprint-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.08;
+        }
+
+        .blueprint-grid svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Architectural Elements */
+        .arch-element {
+            position: fixed;
+            stroke: var(--white);
+            fill: none;
+            stroke-width: 1;
+            opacity: 0.35;
+            pointer-events: none;
+        }
+
+        .arch-circle-1 {
+            top: 15%;
+            right: 10%;
+            width: 200px;
+            height: 200px;
+            animation: rotateBlueprint 40s linear infinite;
+        }
+
+        .arch-circle-2 {
+            bottom: 20%;
+            left: 8%;
+            width: 150px;
+            height: 150px;
+            animation: rotateBlueprint 50s linear infinite reverse;
+        }
+
+        .arch-rect {
+            top: 60%;
+            right: 15%;
+            width: 180px;
+            height: 120px;
+            animation: fadeInOut 8s ease-in-out infinite;
+        }
+
+        .arch-diagonal {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            top: 30%;
+            left: 5%;
+            opacity: 0.2;
+            animation: rotateBlueprint 60s linear infinite;
+        }
+
+        @keyframes rotateBlueprint {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.12; }
+            50% { opacity: 0.05; }
+        }
+
+        /* Dimension Lines */
+        .dimension-line {
+            position: fixed;
+            stroke: var(--white);
+            stroke-width: 1;
+            opacity: 0.1;
+            pointer-events: none;
+            animation: dashMove 3s linear infinite;
+        }
+
+        @keyframes dashMove {
+            to { stroke-dashoffset: -20; }
+        }
+
+        /* Data Section */
+        .data-section {
+            padding: 10rem 3rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Ornament Patterns */
+        .ornament-pattern {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            pointer-events: none;
+            opacity: 0.08;
+        }
+
+        .ornament-pattern.top-left {
+            top: 5%;
+            left: 5%;
+            background-image: 
+                radial-gradient(circle at 30% 30%, transparent 40%, var(--white) 40%, var(--white) 41%, transparent 41%),
+                radial-gradient(circle at 60% 50%, transparent 25%, var(--white) 25%, var(--white) 26%, transparent 26%),
+                radial-gradient(circle at 45% 70%, transparent 15%, var(--white) 15%, var(--white) 16%, transparent 16%);
+            animation: spiralRotate 40s linear infinite;
+        }
+
+        .ornament-pattern.bottom-right {
+            bottom: 5%;
+            right: 5%;
+            background-image: 
+                radial-gradient(circle at 70% 70%, transparent 40%, var(--white) 40%, var(--white) 41%, transparent 41%),
+                radial-gradient(circle at 40% 50%, transparent 25%, var(--white) 25%, var(--white) 26%, transparent 26%),
+                radial-gradient(circle at 55% 30%, transparent 15%, var(--white) 15%, var(--white) 16%, transparent 16%);
+            animation: spiralRotate 50s linear infinite reverse;
+        }
+
+        @keyframes spiralRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .section-header {
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 4rem;
+            opacity: 0.7;
+            text-align: center;
+            font-family: 'Monument Grotesk Mono', monospace;
+        }
+
+        .viz-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0;
+            border: 1px solid var(--white);
+        }
+
+        .viz-item {
+            aspect-ratio: 1;
+            border: 1px solid var(--white);
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: background 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .viz-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--white);
+            transform: scaleY(0);
+            transform-origin: bottom;
+            transition: transform 0.5s ease;
+            z-index: 0;
+        }
+
+        .viz-item:hover::before {
+            transform: scaleY(1);
+            transform-origin: top;
+        }
+
+        .viz-item:hover {
+            color: var(--black);
+        }
+
+        .viz-number {
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 1;
+            font-family: 'Monument Grotesk Mono', monospace;
+        }
+
+        .viz-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .viz-title {
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+            font-weight: 400;
+            font-family: 'Affairs', serif;
+        }
+
+        .viz-desc {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            line-height: 1.6;
+            font-family: 'Monument Grotesk Mono', monospace;
+        }
+
+        /* Side Panel */
+        .side-panel {
+            position: fixed;
+            right: -100%;
+            top: 0;
+            width: 50vw;
+            height: 100vh;
+            background: var(--white);
+            color: var(--black);
+            z-index: 101;
+            transition: right 0.6s cubic-bezier(0.77, 0, 0.175, 1);
+            overflow-y: auto;
+        }
+
+        .side-panel.active {
+            right: 0;
+        }
+
+        .panel-header {
+            padding: 3rem;
+            display: flex;
+            justify-content: flex-end;
+            border-bottom: 1px solid var(--black);
+        }
+
+        .close-panel {
+            cursor: pointer;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: none;
+            border: none;
+            color: var(--black);
+            transition: opacity 0.3s ease;
+            font-family: 'Monument Grotesk Mono', monospace;
+        }
+
+        .close-panel:hover {
+            opacity: 0.5;
+        }
+
+        .panel-content {
+            padding: 3rem;
+        }
+
+        .panel-title {
+            font-size: clamp(2rem, 5vw, 4rem);
+            margin-bottom: 2rem;
+            letter-spacing: -2px;
+            font-weight: 300;
+            font-family: 'Affairs', serif;
+        }
+
+        .panel-meta {
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.5;
+            margin-bottom: 3rem;
+            font-family: 'Monument Grotesk Mono', monospace;
+        }
+
+        .panel-text {
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            font-family: 'Affairs', serif;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 4rem;
+        }
+
+        .data-item {
+            border: 1px solid var(--black);
+            padding: 2rem;
+        }
+
+        .data-value {
+            font-size: 3rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+            letter-spacing: -2px;
+            font-family: 'Affairs', serif;
+        }
+
+        .data-label {
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.5;
+            font-family: 'Monument Grotesk Mono', monospace;
+        }
+
+        /* Info Strip Toggle - Now on Bottom */
+        .info-strip {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: var(--white);
+            z-index: 102;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+            border-top: 1px solid var(--white);
+        }
+
+        .info-strip:hover {
+            background: #f0f0f0;
+        }
+
+        .info-strip-label {
+            font-family: 'Monument Grotesk Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--black);
+        }
+
+        /* Info Panel - Slides up from bottom */
+        .info-panel {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            height: 60vh;
+            background: var(--white);
+            color: var(--black);
+            z-index: 101;
+            transition: bottom 0.5s cubic-bezier(0.77, 0, 0.175, 1);
+            overflow-y: auto;
+            padding: 3rem;
+            border-top: 1px solid var(--black);
+        }
+
+        .info-panel.active {
+            bottom: 40px;
+        }
+
+        .info-panel-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4rem;
+        }
+
+        .info-panel h3 {
+            font-family: 'Affairs', serif;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 400;
+        }
+
+        .info-panel p {
+            font-family: 'Affairs', serif;
+            font-size: 1rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-panel .info-meta {
+            font-family: 'Monument Grotesk Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            opacity: 0.6;
+            margin-bottom: 2rem;
+        }
+
+        .info-section {
+            margin-bottom: 2rem;
+        }
+
+        .info-section-title {
+            font-family: 'Monument Grotesk Mono', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+
+        /* Overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 1.5rem;
+            }
+
+            .data-section {
+                padding: 5rem 1.5rem;
+            }
+
+            .viz-item {
+                padding: 2rem;
+            }
+
+            .panel-content {
+                padding: 2rem;
+            }
+
+            .data-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-panel {
+                width: 100%;
+                right: -100%;
+                height: 70vh;
+            }
+
+            .info-panel.active {
+                right: 40px;
+            }
+
+            .info-panel-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            /* Reset offsets on mobile for readability */
+            .word-line.line-1,
+            .word-line.line-2,
+            .word-line.line-3 {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+
+    <!-- Animated Lines -->
+    <div class="lines">
+        <div class="line vertical" style="left: 20%;"></div>
+        <div class="line vertical" style="left: 50%;"></div>
+        <div class="line vertical" style="left: 80%;"></div>
+        <div class="line horizontal" style="top: 30%;"></div>
+        <div class="line horizontal" style="top: 70%;"></div>
+    </div>
+
+    <!-- Blueprint Grid -->
+    <div class="blueprint-grid">
+        <svg xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="smallGrid" width="30" height="30" patternUnits="userSpaceOnUse">
+                    <path d="M 30 0 L 0 0 0 30" fill="none" stroke="white" stroke-width="0.5" opacity="0.5"/>
+                </pattern>
+                <pattern id="grid" width="150" height="150" patternUnits="userSpaceOnUse">
+                    <rect width="150" height="150" fill="url(#smallGrid)"/>
+                    <path d="M 150 0 L 0 0 0 150" fill="none" stroke="white" stroke-width="0.8" opacity="0.6"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+        </svg>
+    </div>
+
+    <!-- Experimental Architectural Blueprint Elements -->
+    <svg class="arch-element arch-circle-1" viewBox="0 0 500 500" style="top: 8%; right: 8%; width: 500px; height: 500px;">
+        <!-- Deconstructed floor plan -->
+        <g opacity="0.8">
+            <!-- Outer frame fragments -->
+            <line x1="50" y1="50" x2="200" y2="50" stroke-width="1"/>
+            <line x1="300" y1="50" x2="450" y2="50" stroke-width="1"/>
+            <line x1="50" y1="50" x2="50" y2="200" stroke-width="1"/>
+            <line x1="450" y1="50" x2="450" y2="200" stroke-width="1"/>
+            
+            <!-- Floating room fragments -->
+            <rect x="80" y="80" width="100" height="100" stroke-width="0.8"/>
+            <rect x="220" y="100" width="80" height="120" stroke-width="0.8"/>
+            <rect x="330" y="70" width="90" height="90" stroke-width="0.8"/>
+            
+            <!-- Diagonal construction lines -->
+            <line x1="80" y1="80" x2="180" y2="180" stroke-width="0.6" stroke-dasharray="4,6" opacity="0.6"/>
+            <line x1="220" y1="100" x2="300" y2="220" stroke-width="0.6" stroke-dasharray="4,6" opacity="0.6"/>
+            
+            <!-- Circular elements -->
+            <circle cx="250" cy="250" r="120" stroke-width="0.8"/>
+            <circle cx="250" cy="250" r="80" stroke-width="0.7"/>
+            <circle cx="250" cy="250" r="40" stroke-width="0.6"/>
+            
+            <!-- Radial guides -->
+            <line x1="250" y1="130" x2="250" y2="180" stroke-width="0.6"/>
+            <line x1="370" y1="250" x2="320" y2="250" stroke-width="0.6"/>
+            <line x1="180" y1="180" x2="210" y2="210" stroke-width="0.6"/>
+            
+            <!-- Scattered dimension marks -->
+            <g opacity="0.7">
+                <line x1="70" y1="200" x2="70" y2="280" stroke-width="0.6" stroke-dasharray="5,5"/>
+                <line x1="65" y1="200" x2="75" y2="200" stroke-width="0.8"/>
+                <line x1="65" y1="280" x2="75" y2="280" stroke-width="0.8"/>
+            </g>
+            
+            <!-- Window notations -->
+            <line x1="90" y1="80" x2="110" y2="80" stroke-width="1.5"/>
+            <line x1="150" y1="80" x2="170" y2="80" stroke-width="1.5"/>
+        </g>
+    </svg>
+
+    <svg class="arch-element arch-circle-2" viewBox="0 0 400 550" style="bottom: 5%; left: 5%; width: 400px; height: 550px;">
+        <!-- Fragmented elevation -->
+        <g opacity="0.8">
+            <!-- Broken foundation line -->
+            <line x1="40" y1="500" x2="160" y2="500" stroke-width="1"/>
+            <line x1="200" y1="500" x2="360" y2="500" stroke-width="1"/>
+            
+            <!-- Floating floor sections -->
+            <g>
+                <rect x="60" y="350" width="120" height="130" stroke-width="0.8"/>
+                <rect x="80" y="370" width="35" height="80" stroke-width="0.7"/>
+                <rect x="125" y="370" width="35" height="80" stroke-width="0.7"/>
+            </g>
+            
+            <g transform="translate(20, -30)">
+                <rect x="80" y="250" width="120" height="130" stroke-width="0.8"/>
+                <rect x="100" y="270" width="35" height="80" stroke-width="0.7"/>
+                <rect x="145" y="270" width="35" height="80" stroke-width="0.7"/>
+            </g>
+            
+            <!-- Deconstructed roof -->
+            <line x1="50" y1="200" x2="200" y2="100" stroke-width="0.8"/>
+            <line x1="200" y1="100" x2="350" y2="200" stroke-width="0.8"/>
+            <line x1="170" y1="130" x2="230" y2="130" stroke-width="0.6" stroke-dasharray="6,6" opacity="0.7"/>
+            
+            <!-- Structural guides -->
+            <line x1="120" y1="500" x2="120" y2="220" stroke-width="0.6" stroke-dasharray="4,8" opacity="0.5"/>
+            <line x1="200" y1="500" x2="200" y2="100" stroke-width="0.6" stroke-dasharray="4,8" opacity="0.5"/>
+            <line x1="280" y1="500" x2="280" y2="220" stroke-width="0.6" stroke-dasharray="4,8" opacity="0.5"/>
+            
+            <!-- Annotation arcs -->
+            <path d="M 150 480 Q 200 460 250 480" fill="none" stroke-width="0.6" opacity="0.6"/>
+        </g>
+    </svg>
+
+    <svg class="arch-element arch-rect" viewBox="0 0 450 350" style="top: 50%; right: 5%; width: 450px; height: 350px;">
+        <!-- Abstract section view -->
+        <g opacity="0.8">
+            <!-- Exploded floor plates -->
+            <line x1="50" y1="200" x2="250" y2="200" stroke-width="0.8"/>
+            <line x1="300" y1="200" x2="400" y2="200" stroke-width="0.8"/>
+            
+            <line x1="70" y1="120" x2="220" y2="120" stroke-width="0.8" stroke-dasharray="8,8" opacity="0.7"/>
+            <line x1="280" y1="120" x2="380" y2="120" stroke-width="0.8" stroke-dasharray="8,8" opacity="0.7"/>
+            
+            <!-- Column fragments -->
+            <rect x="100" y="50" width="8" height="280" stroke-width="0.7" opacity="0.7"/>
+            <rect x="220" y="70" width="8" height="260" stroke-width="0.7" opacity="0.7"/>
+            <rect x="340" y="60" width="8" height="270" stroke-width="0.7" opacity="0.7"/>
+            
+            <!-- Spatial divisions -->
+            <rect x="130" y="140" width="60" height="50" stroke-width="0.7"/>
+            <rect x="260" y="150" width="50" height="40" stroke-width="0.7"/>
+            
+            <!-- Connection lines -->
+            <line x1="160" y1="120" x2="160" y2="140" stroke-width="0.5" opacity="0.6"/>
+            <line x1="285" y1="120" x2="285" y2="150" stroke-width="0.5" opacity="0.6"/>
+            
+            <!-- Circular detail -->
+            <circle cx="375" cy="250" r="40" stroke-width="0.7"/>
+            <circle cx="375" cy="250" r="25" stroke-width="0.6"/>
+        </g>
+    </svg>
+
+    <svg class="arch-element arch-diagonal" viewBox="0 0 400 400" style="top: 20%; left: 2%; width: 400px; height: 400px;">
+        <!-- Orbital floor plan -->
+        <g opacity="0.8">
+            <!-- Multiple rotating circles -->
+            <circle cx="200" cy="200" r="150" stroke-width="0.8"/>
+            <circle cx="200" cy="200" r="120" stroke-width="0.7" stroke-dasharray="8,8"/>
+            <circle cx="200" cy="200" r="90" stroke-width="0.7"/>
+            <circle cx="200" cy="200" r="60" stroke-width="0.6" stroke-dasharray="5,5"/>
+            
+            <!-- Radial divisions with breaks -->
+            <line x1="200" y1="50" x2="200" y2="140" stroke-width="0.7"/>
+            <line x1="200" y1="260" x2="200" y2="350" stroke-width="0.7"/>
+            <line x1="50" y1="200" x2="140" y2="200" stroke-width="0.7"/>
+            <line x1="260" y1="200" x2="350" y2="200" stroke-width="0.7"/>
+            
+            <!-- Diagonal guides -->
+            <line x1="80" y1="80" x2="150" y2="150" stroke-width="0.5" stroke-dasharray="4,6" opacity="0.6"/>
+            <line x1="320" y1="80" x2="250" y2="150" stroke-width="0.5" stroke-dasharray="4,6" opacity="0.6"/>
+            
+            <!-- Interior fragments -->
+            <rect x="170" y="170" width="60" height="60" stroke-width="0.7"/>
+            <circle cx="200" cy="100" r="15" stroke-width="0.6"/>
+            <circle cx="200" cy="300" r="15" stroke-width="0.6"/>
+            <circle cx="100" cy="200" r="12" stroke-width="0.6"/>
+            <circle cx="300" cy="200" r="12" stroke-width="0.6"/>
+            
+            <!-- Arc notations -->
+            <path d="M 230 170 A 30 30 0 0 1 230 230" fill="none" stroke-width="0.5" opacity="0.5"/>
+        </g>
+    </svg>
+
+    <!-- Dimension Lines -->
+    <svg class="dimension-line" style="top: 25%; left: 30%; width: 40%;" viewBox="0 0 400 20">
+        <line x1="0" y1="10" x2="400" y2="10" stroke-dasharray="5,5" />
+        <line x1="0" y1="5" x2="0" y2="15" />
+        <line x1="400" y1="5" x2="400" y2="15" />
+    </svg>
+
+    <svg class="dimension-line" style="top: 45%; right: 20%; width: 2%; height: 30%;" viewBox="0 0 20 300">
+        <line x1="10" y1="0" x2="10" y2="300" stroke-dasharray="5,5" />
+        <line x1="5" y1="0" x2="15" y2="0" />
+        <line x1="5" y1="300" x2="15" y2="300" />
+    </svg>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-left">
+            <div class="nav-item">[ * ]</div>
+            <a class="nav-item" href="https://www.google.com/maps/search/?api=1&query=41.8258,-71.4064" target="_blank" rel="noopener" style="text-decoration: none; color: inherit; cursor: pointer;">41.8258° N, 71.4064° W</a>
+        </div>
+        <div class="nav-right">
+            <button class="menu-toggle" onclick="toggleMenu()">[ Menu ]</button>
+            <div class="nav-item">2024</div>
+        </div>
+    </nav>
+
+    <!-- Fullscreen Menu -->
+    <div class="fullscreen-menu">
+        <ul class="menu-items">
+            <li><a href="#data" onclick="toggleMenu()">Visualizations</a></li>
+            <li><a href="#about" onclick="toggleMenu()">About</a></li>
+            <li><a href="#archive" onclick="toggleMenu()">Archive</a></li>
+            <li><a href="#contact" onclick="toggleMenu()">Contact</a></li>
+        </ul>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1 class="hero-title kinetic" id="kineticText">
+            <div class="word-line line-1">Personalizing</div>
+            <div class="word-line line-2">the</div>
+            <div class="word-line line-3">Impersonal</div>
+        </h1>
+        <p class="hero-subtitle">Mapping The Providence Athenaeum</p>
+    </section>
+
+    <!-- Data Section -->
+    <section class="data-section" id="data">
+        <div class="section-header">[ Select to Explore ]</div>
+        <div class="ornament-pattern top-left"></div>
+        <div class="ornament-pattern bottom-right"></div>
+        <div class="viz-container">
+            <div class="viz-item" onclick="openPanel('circulation')">
+                <div class="viz-number">[ 01 ]</div>
+                <div class="viz-content">
+                    <h3 class="viz-title">Circulation<br>Patterns</h3>
+                    <p class="viz-desc">Temporal flows of knowledge through space</p>
+                </div>
+            </div>
+            <div class="viz-item" onclick="openPanel('taxonomy')">
+                <div class="viz-number">[ 02 ]</div>
+                <div class="viz-content">
+                    <h3 class="viz-title">Collection<br>Taxonomy</h3>
+                    <p class="viz-desc">Cartography of literary classification</p>
+                </div>
+            </div>
+            <div class="viz-item" onclick="openPanel('spatial')">
+                <div class="viz-number">[ 03 ]</div>
+                <div class="viz-content">
+                    <h3 class="viz-title">Spatial<br>Architecture</h3>
+                    <p class="viz-desc">Physical dimension of information</p>
+                </div>
+            </div>
+            <div class="viz-item" onclick="openPanel('temporal')">
+                <div class="viz-number">[ 04 ]</div>
+                <div class="viz-content">
+                    <h3 class="viz-title">Temporal<br>Evolution</h3>
+                    <p class="viz-desc">190 years of cultural memory</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Side Panel -->
+    <div class="side-panel" id="sidePanel">
+        <div class="panel-header">
+            <button class="close-panel" onclick="closePanel()">[ Close ]</button>
+        </div>
+        <div class="panel-content" id="panelContent">
+            <!-- Content loaded dynamically -->
+        </div>
+    </div>
+
+    <!-- Info Strip Toggle -->
+    <div class="info-strip" onclick="toggleInfo()">
+        <div class="info-strip-label">[ + ]</div>
+    </div>
+
+    <!-- Info Panel -->
+    <div class="info-panel" id="infoPanel">
+        <div class="info-panel-content">
+            <div class="info-section">
+                <div class="info-section-title">Overview</div>
+                <p>Personalizing the Impersonal is a data visualization project that explores the spatial, temporal, and social dimensions of the Providence Athenaeum, one of America's oldest independent libraries.</p>
+                <p>Through mapping circulation patterns, collection taxonomies, and architectural spaces, this project reveals the invisible networks that connect readers, books, and knowledge across 190 years of cultural memory.</p>
+            </div>
+
+            <div class="info-section">
+                <div class="info-section-title">Methodology</div>
+                <p>We analyzed over 200,000 catalogued items, 52,000+ circulation events, and conducted spatial surveys of the building's architecture to create a comprehensive data portrait of the library.</p>
+                <p>The visualizations combine quantitative data analysis with qualitative spatial observation to reveal patterns in how knowledge circulates through physical and temporal space.</p>
+            </div>
+
+            <div class="info-section">
+                <div class="info-section-title">Credits</div>
+                <p>Design & Research: [Your Name]<br>
+                Institution: Providence Athenaeum<br>
+                Typography: Affairs by SM Typeface Design, Monument Grotesk Mono by ABC Dinamo<br>
+                Year: 2024</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay" onclick="closePanel()"></div>
+
+    <script>
+        // Custom Cursor
+        const cursor = document.querySelector('.cursor');
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        function animateCursor() {
+            cursorX += (mouseX - cursorX) * 0.1;
+            cursorY += (mouseY - cursorY) * 0.1;
+            cursor.style.left = cursorX + 'px';
+            cursor.style.top = cursorY + 'px';
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        // Cursor hover effect
+        document.querySelectorAll('a, button, .viz-item').forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+        });
+
+        const visualizations = {
+            circulation: {
+                title: 'Circulation Patterns',
+                meta: '52,847 Checkouts Analyzed / 2020-2024',
+                text1: 'An exploration of how books move through the library ecosystem, revealing the invisible networks that connect readers, subjects, and time.',
+                text2: 'Through visualization of checkout patterns, we map the pulse of intellectual curiosity—peak hours, seasonal trends, and the unexpected paths that certain texts trace through different communities.',
+                data: [
+                    { value: '52,847', label: 'Total Checkouts' },
+                    { value: '3.2', label: 'Avg Per Patron' },
+                    { value: '12', label: 'Subject Clusters' },
+                    { value: '89%', label: 'Return Rate' }
+                ]
+            },
+            taxonomy: {
+                title: 'Collection Taxonomy',
+                meta: '200,000+ Items / Complete Archive',
+                text1: 'A reimagining of library classification that layers Dewey Decimal with spatial coordinates, creating a three-dimensional architecture of knowledge.',
+                text2: 'Each book becomes a data point in space, revealing unexpected adjacencies, subject clusters, and the gaps that define our collective understanding.',
+                data: [
+                    { value: '200k+', label: 'Items Catalogued' },
+                    { value: '500+', label: 'Subject Tags' },
+                    { value: '4', label: 'Floor Levels' },
+                    { value: '1836', label: 'Earliest Item' }
+                ]
+            },
+            spatial: {
+                title: 'Spatial Architecture',
+                meta: '8,500 Sq Ft / Built 1838',
+                text1: 'An investigation into how physical space shapes intellectual discovery. Heat mapping reveals the zones where serendipity occurs most frequently.',
+                text2: 'Transitional spaces—staircases, thresholds, alcoves—emerge as sites of unexpected collision between disciplines, where the architecture itself becomes an agent of knowledge.',
+                data: [
+                    { value: '8,500', label: 'Square Feet' },
+                    { value: '42', label: 'Reading Spaces' },
+                    { value: '73%', label: 'Natural Light' },
+                    { value: '186', label: 'Years Standing' }
+                ]
+            },
+            temporal: {
+                title: 'Temporal Evolution',
+                meta: '190 Years / 1836-2024',
+                text1: 'A timeline visualization charting the intellectual currents that have shaped the collection from its founding to the present moment.',
+                text2: 'By analyzing acquisition patterns and circulation histories across nearly two centuries, we observe the library as a living organism—documenting, adapting, and reflecting the evolving consciousness of its community.',
+                data: [
+                    { value: '190', label: 'Years Documented' },
+                    { value: '12k', label: 'Books Per Decade' },
+                    { value: '45', label: 'Languages' },
+                    { value: '∞', label: 'Future Growth' }
+                ]
+            }
+        };
+
+        function toggleMenu() {
+            document.querySelector('.fullscreen-menu').classList.toggle('active');
+        }
+
+        function openPanel(vizId) {
+            const panel = document.getElementById('sidePanel');
+            const overlay = document.getElementById('overlay');
+            const content = document.getElementById('panelContent');
+            const viz = visualizations[vizId];
+
+            const dataHTML = viz.data.map(item => 
+                `<div class="data-item">
+                    <div class="data-value">${item.value}</div>
+                    <div class="data-label">${item.label}</div>
+                </div>`
+            ).join('');
+
+            content.innerHTML = `
+                <h2 class="panel-title">${viz.title}</h2>
+                <div class="panel-meta">${viz.meta}</div>
+                <p class="panel-text">${viz.text1}</p>
+                <p class="panel-text">${viz.text2}</p>
+                <div class="data-grid">
+                    ${dataHTML}
+                </div>
+            `;
+
+            panel.classList.add('active');
+            overlay.classList.add('active');
+        }
+
+        function closePanel() {
+            document.getElementById('sidePanel').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+        }
+
+        // Toggle info panel
+        function toggleInfo() {
+            const infoPanel = document.getElementById('infoPanel');
+            infoPanel.classList.toggle('active');
+        }
+
+        // Kinetic Typography - Split text into individual characters
+        function initKineticText() {
+            const kineticText = document.getElementById('kineticText');
+            const lines = kineticText.querySelectorAll('.word-line');
+            
+            lines.forEach(line => {
+                const text = line.textContent;
+                line.innerHTML = '';
+                
+                for (let i = 0; i < text.length; i++) {
+                    const span = document.createElement('span');
+                    span.className = 'char';
+                    span.textContent = text[i];
+                    
+                    // Give each letter a truly unique random value
+                    const randomValue = Math.random();
+                    span.style.setProperty('--random', randomValue);
+                    span.style.setProperty('--index', i);
+                    
+                    // Randomize animation delay so letters don't sync up
+                    span.style.animationDelay = `${Math.random() * 5}s`;
+                    
+                    line.appendChild(span);
+                }
+            });
+        }
+
+        // Add hover scatter effect like ryanyan.ca
+        function addHoverEffect() {
+            const kineticText = document.getElementById('kineticText');
+            const chars = kineticText.querySelectorAll('.char');
+            
+            kineticText.addEventListener('mousemove', (e) => {
+                chars.forEach(char => {
+                    const rect = char.getBoundingClientRect();
+                    const charCenterX = rect.left + rect.width / 2;
+                    const charCenterY = rect.top + rect.height / 2;
+                    
+                    const deltaX = e.clientX - charCenterX;
+                    const deltaY = e.clientY - charCenterY;
+                    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                    
+                    // Only affect letters within 150px radius
+                    if (distance < 150) {
+                        char.classList.add('hover-active');
+                        const force = (150 - distance) / 150;
+                        const pushX = -(deltaX / distance) * force * 40;
+                        const pushY = -(deltaY / distance) * force * 40;
+                        const rotate = force * 20 * (Math.random() > 0.5 ? 1 : -1);
+                        
+                        char.style.transform = `translate(${pushX}px, ${pushY}px) rotate(${rotate}deg)`;
+                    } else {
+                        char.classList.remove('hover-active');
+                        char.style.transform = '';
+                    }
+                });
+            });
+            
+            kineticText.addEventListener('mouseleave', () => {
+                chars.forEach(char => {
+                    char.classList.remove('hover-active');
+                    char.style.transform = '';
+                });
+            });
+        }
+
+        // Initialize kinetic text on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            initKineticText();
+            addHoverEffect();
+        });
+    </script>
+</body>
+</html>
