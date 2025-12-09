@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=1920, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Providence Athenaeum - Mapping Knowledge</title>
     <style>
         /* Custom Fonts - Affairs and Monument Grotesk Mono */
@@ -259,9 +259,7 @@
             will-change: transform;
         }
 
-        .stacked-image:hover {
-            z-index: 999 !important;
-        }
+    
 
         .stacked-image.dragging {
             opacity: 0.95;
@@ -311,19 +309,23 @@
             color: var(--black);
         }
 
-        .stacked-image-label {
-            position: absolute;
-            top: 1rem;
-            left: 1rem;
-            text-align: left;
-            font-family: 'Monument Grotesk Mono', monospace;
-            font-size: 0.65rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--white);
-            opacity: 0.7;
-            pointer-events: none;
-        }
+       .stacked-image-label {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;  /* Allows wrapping */
+    text-align: left;
+    font-family: 'Monument Grotesk Mono', monospace;
+    font-size: 0.5rem;  /* Smaller for long captions */
+    letter-spacing: 0.5px;  /* Tighter */
+    text-transform: uppercase;
+    color: var(--white);
+    pointer-events: none;
+    mix-blend-mode: difference;
+    line-height: 1.4;  /* Better line spacing for multi-line */
+    opacity: 0.8;  /* Subtle */
+    max-width: 30%;  /* Prevents stretching across entire width */
+}
 
         /* Image Controls inside each image */
         .image-controls-inner {
@@ -866,30 +868,65 @@
             line-height: 1.6;
             font-family: 'Monument Grotesk Mono', monospace;
         }
+        
+        .viz-btn {
+    background: transparent;
+    border: 2px solid var(--black);  /* Thicker border - was 1px */
+    color: var(--black);
+    font-family: 'Monument Grotesk Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 0.7rem;
+    white-space: nowrap;
+    opacity: 0.9;  /* Slightly visible always */
+}
+
+.viz-btn:hover {
+    background: var(--black);
+    color: var(--white);
+    opacity: 1;
+}
+
+.viz-item:hover .viz-btn {
+    border-color: var(--black);  /* Keep black border on hover */
+    color: var(--black);
+    background: rgba(255, 255, 255, 0.9);  /* Slight white background */
+    opacity: 1;
+}
+
+.viz-item:hover .viz-btn:hover {
+    background: var(--black);
+    color: var(--white);
+    border-color: var(--black);
+}
 
         .side-panel {
-            position: fixed;
-            right: -100%;
-            top: 0;
-            width: 50vw;
-            height: 100vh;
-            background: var(--white);
-            color: var(--black);
-            z-index: 101;
-            transition: right 0.6s cubic-bezier(0.77, 0, 0.175, 1);
-            overflow-y: auto;
-        }
+    position: fixed;
+    right: -100%;
+    top: 0;
+    width: 50vw;  /* Changed back from 100vw */
+    height: 100vh;
+    background: var(--white);
+    color: var(--black);
+    z-index: 101;
+    transition: right 0.6s cubic-bezier(0.77, 0, 0.175, 1);
+    overflow-y: auto;
+}
 
         .side-panel.active {
             right: 0;
         }
 
         .panel-header {
-            padding: 3rem;
-            display: flex;
-            justify-content: flex-end;
-            border-bottom: 1px solid var(--black);
-        }
+    padding: 1rem 3rem;  /* Even tighter */
+    display: flex;
+    justify-content: flex-end;
+    border-bottom: 1px solid var(--black);
+}
 
         .close-panel {
             cursor: pointer;
@@ -908,9 +945,15 @@
         }
 
         .panel-content {
-            padding: 3rem;
-        }
-
+    padding: 3rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: 60vh;
+}
+          
         .panel-title {
             font-size: clamp(2rem, 5vw, 4rem);
             margin-bottom: 2rem;
@@ -929,12 +972,31 @@
         }
 
         .panel-text {
-            font-size: 1rem;
-            line-height: 1.8;
-            margin-bottom: 2rem;
-            font-family: 'Affairs', serif;
-            user-select: text;
-        }
+    font-size: 1.25rem;  /* Bigger text - increased from 1rem */
+    line-height: 1.3;    /* Smaller leading - decreased from 1.8 */
+    margin-bottom: 2rem;
+    font-family: 'Affairs', serif;
+    user-select: text;
+}
+.panel-data-btn {
+    background: transparent;
+    border: 2px solid var(--black);
+    color: var(--black);
+    font-family: 'Monument Grotesk Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 1rem 2.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1.5rem;
+    margin-bottom: 3rem;  /* Add this line - space after button */
+    white-space: nowrap;
+}
+.panel-data-btn:hover {
+    background: var(--black);
+    color: var(--white);
+}
 
         .data-grid {
             display: grid;
@@ -1034,7 +1096,7 @@
         .info-panel p {
             font-family: 'Affairs', serif;
             font-size: 1rem;
-            line-height: 1.8;
+            line-height: 1.35;
             margin-bottom: 1.5rem;
             user-select: text;
         }
@@ -1051,6 +1113,32 @@
         .info-section {
             margin-bottom: 2rem;
         }
+        .quote-highlight {
+    margin: 2.5rem 0;
+    padding: 1.5rem;
+    border-left: 3px solid var(--black);
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.quote-highlight p {
+    font-size: 1.3rem;
+    font-style: italic;
+    margin-bottom: 0;
+    opacity: 0.9;
+}
+
+.credits-text {
+    line-height: 1.6;
+}
+
+.credits-text strong {
+    font-family: 'Monument Grotesk Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    opacity: 0.6;
+    font-weight: 400;
+}
 
         .info-section-title {
             font-family: 'Monument Grotesk Mono', monospace;
@@ -1295,16 +1383,16 @@
         </div>
         <div class="nav-right">
             <button class="menu-toggle" onclick="toggleMenu()">[ Menu ]</button>
-            <div class="nav-item">2024</div>
+            <div class="nav-item">2025</div>
         </div>
     </nav>
 
     <div class="fullscreen-menu">
         <ul class="menu-items">
-            <li><a href="#data" onclick="toggleMenu()">Visualizations</a></li>
-            <li><a href="#about" onclick="toggleMenu()">About</a></li>
-            <li><a href="#archive" onclick="toggleMenu()">Archive</a></li>
-            <li><a href="#contact" onclick="toggleMenu()">Contact</a></li>
+            <li><a href="index3.html" onclick="toggleMenu()">Come Hither</a></li>
+            <li><a href="index2.html" onclick="toggleMenu()">Investigate</a></li>
+            <li><a href="Chair web" onclick="toggleMenu()">Sanctuary</a></li>
+            <li><a href="index.html" onclick="toggleMenu()">Correspondnce</a></li>
         </ul>
     </div>
 
@@ -1322,35 +1410,39 @@
         <div class="ornament-pattern top-left"></div>
         <div class="ornament-pattern bottom-right"></div>
         <div class="viz-container">
-            <div class="viz-item" onclick="openPanel('circulation')">
-                <div class="viz-number">[ 01 ]</div>
-                <div class="viz-content">
-                    <h3 class="viz-title">Circulation<br>Patterns</h3>
-                    <p class="viz-desc">Temporal flows of knowledge through space</p>
-                </div>
-            </div>
-            <div class="viz-item" onclick="openPanel('taxonomy')">
-                <div class="viz-number">[ 02 ]</div>
-                <div class="viz-content">
-                    <h3 class="viz-title">Collection<br>Taxonomy</h3>
-                    <p class="viz-desc">Cartography of literary classification</p>
-                </div>
-            </div>
-            <div class="viz-item" onclick="openPanel('spatial')">
-                <div class="viz-number">[ 03 ]</div>
-                <div class="viz-content">
-                    <h3 class="viz-title">Spatial<br>Architecture</h3>
-                    <p class="viz-desc">Physical dimension of information</p>
-                </div>
-            </div>
-            <div class="viz-item" onclick="openPanel('temporal')">
-                <div class="viz-number">[ 04 ]</div>
-                <div class="viz-content">
-                    <h3 class="viz-title">Temporal<br>Evolution</h3>
-                    <p class="viz-desc">190 years of cultural memory</p>
-                </div>
-            </div>
+    <div class="viz-item" onclick="openPanel('circulation')">
+        <div class="viz-number">[ 01 ]</div>
+        <div class="viz-content">
+            <h3 class="viz-title">Come<br>Hither</h3>
+            <p class="viz-desc">Flows and records</p>
+            <button class="viz-btn" onclick="event.stopPropagation(); window.open('index3.html')">[ Take Me To The Data ]</button>
         </div>
+    </div>
+    <div class="viz-item" onclick="openPanel('taxonomy')">
+        <div class="viz-number">[ 02 ]</div>
+        <div class="viz-content">
+            <h3 class="viz-title">Exterior<br>Investigation</h3>
+            <p class="viz-desc">The work behind the walls</p>
+            <button class="viz-btn" onclick="event.stopPropagation(); window.open('index2.html', '_blank')">[ Take Me To The Data ]</button>
+        </div>
+    </div>
+    <div class="viz-item" onclick="openPanel('spatial')">
+        <div class="viz-number">[ 03 ]</div>
+        <div class="viz-content">
+            <h3 class="viz-title">Seeking<br>Sanctuary</h3>
+            <p class="viz-desc">Making a corner your own</p>
+            <button class="viz-btn" onclick="event.stopPropagation(); window.open('Chair web', '_blank')">[ Take Me To The Data ]</button>
+        </div>
+    </div>
+    <div class="viz-item" onclick="openPanel('temporal')">
+        <div class="viz-number">[ 04 ]</div>
+        <div class="viz-content">
+            <h3 class="viz-title">Conceal<br>Correspondnce</h3>
+            <p class="viz-desc">Notes left for strangers</p>
+            <button class="viz-btn" style="visibility: hidden;" onclick="event.stopPropagation(); window.open('#', '_blank')">[ Take Me To The Data ]</button>
+        </div>
+    </div>
+</div>
     </section>
 
     <div class="side-panel" id="sidePanel">
@@ -1365,28 +1457,47 @@
     </div>
 
     <div class="info-panel" id="infoPanel">
-        <div class="info-panel-content">
-            <div class="info-section">
-                <div class="info-section-title">Overview</div>
-                <p>Personalizing the Impersonal is a data visualization project that explores the spatial, temporal, and social dimensions of the Providence Athenaeum, one of America's oldest independent libraries.</p>
-                <p>Through mapping circulation patterns, collection taxonomies, and architectural spaces, this project reveals the invisible networks that connect readers, books, and knowledge across 190 years of cultural memory.</p>
-            </div>
+    <div class="info-panel-content">
+        <div class="info-section">
+            <div class="info-section-title">About</div>
+            <p>The Athenaeum is an independent, membership-based library located on Benefit Street in Providence, Rhode Island. Established in 1836, it is one of the oldest libraries in the United States, serving as a center for learning, reading, and community programs for generations.</p>
+            
+            <p>"Personalize the Impersonal"</p>
+            
+            <p>The Athenaeum's entrance stands prominently at the corner of Benefit Street. The stone steps leading up may seem imposing at first, but they are a hallmark of its historic character, conveying a sense of tradition and architectural significance.</p>
+        </div>
+        
+        <div class="info-section">
+            <div class="info-section-title">Experience</div>
+            <p>Once inside, patrons are greeted by a warm and inviting atmosphere. The library's interior features tall bookshelves, comfortable seating, and displays of artifacts and historical objects.</p>
+            
+            <p>Visitors are encouraged to explore the collection, appreciate the unique architecture, and learn about the library's role in the local community. Patrons have the freedom to choose their own seats, find a quiet corner to read or study, and spend time as they wish.</p>
+            
+            <p>Over time, each person contributes to the library's atmosphere, making it a unique and memorable place for everyone who visits.</p>
+        </div>
+        
+        <div class="info-section">
+            <div class="info-section-title">Credits</div>
+            <p class="credits-text">
+                <strong>Design & Research</strong><br>
+  Punch Kulphisanrat<br>
+  Fah Prayottavekit<br>
+  Yi-Tung Chen (Antonio)<br><br>
 
-            <div class="info-section">
-                <div class="info-section-title">Methodology</div>
-                <p>We analyzed over 200,000 catalogued items, 52,000+ circulation events, and conducted spatial surveys of the building's architecture to create a comprehensive data portrait of the library.</p>
-                <p>The visualizations combine quantitative data analysis with qualitative spatial observation to reveal patterns in how knowledge circulates through physical and temporal space.</p>
-            </div>
+  <strong>Location</strong><br>
+  The Providence Athenaeum<br><br>
 
-            <div class="info-section">
-                <div class="info-section-title">Credits</div>
-                <p>Design & Research: [Your Name]<br>
-                Institution: Providence Athenaeum<br>
-                Typography: Affairs by SM Typeface Design, Monument Grotesk Mono by ABC Dinamo<br>
-                Year: 2024</p>
-            </div>
+  <strong>Typefaces</strong><br>
+  Affairs by SM Typeface Design<br>
+  Monument Grotesk Mono by ABC Dinamo<br><br>
+
+  <strong>Year</strong><br>
+  RISD 2025
+</div>
+            </p>
         </div>
     </div>
+</div>
 
     <div class="overlay" id="overlay" onclick="closePanel()"></div>
 
@@ -1411,10 +1522,11 @@
 
         const visualizations = {
             circulation: {
-                title: 'Circulation Patterns',
+                title: 'Come Hither',
                 meta: '52,847 Checkouts Analyzed / 2020-2024',
-                text1: 'An exploration of how books move through the library ecosystem, revealing the invisible networks that connect readers, subjects, and time.',
-                text2: 'Through visualization of checkout patterns, we map the pulse of intellectual curiosity—peak hours, seasonal trends, and the unexpected paths that certain texts trace through different communities.',
+                text1: 'The fountain at the Athenaeum is more than just a decorative element—it serves as a welcoming symbol for everyone who visits. Flowing from the fountain is water that replenishes the weary, refreshes the wanderers, and revives the worriers. Its steady presence provides a sense of calm and relaxation, inviting people to pause and enjoy a moment of reflection. The fountain acts as a centerpiece for the garden, bringing together visitors from various backgrounds who come to learn, study, or simply take a break from their busy lives. The motion of the water mirrors the dynamic atmosphere inside the library, where activities and interactions continually change throughout the day.',
+                text2: 'This connection between the fountain and the library’s physical space highlights the Athenaeum’s commitment to being an inviting and accessible place for everyone. The fountain is the library’s offering to Providence, symbolizing its dedication to serving the community. Before entering the Athenaeum’s gated garden, visitors are greeted by the gentle sound and sight of the flowing water.  The presence of the fountain reinforces the idea that the Athenaeum is a place of comfort and generosity, open to all who seek knowledge or a peaceful environment. Bestowing you with unconditional grace, the library declares its invitation: “Come Hither!” it seems to yell. So come hither we did.',
+                link: 'index3.html',
                 data: [
                     { value: '52,847', label: 'Total Checkouts' },
                     { value: '3.2', label: 'Avg Per Patron' },
@@ -1423,10 +1535,11 @@
                 ]
             },
             taxonomy: {
-                title: 'Collection Taxonomy',
+                title: 'Exterior Investigation',
                 meta: '200,000+ Items / Complete Archive',
-                text1: 'A reimagining of library classification that layers Dewey Decimal with spatial coordinates, creating a three-dimensional architecture of knowledge.',
-                text2: 'Each book becomes a data point in space, revealing unexpected adjacencies, subject clusters, and the gaps that define our collective understanding.',
+                text1: 'Step into the storied halls of the Athenaeum, where history lingers in sunlit dust and echoes through ancient shelves. Better understand the rich tapestry of its past and present by hearing from Stephanie, the Head of Research & Library Services at the Providence Athenaeum.',
+                text2: 'Observe the harmonious rhythm by which the library is operated—a quiet choreography as librarians glide between stacks, collaborating to maintain, preserve, and renew the wisdom housed within these venerable walls.Through the lens of the exterior space, viewers glimpse the steadfast devotion required to sustain such a historic haven. Ancient stones and weathered façades whisper of the ceaseless labor beneath the surface—each repair, each restoration, a love letter to time itself. Here, the Athenaeum stands not only as a monument, but as a living poem, composed daily by all who cherish its legacy.',
+                link: 'index2.html',
                 data: [
                     { value: '200k+', label: 'Items Catalogued' },
                     { value: '500+', label: 'Subject Tags' },
@@ -1435,10 +1548,11 @@
                 ]
             },
             spatial: {
-                title: 'Spatial Architecture',
+                title: 'Seeking Sanctuary',
                 meta: '8,500 Sq Ft / Built 1838',
-                text1: 'An investigation into how physical space shapes intellectual discovery. Heat mapping reveals the zones where serendipity occurs most frequently.',
-                text2: 'Transitional spaces—staircases, thresholds, alcoves—emerge as sites of unexpected collision between disciplines, where the architecture itself becomes an agent of knowledge.',
+                text1: 'Each corner of the Athenaeum provides patrons with the opportunity to create a space that suits their individual needs. Whether someone is searching for a quiet nook to read in solitude or a comfortable area to work, the library accommodates a range of preferences. The option to turn on or off the lights allows visitors to set the atmosphere to their liking. Different types of chairs are available to suit various levels of privacy and comfort, and the ladders offer access to higher shelves, encouraging exploration of the library’s extensive collection.',
+                text2: 'We offer the same level of autonomy through various interactive features designed to help you personalize your experience at the Athenaeum. You can expand your chosen area to make it more spacious, or resize your corner for a more private and cozy feel. Adjust the layout by moving ladders and chairs to suit your preferences, and place signage wherever it is most helpful or relevant to you. The library encourages creative use of the space—add objects that make your area functional, comfortable, or uniquely yours. There are different types of chairs and seating arrangements to match your needs, whether you prefer a quiet individual space or a spot for small group discussions. By making these adjustments, you transform a shared environment into a personalized retreat that reflects your habits and interests. The Athenaeum values this flexibility, knowing it helps every visitor feel more at home and invested in their surroundings.',
+                link: 'Chair web',
                 data: [
                     { value: '8,500', label: 'Square Feet' },
                     { value: '42', label: 'Reading Spaces' },
@@ -1447,10 +1561,10 @@
                 ]
             },
             temporal: {
-                title: 'Temporal Evolution',
+                title: 'Conceal Correspondence',
                 meta: '190 Years / 1836-2024',
-                text1: 'A timeline visualization charting the intellectual currents that have shaped the collection from its founding to the present moment.',
-                text2: 'By analyzing acquisition patterns and circulation histories across nearly two centuries, we observe the library as a living organism—documenting, adapting, and reflecting the evolving consciousness of its community.',
+                text1: 'Embark on a deep exploration of the Athenaeum and you will discover the hidden troves of handwritten letters scattered throughout its quiet alcoves and shelves. In the gentle solitude offered by the library, thinkers and dreamers alike have put pencil to paper, pouring out their hopes, fears, and reflections. Each letter is a testament to the generosity of the space—a living archive where the writer’s soul breathes life into the centuries-old building. These missives range from confessions to unrequited lovers, to regretful memoirs weighed down by memory, to declarations of purpose and longing. Together, they form a tapestry of disparate souls, each drawn by the same subtle gravity to the sanctuary that is the Athenaeum.',
+                text2: 'Respondents of these letters have read and listened to the woes and wonders, expressing their amicable joy or undiluted concerns. This ongoing exchange of written words weaves a dialogue across generations. Join the patrons; Write your own letters, respond to those that move you, and contribute your voice to the ever-growing catalogue of stories that fill the Athenaeum’s walls. Reify your thoughts and materialize whatever stories might be weighing your soul down. The Athenaeum welcomes your expressions, offering a space of requiem and quiet peace where your words can find a home. We permit you to claim it as your own.',
                 data: [
                     { value: '190', label: 'Years Documented' },
                     { value: '12k', label: 'Books Per Decade' },
@@ -1465,31 +1579,28 @@
         }
 
         function openPanel(vizId) {
-            const panel = document.getElementById('sidePanel');
-            const overlay = document.getElementById('overlay');
-            const content = document.getElementById('panelContent');
-            const viz = visualizations[vizId];
+    const panel = document.getElementById('sidePanel');
+    const overlay = document.getElementById('overlay');
+    const content = document.getElementById('panelContent');
+    const viz = visualizations[vizId];
 
-            const dataHTML = viz.data.map(item => 
-                `<div class="data-item">
-                    <div class="data-value">${item.value}</div>
-                    <div class="data-label">${item.label}</div>
-                </div>`
-            ).join('');
+    // Create button HTML only if it's NOT the temporal visualization
+    const buttonHTML = vizId !== 'temporal' ? `
+        <button class="panel-data-btn" onclick="window.open('${viz.link}', '_blank')">
+            [ Take Me To The Data ]
+        </button>
+    ` : '';
 
-            content.innerHTML = `
-                <h2 class="panel-title">${viz.title}</h2>
-                <div class="panel-meta">${viz.meta}</div>
-                <p class="panel-text">${viz.text1}</p>
-                <p class="panel-text">${viz.text2}</p>
-                <div class="data-grid">
-                    ${dataHTML}
-                </div>
-            `;
+    content.innerHTML = `
+        <h2 class="panel-title">${viz.title}</h2>
+        <p class="panel-text">${viz.text1}</p>
+        <p class="panel-text">${viz.text2}</p>
+        ${buttonHTML}
+    `;
 
-            panel.classList.add('active');
-            overlay.classList.add('active');
-        }
+    panel.classList.add('active');
+    overlay.classList.add('active');
+}
 
         function closePanel() {
             document.getElementById('sidePanel').classList.remove('active');
@@ -1561,17 +1672,16 @@
             });
         }
 
-        const thumbnailData = [
-            { id: 1, label: 'Circulation Flow', image: 'data:image/svg+xml,%3Csvg width="400" height="400" xmlns="http://www.w3.org/2000/svg"%3E%3Crect fill="%23000" width="400" height="400"/%3E%3Cg stroke="%23fff" fill="none" stroke-width="2"%3E%3Ccircle cx="200" cy="200" r="150"/%3E%3Ccircle cx="200" cy="200" r="100"/%3E%3Ccircle cx="200" cy="200" r="50"/%3E%3Cline x1="200" y1="50" x2="200" y2="150"/%3E%3Cline x1="200" y1="250" x2="200" y2="350"/%3E%3Cline x1="50" y1="200" x2="150" y2="200"/%3E%3Cline x1="250" y1="200" x2="350" y2="200"/%3E%3C/g%3E%3C/svg%3E' },
-            { id: 2, label: 'Archive Grid', image: 'data:image/svg+xml,%3Csvg width="400" height="400" xmlns="http://www.w3.org/2000/svg"%3E%3Crect fill="%23000" width="400" height="400"/%3E%3Cg stroke="%23fff" fill="none" stroke-width="1"%3E%3Crect x="50" y="50" width="100" height="100"/%3E%3Crect x="150" y="50" width="100" height="100"/%3E%3Crect x="250" y="50" width="100" height="100"/%3E%3Crect x="50" y="150" width="100" height="100"/%3E%3Crect x="150" y="150" width="100" height="100"/%3E%3Crect x="250" y="150" width="100" height="100"/%3E%3Crect x="50" y="250" width="100" height="100"/%3E%3Crect x="150" y="250" width="100" height="100"/%3E%3Crect x="250" y="250" width="100" height="100"/%3E%3C/g%3E%3C/svg%3E' },
-            { id: 3, label: 'Dewey Network', image: 'data:image/svg+xml,%3Csvg width="400" height="400" xmlns="http://www.w3.org/2000/svg"%3E%3Crect fill="%23000" width="400" height="400"/%3E%3Cg stroke="%23fff" fill="none" stroke-width="1"%3E%3Cline x1="200" y1="100" x2="100" y2="200"/%3E%3Cline x1="200" y1="100" x2="300" y2="200"/%3E%3Cline x1="100" y1="200" x2="50" y2="300"/%3E%3Cline x1="100" y1="200" x2="150" y2="300"/%3E%3Cline x1="300" y1="200" x2="250" y2="300"/%3E%3Cline x1="300" y1="200" x2="350" y2="300"/%3E%3Ccircle cx="200" cy="100" r="15" fill="%23fff"/%3E%3Ccircle cx="100" cy="200" r="12" fill="%23fff"/%3E%3Ccircle cx="300" cy="200" r="12" fill="%23fff"/%3E%3Ccircle cx="50" cy="300" r="10" fill="%23fff"/%3E%3Ccircle cx="150" cy="300" r="10" fill="%23fff"/%3E%3Ccircle cx="250" cy="300" r="10" fill="%23fff"/%3E%3Ccircle cx="350" cy="300" r="10" fill="%23fff"/%3E%3C/g%3E%3C/svg%3E' },
-            { id: 4, label: 'Floor Plan', image: 'data:image/svg+xml,%3Csvg width="400" height="400" xmlns="http://www.w3.org/2000/svg"%3E%3Crect fill="%23000" width="400" height="400"/%3E%3Cg stroke="%23fff" fill="none" stroke-width="2"%3E%3Crect x="50" y="100" width="300" height="200"/%3E%3Crect x="100" y="150" width="80" height="100"/%3E%3Crect x="220" y="150" width="80" height="100"/%3E%3Cline x1="50" y1="200" x2="100" y2="200" stroke-dasharray="5,5"/%3E%3Cline x1="300" y1="200" x2="350" y2="200" stroke-dasharray="5,5"/%3E%3C/g%3E%3C/svg%3E' },
-            { id: 5, label: 'Time Series', image: 'data:image/svg+xml,%3Csvg width="400" height="400" xmlns="http://www.w3.org/2000/svg"%3E%3Crect fill="%23000" width="400" height="400"/%3E%3Cg stroke="%23fff" fill="none" stroke-width="2"%3E%3Cpolyline points="50,300 100,250 150,280 200,180 250,220 300,120 350,150"/%3E%3Cline x1="50" y1="50" x2="50" y2="350" stroke-width="1"/%3E%3Cline x1="50" y1="350" x2="350" y2="350" stroke-width="1"/%3E%3C/g%3E%3C/svg%3E' },
-            { id: 6, label: 'Spatial Heat', image: 'data:image/svg+xml,%3Csvg width="400" height="400" xmlns="http://www.w3.org/2000/svg"%3E%3Crect fill="%23000" width="400" height="400"/%3E%3Cg fill="%23fff" opacity="0.2"%3E%3Ccircle cx="150" cy="150" r="80"/%3E%3Ccircle cx="250" cy="200" r="60"/%3E%3Ccircle cx="180" cy="280" r="70"/%3E%3C/g%3E%3Cg stroke="%23fff" fill="none" stroke-width="1"%3E%3Ccircle cx="150" cy="150" r="80"/%3E%3Ccircle cx="250" cy="200" r="60"/%3E%3Ccircle cx="180" cy="280" r="70"/%3E%3C/g%3E%3C/svg%3E' },
-            { id: 7, label: 'Collection Map', image: 'data:image/svg+xml,%3Csvg width="400" height="400" xmlns="http://www.w3.org/2000/svg"%3E%3Crect fill="%23000" width="400" height="400"/%3E%3Cg stroke="%23fff" fill="none" stroke-width="1.5"%3E%3Cpath d="M200,50 L350,150 L300,300 L100,300 L50,150 Z"/%3E%3Cpath d="M200,100 L300,170 L270,260 L130,260 L100,170 Z"/%3E%3Cline x1="200" y1="50" x2="200" y2="100"/%3E%3Cline x1="350" y1="150" x2="300" y2="170"/%3E%3Cline x1="300" y1="300" x2="270" y2="260"/%3E%3Cline x1="100" y1="300" x2="130" y2="260"/%3E%3Cline x1="50" y1="150" x2="100" y2="170"/%3E%3C/g%3E%3C/svg%3E' },
-            { id: 8, label: 'Reader Paths', image: 'data:image/svg+xml,%3Csvg width="400" height="400" xmlns="http://www.w3.org/2000/svg"%3E%3Crect fill="%23000" width="400" height="400"/%3E%3Cg stroke="%23fff" fill="none" stroke-width="2"%3E%3Cpath d="M50,200 Q150,100 200,200 T350,200" stroke-dasharray="10,5"/%3E%3Cpath d="M50,150 Q100,250 200,150 T350,150" stroke-dasharray="10,5" opacity="0.6"/%3E%3Cpath d="M50,250 Q180,180 200,250 T350,250" stroke-dasharray="10,5" opacity="0.4"/%3E%3C/g%3E%3C/svg%3E' }
-        ];
-
+      const thumbnailData = [
+    { id: 1, label: 'One of the Many Unique Chairs in the Atheneum ', image: 'img/img1.jpg' },
+    { id: 2, label: 'Texture from an Old Chair in  the Atheneum', image: 'img/img2.jpg' },
+    { id: 3, label: 'The Providence Athenaeum on Benefit Street in Providence, around 1906', image: 'img/img3.jpg' },
+    { id: 4, label: 'Richmond Fountain', image: 'img/img4.jpg' },
+    { id: 5, label: 'Project for Lecture Hall: Longitudinal Section]. Ink, Pencil on Paper, CA. 1835. Providence Athenaeum: Russell Warren Drawings 168B', image: 'img/img5.jpg' },
+    { id: 6, label: ' Project for Lecture Hall: Front Elevation and Transverse Section]. Ink, Pencil on Paper, CA. 1835. Providence Athenaeum: Russell Warren Drawings 168A (Framed)', image: 'img/img6.jpg' },
+    { id: 7, label: 'Providence Athenaeum, Transverse Section]. Ink, Pencil and Watercolor on Paper, 1836. Providence Athenaeum: William Strickland Drawings 134B (Framed)', image: 'img/img7.jpg' },
+    { id: 8, label: 'Project for Lecture Hall: First Floor Plan]. Ink, Pencil on Paper, CA. 1835. Providence Athenaeum: Russell Warren Drawings 168C', image: 'img/img8.jpg' }
+];
         function initThumbnails() {
             const container = document.getElementById('thumbnailContainer');
             // More dynamic, balanced distribution around all edges
@@ -1602,9 +1712,8 @@
                 thumb.style.setProperty('--initial-rotation', `${pos.rotation}deg`);
                 
                 thumb.innerHTML = `
-                    <img src="${data.image}" alt="${data.label}">
-                    <div class="thumbnail-label">${data.label}</div>
-                `;
+    <img src="${data.image}" alt="${data.label}">
+`;
                 
                 makeThumbnailDraggable(thumb, data);
                 container.appendChild(thumb);
@@ -1686,47 +1795,58 @@
         }
 
         let stackCount = 0;
-        function createStackedImage(data) {
-            const container = document.getElementById('stackedImages');
-            const stackedDiv = document.createElement('div');
-            stackedDiv.className = 'stacked-image';
-            
-            const offsetX = (Math.random() - 0.5) * 40;
-            const offsetY = (Math.random() - 0.5) * 40;
-            const rotation = (Math.random() - 0.5) * 6;
-            
-            stackedDiv.style.left = `calc(50% + ${offsetX}px)`;
-            stackedDiv.style.top = `calc(50% + ${offsetY}px)`;
-            stackedDiv.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
-            stackedDiv.style.zIndex = 50 + stackCount++;
-            
-            stackedDiv.innerHTML = `
-                <button class="stacked-image-close">×</button>
-                <div class="stacked-image-label">[ ${data.label} ]</div>
-                <img src="${data.image}" alt="${data.label}">
-                <div class="image-controls-inner">
-                    <button class="control-btn-inner" onclick="nextImage(event)">[ Next ]</button>
-                    <button class="control-btn-inner" onclick="clearAllImages(event)">[ Clear All ]</button>
-                </div>
-            `;
-            
-            stackedDiv.querySelector('.stacked-image-close').addEventListener('click', (e) => {
-                e.stopPropagation();
-                stackedDiv.remove();
-            });
-            
-            makeDraggable(stackedDiv);
-            container.appendChild(stackedDiv);
-        }
+function createStackedImage(data) {
+    const container = document.getElementById('stackedImages');
+    const stackedDiv = document.createElement('div');
+    stackedDiv.className = 'stacked-image';
+    
+    const offsetX = (Math.random() - 0.5) * 40;
+    const offsetY = (Math.random() - 0.5) * 40;
+    const rotation = (Math.random() - 0.5) * 6;
+    
+    stackedDiv.style.left = `calc(50% + ${offsetX}px)`;
+    stackedDiv.style.top = `calc(50% + ${offsetY}px)`;
+    stackedDiv.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+    
+    // FIND THE HIGHEST Z-INDEX AND ADD 1
+    const allImages = document.querySelectorAll('.stacked-image');
+    let maxZ = 50;
+    allImages.forEach(img => {
+        const z = parseInt(img.style.zIndex) || 50;
+        if (z > maxZ) maxZ = z;
+    });
+    stackedDiv.style.zIndex = maxZ + 1;
+    
+    stackedDiv.innerHTML = `
+        <button class="stacked-image-close">×</button>
+        <div class="stacked-image-label">[ ${data.label} ]</div>
+        <img src="${data.image}" alt="${data.label}">
+        <div class="image-controls-inner">
+            <button class="control-btn-inner" onclick="nextImage(event)">[ Next ]</button>
+            <button class="control-btn-inner" onclick="clearAllImages(event)">[ Clear All ]</button>
+        </div>
+    `;
+    
+    stackedDiv.querySelector('.stacked-image-close').addEventListener('click', (e) => {
+        e.stopPropagation();
+        stackedDiv.remove();
+    });
+    
+    makeDraggable(stackedDiv);
+    container.appendChild(stackedDiv);
+}
 
-        function nextImage(event) {
-            event.stopPropagation();
-            
-            const randomIndex = Math.floor(Math.random() * thumbnailData.length);
-            const nextData = thumbnailData[randomIndex];
-            
-            createStackedImage(nextData);
-        }
+        let currentImageIndex = 0;
+
+function nextImage(event) {
+    event.stopPropagation();
+    
+    // Move to next image in array
+    currentImageIndex = (currentImageIndex + 1) % thumbnailData.length;
+    const nextData = thumbnailData[currentImageIndex];
+    
+    createStackedImage(nextData);
+}
 
         function clearAllImages(event) {
             if (event) event.stopPropagation();
@@ -1760,7 +1880,13 @@
 
                 isDragging = true;
                 element.classList.add('dragging');
-                element.style.zIndex = 50 + stackCount++;
+                const allImages = document.querySelectorAll('.stacked-image');
+                let maxZ = 50;
+                allImages.forEach(img => {
+                    const z = parseInt(img.style.zIndex) || 50;
+                    if (z > maxZ) maxZ = z;
+                });
+                element.style.zIndex = maxZ + 1;
                 element.style.transition = 'none';
             }
 

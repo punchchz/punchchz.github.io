@@ -1,0 +1,28 @@
+html, body {
+  height: 100%;
+  margin: 0;
+  background: #ff0000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 30px;
+  max-width: 95vw;
+  width: 100%;
+  justify-content: center;
+}
+
+.square {
+  display: inline-block;
+  cursor: pointer;
+  border-radius: 50%;
+}
+
+.square:hover {
+  transform: scale(3.1);
+}

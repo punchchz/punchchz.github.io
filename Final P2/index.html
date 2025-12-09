@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Being Perceived</title>
+<link rel="stylesheet" href="https://use.typekit.net/frm3wli.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+
+<div class="about-toggle">
+  <span class="toggle-btn">about</span>
+  <div class="about-content">
+    <p>A durational staring contest with the device that knows you best. Your screen watches you for hours every day; this website makes you watch back.</p>
+    <p>Eyes appear and grow larger over time, reaching uncomfortable sizes after two minutes. Rooms unlock progressively, each adding more observers—one pair becomes two, then three, four, five. The cursor blurs as observation intensifies, representing how constant surveillance erodes your sense of self.</p>
+  </div>
+</div>
+
+<!-- Bottom room navigation -->
+<div class="bottom-nav">
+<div class="room-nav-item active" data-room="1">
+<div class="room-circle">1</div>
+<div class="room-label">Room</div>
+</div>
+<div class="room-nav-item" data-room="2">
+<div class="room-circle">2</div>
+<div class="room-label">Room</div>
+</div>
+<div class="room-nav-item" data-room="3">
+<div class="room-circle">3</div>
+<div class="room-label">Room</div>
+</div>
+<div class="room-nav-item" data-room="4">
+<div class="room-circle">4</div>
+<div class="room-label">Room</div>
+</div>
+<div class="room-nav-item" data-room="5">
+<div class="room-circle">5</div>
+<div class="room-label">Room</div>
+</div>
+</div>
+
+<div class="play-area" id="playArea">
+<div class="boundary"></div>
+</div>
+<div class="header-text-container">
+<div class="header-text" id="headerText">Do you notice them watching?</div>
+</div>
+<div class="eye-count-container">
+<div class="eye-count">You are being watched by <span id="eyeCount">0</span> pairs of eyes</div>
+</div>
+<!-- Left door - go back -->
+<div class="door door-left" id="doorLeft">
+  <div class="door-knob"></div>
+</div>
+
+<!-- Right door - go forward -->
+<div class="door door-right" id="doorRight">
+  <div class="door-knob"></div>
+</div>
+
+
+
+
+<!-- Left side question block -->
+<div class="question-block question-left" style="display: none;">
+    <p class="question-text">Did you blink?</p>
+</div>
+
+<!-- Right side question block -->
+<div class="question-block question-right" style="display: none;">
+    <p class="question-text">Are you still there?</p>
+</div>
+
+
+
+<div class="cursor" id="cursor"></div>
+
+<script src="script.js"></script>
+</body>
+</html>

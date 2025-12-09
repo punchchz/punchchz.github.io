@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Data 4</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app">
+    <!-- LEFT: RESIZABLE PANEL (Text content) -->
+    <div class="resizable-panel">
+      <div class="panel-content">
+      
+        
+        <img src="Pic1.JPG" alt="Providence Athenaeum Interior" class="panel-image" />
+        
+        <p>Intimacy in design isn't only about privacy, it's about how space makes people feel close, safe, and connected even in shared or public areas. Researchers in architecture and psychology have found that small-scale spaces, warm materials, and subtle boundaries help turn large or impersonal places into ones that feel personal. A study on Public Space Intimacy (Victoria University of Wellington, 2018) explains that details like lower ceilings, corners, and partitions let people feel "present but protected." In Tokyo's Jimbocho neighborhood, researchers noticed that narrow streets and tiny shops create a sense of comfort inside a dense city (Urban Design and Mental Health Journal, 2017). Other studies on Public Intimacy in architecture show that buildings can connect public life with private feeling, letting people project their own emotions and stories into a shared space. Together, these ideas show that intimacy in public space comes from design that lets people take small ownership, choosing a corner, a bench, or a path that feels like their own.</p>
+        
+        <img src="Pic2.JPG" alt="Library Details" class="panel-image" />
+        
+        <p>The Providence AthenÃ¦um shows how a public building can still feel deeply personal. Although it's open to everyone, its rooms are small and layered, filled with tall bookshelves, narrow aisles, and wooden staircases that divide the space into cozy sections. The building, first designed by William Strickland in 1838, looks grand from the outside with its Greek Revival style, but inside it feels more like a quiet home for readers than a formal institution. Later renovations kept its warm wood, soft lighting, and skylights that bring in daylight, elements that make the space gentle and human. According to our data and research, there are a total of 13 different chairs donated, 6 different kinds of lights, and 16 corners throughout the library, each contributing to the building's intimate rhythm and texture. These choices help visitors slow down and find their own corner or chair, making the library feel both public and private at once. In this way, the AthenÃ¦um turns public knowledge into a personal experience, into a place where architecture itself invites closeness.</p>
+        
+        <img src="Pic3.JPG" alt="Architectural Elements" class="panel-image" />
+        
+        <img src="Pic4.JPG" alt="Library Atmosphere" class="panel-image" />
+      </div>
+      <div class="resize-handle"></div>
+    </div>
+
+    <!-- MIDDLE: CONTROLS -->
+    <section class="left" aria-label="Controls">
+      <div class="controls">
+        <!-- Room width -->
+       <label for="t" class="control-label hover-split-target">
+          Space
+        </label>
+        <input id="t" type="range" min="0" max="0.9" step="0.01" value="0" aria-label="Adjust room depth" />
+
+        <!-- Stuffiness -->
+       <label for="stuffiness" class="control-label hover-split-target">
+          Stuffiness
+        </label>
+        <input id="stuffiness" type="range" min="0" max="1" step="0.01" value="0" aria-label="Room stuffiness level" />
+
+        <!-- Ambiance control -->
+        <div class="switch-row" aria-live="polite">
+          <label class="light-switch">
+            <input id="tintSwitch" type="checkbox" aria-label="Toggle warm lighting ambiance" />
+            <svg class="light-switch-svg" viewBox="0 0 60 100" width="80" height="120">
+              <!-- Switch plate -->
+              <rect x="5" y="5" width="50" height="90" rx="3" class="switch-plate" />
+              <!-- Screws -->
+              <circle cx="30" cy="12" r="2" class="screw" />
+              <circle cx="30" cy="88" r="2" class="screw" />
+              <!-- Toggle switch -->
+              <rect x="22" y="35" width="16" height="30" rx="2" class="toggle" />
+            </svg>
+          </label>
+        </div>
+        
+        <!-- Chair switch button -->
+        <div class="tool-row">
+          <button id="chairSwitch" class="icon-btn" aria-label="Switch chair">
+            <img src="chairathen1.png" alt="Switch chair icon" />
+          </button>
+        </div>
+        
+        <!-- Expand panel button -->
+        <div class="expand-btn-row">
+          <button class="expand-panel-btn" aria-label="Expand text panel">>>></button>
+        </div>
+       
+      </div>
+    </section>
+
+    <!-- RIGHT: Room + Chair + Objects -->
+    <section class="right" aria-label="Room viewport">
+      <div class="room">
+        <img class="chair" src="chairathen.png" alt="Chair" />
+        <img class="ladder object-item" data-threshold="0.95" src="ladder.png" alt="Ladder" />
+        <!-- Stool1 PNG - appears at 65% - positioned on outer right wall -->
+        <img class="stool1-png object-item" data-threshold="0.65" src="stool1.png" alt="Stool 1" />
+        <!-- Stool PNG - appears at 15% -->
+        <img class="stool-png object-item" data-threshold="0.15" src="Stool.png" alt="Stool" />
+        
+        <!-- Table PNG - appears at 30% -->
+        <img class="table-png object-item" data-threshold="0.3" src="Table.png" alt="Table" />
+        
+        <!-- Sign 1 PNG - appears at 45% -->
+        <img class="sign1-png object-item" data-threshold="0.45" src="sign1.png" alt="Sign 1" />
+        
+        <!-- Sign 2 PNG - appears at 55% -->
+        <img class="sign2-png object-item" data-threshold="0.55" src="sign2.png" alt="Sign 2" />
+        
+        <!-- Sign 3 PNG - appears at 70% -->
+        <img class="sign3-png object-item" data-threshold="0.7" src="sign3.png" alt="Sign 3" />
+        
+        <!-- Light PNG - appears at 75% -->
+        <img class="light-png object-item" data-threshold="0.75" src="light.png" alt="Light" />
+        
+        <!-- Sign 4 PNG - appears at 85% -->
+        <img class="sign4-png object-item" data-threshold="0.85" src="sign4.png" alt="Sign 4" />
+        
+        <svg viewBox="0 0 1200 750" role="img" aria-label="Corridor that narrows as walls close in">
+          <!-- corner diagonals -->
+          <line id="L_diag_top" class="hl2" x1="0" y1="0"    x2="365"  y2="100"/>
+          <line id="R_diag_top" class="hl2" x1="1200" y1="0" x2="1035" y2="100"/>
+          <line id="L_diag_bot" class="hl2" x1="0" y1="750"  x2="365"  y2="740"/>
+          <line id="R_diag_bot" class="hl2" x1="1200" y1="750" x2="1035" y2="740"/>
+
+          <!-- back wall -->
+          <rect id="back"  class="hl"  x="490" y="270" width="420" height="300"/>
+          <rect id="back2" class="hl2" x="505" y="285" width="390" height="270"/>
+
+          <!-- left wall -->
+          <line id="L_arm_top" class="hl"  x1="490" y1="270" x2="365"  y2="120"/>
+          <line id="L_arm_bot" class="hl"  x1="490" y1="570" x2="365"  y2="730"/>
+          <line id="L_far"     class="hl2" x1="365" y1="120" x2="365"  y2="730"/>
+
+          <!-- right wall -->
+          <line id="R_arm_top" class="hl"  x1="910" y1="270" x2="1035" y2="120"/>
+          <line id="R_arm_bot" class="hl"  x1="910" y1="570" x2="1035" y2="730"/>
+          <line id="R_far"     class="hl2" x1="1035" y1="120" x2="1035" y2="730"/>
+        </svg>
+      </div>
+    </section>
+  </main>
+
+  <!-- full-screen tint overlay -->
+  <div id="screenTint" class="screen-tint" aria-hidden="true">
+    <div class="tint-message">
+      <p>Average North American public libraries use about 1,200 kWh of energy per day.</p>
+      <p>If lights stay on automatically, much of that is wasted.</p>
+      <p>Allowing users to turn lights on and off themselves can cut lighting energy by 20â€"35%, saving around 60â€"120 kWh per day overall.</p>
+    </div>
+  </div>
+
+  <!-- Custom cursor -->
+  <div class="custom-cursor"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

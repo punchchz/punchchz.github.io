@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=1920, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Interview - Stephanie Ovoian</title>
     <style>
         /* Custom Fonts - Affairs and Monument Grotesk Mono */
@@ -128,17 +128,18 @@
             height: 100%;
         }
 
-        nav {
+    
+    nav {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    padding: 2rem 3rem;
+    padding: 1.3rem 3rem;  /* Changed from 2rem - brings line closer */
     display: flex;
     justify-content: space-between;
-    align-items: center;  /* CHANGE from flex-start to center */
+    align-items: center;
     z-index: 100;
-    background: var(--black);  /* CHANGE to solid black instead of transparent */
+    background: var(--black);
     border-bottom: 1px solid var(--white);
 }
 
@@ -168,11 +169,11 @@
         }
 
         /* Main container */
-        .container {
-            position: relative;
-            z-index: 2;
-            padding-top: 80px;
-        }
+       .container {
+    position: relative;
+    z-index: 2;
+    padding-top: 60px;  /* Much smaller - just clears the nav */
+}
 
         /* Two column layout */
         .two-column {
@@ -277,7 +278,7 @@
         .pull-quote-wrapper .pull-quote,
         .text-content .pull-quote-wrapper p.pull-quote {
             font-size: 70px !important;
-            line-height: 0.95 !important;
+            line-height: 1.1 !important;
             font-weight: 400 !important;
             margin-bottom: 0 !important;
             font-family: 'Affairs', serif !important;
@@ -371,12 +372,10 @@
     <!-- Navigation -->
     <nav>
         <div class="nav-left">
-            <a href="index.html" class="nav-item">PROVIDENCE ATHENAEUM</a>
+            <a href="index.html" class="nav-item">Personalizing the Impersonal</a>
         </div>
         <div class="nav-right">
-            <a href="#library" class="nav-item">LIBRARY</a>
-            <a href="#interviews" class="nav-item active">INTERVIEWS</a>
-            <a href="#reader" class="nav-item">READER</a>
+            <a href="#interview" class="nav-item active">INTERVIEW</a>
         </div>
     </nav>
 
@@ -398,7 +397,7 @@
                 </div>
 
                 <div class="image-block">
-                    <img src="img/309A0742.png" alt="Archive" class="interview-image">
+                    <img src="img/img1.jpg" alt="Archive" class="interview-image">
                 </div>
 
                 <div class="image-block">
@@ -410,7 +409,7 @@
             <div class="right-column">
                 <div class="text-content">
                     <div class="header-section">
-                        <div class="interview-date">12.15.2024</div>
+                        <div class="interview-date">10.07.2025</div>
                         <h1 class="interview-title">A Conversation With<br>Stephanie Ovoian</h1>
                         <div class="interview-subtitle">Head of Research & Library Services</div>
                     </div>
