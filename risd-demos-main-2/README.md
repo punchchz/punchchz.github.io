@@ -1,1 +1,0 @@
-# risd-demos

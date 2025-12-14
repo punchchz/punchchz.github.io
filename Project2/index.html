@@ -1,21 +1,92 @@
-<!DOCTYPE html><!--document type declaration-->
-<html>
-    <head><!-- a container for metadata -->
-        <meta charset="utf-8"><!--charset: character encoding capable of encoding all characters on the web  -->
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><!--for browser compatibility: choose rendering engine to view the page in an correct view (for old ver. IE)  -->
-        <title>A Handmade Web</title><!--declaring the title, or name, of the HTML document. displayed in the browser's title bar-->
-        <meta name="description" content=""><!--keywords/snippet for search engines-->
-        <meta name="viewport" content="width=device-width"><!--the browser will (probably) render the width of the page at the width of its own screen -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Cossette+Titre:wght@400;700&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="css/style.css">
-        
-    </head>
-    <body><!--all the contents of an HTML document goes here-->
-        <h1>A Handmade Web</h1>
-        <p> The term <em>‘Handmade’</em> usually refers to objects made by hand or by using simple tools rather than machines. The result may be homely <a href="page2.html">as in a child's clay ashtray — or exquisite — as in a pair of bespoke brogues.</a></p>
-        <a href="page2.html" class="arrow">&#8595;</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Being Perceived</title>
 
-    </body>
+
+<link rel="stylesheet" href="https://use.typekit.net/frm3wli.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<!-- about section -->
+<div class="about-toggle">
+<span class="toggle-btn">about</span>
+<div class="about-content">
+<p>A durational staring contest with the device that knows you best. Your screen watches you for hours every day; this website makes you watch back.</p>
+<p>Eyes appear and grow larger over time, reaching uncomfortable sizes after two minutes. Rooms unlock progressively, each adding more observers—one pair becomes two, then three, four, five. The cursor blurs as observation intensifies, representing how constant surveillance erodes your sense of self.</p>
+</div>
+</div>
+
+<!-- room buttons at bottom -->
+<div class="bottom-nav">
+<div class="room-nav-item active" data-room="1">
+<div class="room-circle">1</div>
+<div class="room-label">Room</div>
+</div>
+
+<div class="room-nav-item" data-room="2">
+<div class="room-circle">2</div>
+<div class="room-label">Room</div>
+</div>
+
+<div class="room-nav-item" data-room="3">
+<div class="room-circle">3</div>
+<div class="room-label">Room</div>
+</div>
+
+<div class="room-nav-item" data-room="4">
+<div class="room-circle">4</div>
+<div class="room-label">Room</div>
+</div>
+
+<div class="room-nav-item" data-room="5">
+<div class="room-circle">5</div>
+<div class="room-label">Room</div>
+</div>
+</div>
+
+<!-- main area where eyes appear -->
+<div class="play-area" id="playArea">
+<div class="boundary"></div>
+</div>
+
+<!-- text top -->
+<div class="header-text-container">
+<div class="header-text" id="headerText">Do you notice them watching?</div>
+</div>
+
+<!-- counter for how many eyes -->
+<div class="eye-count-container">
+<div class="eye-count">You are being watched by <span id="eyeCount">0</span> pairs of eyes</div>
+</div>
+
+<!-- left door goes back a room -->
+<div class="door door-left" id="doorLeft">
+<div class="door-knob"></div>
+</div>
+
+<!-- right door goes forward -->
+<div class="door door-right" id="doorRight">
+<div class="door-knob"></div>
+</div>
+
+<!-- question boxes on sides, hidden at first -->
+<div class="question-block question-left" style="display: none;">
+<p class="question-text">Did you blink?</p>
+</div>
+
+<div class="question-block question-right" style="display: none;">
+<p class="question-text">Are you still there?</p>
+</div>
+
+<!-- custom cursor -->
+<div class="cursor" id="cursor"></div>
+
+<script src="script.js"></script>
+
+</body>
 </html>

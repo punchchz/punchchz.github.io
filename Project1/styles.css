@@ -1,0 +1,355 @@
+@font-face {
+    font-family: 'GT Pressura Mono';
+    src: url("font/GT-Pressura-Mono-Regular-Trial copy.otf") format('opentype'),
+         url("font/GT-Pressura-Mono-Regular-Italic-Trial copy.otf") format('opentype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'GT Pressura Mono', 'Courier New', monospace;
+    background-color: #ffffff;
+    color: #000000;
+    margin: 0;
+    cursor: crosshair;
+}
+
+.territory {
+    position: sticky;
+    top: 0;
+    min-height: 100vh;
+    width: 100%;
+    padding: 120px 40px;
+    background-color: #ffffff;
+}
+
+
+.territory.ocean,
+.territory.sky,
+.territory.forest,
+.territory.desert {
+    background-color: #ffffff;
+}
+
+.territory.comparison {
+    background-color: #ffffff;
+}
+
+.territory::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.territory:hover::before {
+    opacity: 1;
+}
+
+.territory.ocean::before {
+    background-image: url('https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExZmFkcGhvZDRrMzdybWViOGU0Zmg3N3ZwdXh2NWtqY28yN3dkaWYxZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/OalJFGFBD4D2xn61qb/giphy.gif');
+}
+
+.territory.sky::before {
+    background-image: url('https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExZmZzaGRndjltc2l4Z3ZlNm9tdWE0YjB1MW1semk0ZGoyeDJjOWEzeSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/KwZoSJlvep6Vy/giphy.gif');
+}
+
+.territory.forest::before {
+    background-image: url('https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExNjQ3aWdzbGJyZWJrcmc4d2htczRlNWEyc3F2MXJ1Z2tqdmRreTVrYSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/uFmH8za4E6M5STIiTu/giphy.gif');
+}
+
+.territory.desert::before {
+    background-image: url('https://i.giphy.com/media/Bg6z4LAg7n8nm/source.gif');
+}
+
+.territory > * {
+    position: relative;
+    z-index: 3;
+}
+
+
+.header {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    padding: 20px 30px;
+    z-index: 1000;
+}
+
+.header-title {
+    font-size: 14px;
+    font-weight: 400;
+    color: #999999;
+    text-transform: lowercase;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    background-color: transparent;
+    margin: 0;
+}
+
+.header-subtitle {
+    font-size: 14px;
+    font-weight: 400;
+    color: #999999;
+    text-transform: lowercase;
+    margin-top: 8px;
+}
+
+.bottom-right-text {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    padding: 20px 30px;
+    z-index: 1000;
+}
+
+.bottom-right-text p {
+    font-size: 14px;
+    font-weight: 400;
+    color: #999999;
+    text-transform: lowercase;
+    margin: 0;
+}
+
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px 30px;
+    z-index: 1000;
+    text-align: center;
+    background-color: transparent;
+}
+
+.footer p {
+    font-size: 14px;
+    font-weight: 400;
+    color: #999999;
+    text-transform: lowercase;
+}
+
+
+.environment-label {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.label-text {
+    font-size: 16px;
+    font-weight: 400;
+    color: #000000;
+    text-transform: lowercase;
+    background-color: #ffffff;
+    border: 2px solid #000000;
+    border-radius: 25px;
+    padding: 12px 28px;
+    display: inline-block;
+}
+
+
+.dot-field {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    height: 70vh;
+    margin: 0 auto;
+    z-index: 3;
+}
+
+.animal-dot {
+    position: absolute;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.dot-core {
+    width: 12px;
+    height: 12px;
+    background-color: #000000;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.4);
+}
+
+.animal-dot:hover .dot-core {
+    transform: scale(1.5);
+    box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.2);
+}
+
+.animal-dot.active .dot-core {
+    transform: scale(1.25);
+    background-color: #ffffff; 
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+    transition: all 0.25s ease-out;
+}
+
+
+
+@keyframes float {
+    0%, 100% {
+        transform: translate(0, 0);
+    }
+    25% {
+        transform: translate(3px, -4px);
+    }
+    50% {
+        transform: translate(-2px, 3px);
+    }
+    75% {
+        transform: translate(2px, 2px);
+    }
+}
+
+
+.environment-description {
+    position: absolute;
+    bottom: 100px;
+    left: 40px;
+    max-width: 500px;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+}
+
+.environment-description.visible {
+    opacity: 1;
+}
+
+.env-desc-text {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.8;
+    color: #999999;
+    text-transform: lowercase;
+}
+
+
+.about-content {
+    max-width: 700px;
+    padding: 100px 40px;
+    position: relative;
+    z-index: 3;
+    margin: 0 auto;          
+    text-align: center;      
+}
+
+.about-text {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #000000;
+    text-transform: lowercase;
+}
+
+.footprint-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 400px;
+    object-fit: contain;
+    pointer-events: auto; 
+    z-index: 15;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+
+.popup-card {
+    display: none !important;
+}
+
+
+::selection {
+    background-color: #000000;
+    color: #ffffff;
+}
+
+
+@media (max-width: 768px) {
+    .header,
+    .footer {
+        padding: 15px 20px;
+    }
+
+    .header-title {
+        font-size: 14px;
+    }
+
+    .header-subtitle {
+        font-size: 12px;
+    }
+
+    .footer p {
+        font-size: 12px;
+    }
+
+    .territory {
+        padding: 80px 20px;
+    }
+
+    .environment-label {
+        top: 70px;
+    }
+
+    .label-text {
+        font-size: 14px;
+        padding: 10px 24px;
+    }
+
+    .environment-description {
+        bottom: 80px;
+        left: 20px;
+        max-width: calc(100% - 40px);
+    }
+
+    .env-desc-text {
+        font-size: 12px;
+    }
+
+    .dot-field {
+        height: 60vh;
+    }
+
+    .dot-core {
+        width: 10px;
+        height: 10px;
+    }
+
+    .about-text {
+        font-size: 14px;
+    }
+
+
+
+}
