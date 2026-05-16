@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>lorem ipsum</title>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --serif: 'Times New Roman', Times, serif;
+  --ui:    'Times New Roman', Times, serif;
+  --blue:  #0000ee;
+  --blue-vis: #551a8b;
+}
+
+html { background: #fff; min-height: 100vh; }
+body {
+  color: #000;
+  font-family: var(--serif);
+  font-size: 13px;
+  line-height: 1.28;
+  letter-spacing: -0.015em;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+#ticker {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  height: 18px; background: #fff; border-bottom: 1px solid #000;
+  overflow: hidden; white-space: nowrap;
+  font-family: var(--ui); font-size: 11px; color: #000;
+}
+#ticker-inner {
+  display: inline-block; padding-left: 100%;
+  animation: ticker-scroll 28s linear infinite;
+}
+@keyframes ticker-scroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+#ticker-inner a { color:#000; text-decoration:underline; margin:0 18px; cursor:pointer; }
+#ticker-inner a:hover { color:var(--blue); }
+
+.aq {
+  display: inline-flex; align-items: center;
+  padding: 3px 14px 4px; border-radius: 50px; border: none;
+  cursor: pointer; font-family: var(--ui); font-size: 11px; font-weight: bold;
+  position: relative; transition: filter .12s, transform .1s; overflow: hidden;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.68) 0%,rgba(255,255,255,.05) 49%,rgba(0,70,190,.12) 50%,rgba(0,55,160,.04) 100%),
+    linear-gradient(180deg,#b8d8f8 0%,#6aaee8 38%,#3e88d5 60%,#7cbaf2 100%);
+  box-shadow: 0 1px 4px rgba(0,55,170,.32),0 0 0 1px rgba(40,100,210,.42),inset 0 1px 0 rgba(255,255,255,.7);
+  color: #1a3060; text-shadow: 0 1px 0 rgba(255,255,255,.5); white-space: nowrap;
+}
+.aq::before {
+  content:''; position:absolute; left:10%; right:10%; top:4%; height:40%;
+  background:linear-gradient(180deg,rgba(255,255,255,.52) 0%,rgba(255,255,255,.05) 100%);
+  border-radius:50px; pointer-events:none;
+}
+.aq:hover { filter: brightness(1.1); }
+.aq:active { filter: brightness(.9); transform: translateY(1px); }
+
+.sb {
+  position: fixed; z-index: 40;
+  background: linear-gradient(180deg,#ddeefa 0%,#c8dff0 100%);
+  border: 1px solid rgba(120,170,220,.5); border-radius: 8px;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,.18),0 1px 0 rgba(255,255,255,.75);
+  overflow: hidden;
+}
+.sb-v { width: 15px; } .sb-h { height: 15px; }
+.sb-thumb {
+  position: absolute; border-radius: 7px;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.75) 0%,rgba(255,255,255,.06) 48%,rgba(0,70,190,.14) 49%,rgba(0,55,160,.05) 100%),
+    linear-gradient(180deg,#b8d8f8 0%,#70b8f0 38%,#3e88d8 58%,#82c0f8 100%);
+  box-shadow: 0 1px 5px rgba(0,60,180,.4),0 0 0 1px rgba(30,90,210,.45),inset 0 1px 0 rgba(255,255,255,.8);
+}
+.sb-v .sb-thumb { left:2px; right:2px; }
+.sb-h .sb-thumb { top:2px; bottom:2px; }
+
+#win { margin:0; max-width:100%; border-radius:0; overflow:visible; box-shadow:none; min-height:100vh; }
+
+.tbar {
+  height: 20px;
+  position: sticky; top: 18px; z-index: 50;
+  background: #fff; border-bottom: 1px solid #000;
+  display: flex; align-items: center; padding: 0 8px; gap: 5px;
+  user-select: none;
+}
+.tbar::after { display: none; }
+.tl { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.tl::after { display: none; }
+.tl-r { background: #d04040; border: 1px solid #a03030; }
+.tl-y { background: #d0a030; border: 1px solid #a07820; }
+.tl-g { background: #40a040; border: 1px solid #207820; }
+#tbar-label {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  font-family: var(--ui); font-size: 11px; color: #000; letter-spacing: 0.02em;
+}
+
+.toolbar {
+  background: #fff; border-bottom: 1px solid #000;
+  padding: 4px 10px;
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  position: sticky; top: 38px; z-index: 50;
+}
+.toolbar::before { display: none; }
+.tb-sep { width: 1px; height: 16px; background: #ccc; margin: 0 3px; }
+
+#main { display: flex; background: #fff; min-height: calc(100vh - 58px); }
+
+#side {
+  width: 200px; flex-shrink: 0;
+  background: #fff; border-right: 1px solid #000;
+  padding: 10px 0 10px;
+  position: sticky; top: 0; height: 100vh; overflow-y: auto; overflow-x: hidden;
+}
+#side::before { display: none; }
+.sh {
+  font-family: var(--ui); font-size: 9px; font-weight: bold; color: #000;
+  letter-spacing: .1em; text-transform: uppercase; padding: 6px 12px 3px;
+  border-top: 1px solid #000; margin-top: 4px;
+}
+.sh:first-child { border-top: none; margin-top: 0; }
+.si {
+  display: block; padding: 1px 12px;
+  font-family: var(--ui); font-size: 11px; line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--blue); text-decoration: underline;
+  cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.si:hover { color: var(--blue-vis); }
+.si.act { color: var(--blue-vis); font-weight: bold; }
+.si::before { display: none; }
+.si-sub { padding-left: 14px; font-size: 10.5px; }
+.ss { height: 1px; background: #ddd; margin: 4px 0; }
+
+#content { flex:1; padding:18px 0; position:relative; overflow-x: hidden; }
+.col { width:70%; padding-left:4%; will-change:width,padding-left; }
+
+.section {
+  padding-bottom: 52px; position: relative;
+  opacity:0; transform:translateY(18px);
+  transition:opacity .75s cubic-bezier(.16,1,.3,1),transform .75s cubic-bezier(.16,1,.3,1);
+}
+.section.in { opacity:1; transform:translateY(0); }
+.sec-r { transform:translateY(18px) translateX(22px); }
+.sec-r.in { transform:translateY(0) translateX(0); }
+
+.sec-head {
+  font-family: var(--ui); font-size: 13px; font-weight: bold; color: #000;
+  background: none; border: none; border-top: 2px solid #000;
+  padding: 5px 0 0; margin-bottom: 14px; margin-top: 36px;
+  letter-spacing: 0.02em;
+}
+.sec-head::before { content: '• '; color: var(--blue); }
+.sec-head:first-child { margin-top: 0; }
+.sub-head {
+  font-family: var(--ui); font-size: 11px; font-weight: bold; color: #000;
+  margin-top: 18px; margin-bottom: 4px;
+  text-decoration: underline; text-decoration-color: var(--blue);
+}
+
+.epigraph {
+  font-style: italic; font-size: 13px; line-height: 1.55; color: #000;
+  margin-bottom: 16px; padding: 0; border: none; background: none;
+}
+.body-text {
+  font-family: var(--serif); font-size: 13.5px;
+  line-height: 1.28; letter-spacing: -0.01em;
+  text-align: left; hyphens: auto; color: #000;
+}
+.par-break { display: block; margin-top: 0.65em; }
+.body-text a { color: var(--blue); text-decoration: underline; }
+
+.pull {
+  font-family: var(--serif);
+  font-size: clamp(72px, 15vw, 22vw);
+  font-style: normal; font-weight: normal;
+  line-height: 0.88; letter-spacing: -0.03em; color: #000;
+  margin: 16px 0; width: 200%; position: relative; left: -4%;
+  padding: 0; overflow: visible;
+  background: none; border: none; box-shadow: none;
+  opacity: 0; transform: translateX(-16px);
+  transition: opacity .7s ease, transform .7s ease;
+  word-break: break-word;
+}
+.pull.in { opacity: 1; transform: translateX(0); }
+.pull::before { display: none; }
+
+.hr-aq { border: none; height: 1px; margin: 28px 0; background: #000; }
+
+.grid {
+  position:fixed; inset:0; pointer-events:none; z-index:1;
+  font-family:var(--ui); font-size:10px; line-height:1.2;
+  color:rgba(0,0,200,.18); letter-spacing:.01em;
+}
+.gn { position:absolute; white-space:nowrap; transition:opacity .8s,color .8s; }
+.gn.dim    { opacity:.12; }
+.gn.bright { opacity:1; color:rgba(0,0,200,.6); }
+
+.gn.n0  { left:14px;  top:72px;  font-style:italic; }
+.gn.n1  { left:41%;   top:72px;  }
+.gn.n11 { left:41%;   top:85px;  font-style:italic; }
+.gn.n12 { left:41%;   top:98px;  font-style:italic; }
+.gn.n13 { left:41%;   top:111px; font-style:italic; }
+.gn.n14 { left:41%;   top:124px; font-style:italic; }
+.gn.n4  { left:14px;  top:192px; }
+.gn.n41 { left:14px;  top:205px; font-style:italic; }
+.gn.n42 { left:14px;  top:218px; font-style:italic; }
+.gn.n43 { left:14px;  top:231px; font-style:italic; }
+.gn.n44 { left:14px;  top:244px; font-style:italic; }
+.gn.n45 { left:14px;  top:257px; font-style:italic; }
+.gn.n46 { left:14px;  top:270px; font-style:italic; }
+.gn.n47 { left:14px;  top:283px; font-style:italic; }
+.gn.n9  { left:43%;   top:246px; }
+.gn.n5  { left:62%;   top:232px; }
+.gn.n51 { left:62%;   top:245px; font-style:italic; }
+.gn.n52 { left:62%;   top:258px; font-style:italic; }
+.gn.n53 { left:62%;   top:271px; font-style:italic; }
+.gn.n7  { left:41%;   top:342px; }
+.gn.n71 { left:41%;   top:355px; font-style:italic; }
+.gn.n72 { left:41%;   top:368px; font-style:italic; }
+.gn.n73 { left:41%;   top:381px; font-style:italic; }
+.gn.n74 { left:41%;   top:394px; font-style:italic; }
+.gn.n75 { left:41%;   top:407px; font-style:italic; }
+.gn.n76 { left:41%;   top:420px; font-style:italic; }
+.gn.n6  { left:81%;   top:342px; }
+.gn.n61 { left:81%;   top:355px; font-style:italic; }
+.gn.n62 { left:81%;   top:368px; font-style:italic; }
+.gn.n3  { left:14px;  top:452px; }
+.gn.n31 { left:14px;  top:465px; font-style:italic; }
+.gn.n32 { left:14px;  top:478px; font-style:italic; }
+.gn.n33 { left:14px;  top:491px; font-style:italic; }
+.gn.n34 { left:14px;  top:504px; font-style:italic; }
+.gn.n8  { left:62%;   top:452px; }
+.gn.n2  { left:49%;   top:542px; }
+.gn.n21 { left:49%;   top:555px; font-style:italic; }
+.gn.n22 { left:49%;   top:568px; font-style:italic; }
+.gn.n23 { left:49%;   top:581px; font-style:italic; }
+.gn.n10 { right:14px; top:542px; }
+
+.sbar {
+  position:fixed; bottom:0; left:0; right:0; height:18px; z-index:30;
+  background:#fff; border-top:1px solid #000;
+  display:flex; align-items:center; padding:0 10px; gap:10px;
+  font-family:var(--ui); font-size:10px; color:#000;
+}
+.sbar::before { display:none; }
+.spill { display:inline-flex; align-items:center; gap:4px; font-size:10px; color:#000; }
+.sdot { width:5px; height:5px; border-radius:50%; background:#0000ee; }
+
+.end-pad { height:62vh; }
+</style>
+</head>
+<body>
+
+<div id="ticker" aria-hidden="true">
+  <span id="ticker-inner">
+    <a>Lorem Ipsum 1</a> ––– <a>Dolor Sit Amet 1.1</a> ––– <a>Consectetur Adipiscing 1.2</a> ––– <a>Sed Do Eiusmod 2</a> ––– <a>Tempor Incididunt 2.1</a> ––– <a>Et Dolore Magna 2.2</a> ––– <a>Ut Labore 3</a> ––– <a>Minim Veniam 4</a> ––– <a>Laboris Nisi 5</a> ––– <a>Reprehenderit 6</a> ––– <a>Cillum Dolore 7</a> ––– <a>Sint Occaecat 8</a> ––– <a>Cupidatat Non 9</a> ––– <a>Lorem Ipsum 1</a> ––– <a>Dolor Sit Amet 1.1</a> ––– <a>Consectetur Adipiscing 1.2</a> ––– <a>Sed Do Eiusmod 2</a> ––– <a>Tempor Incididunt 2.1</a> ––– <a>Et Dolore Magna 2.2</a> ––– <a>Ut Labore 3</a> ––– <a>Minim Veniam 4</a> ––– <a>Laboris Nisi 5</a> ––– <a>Reprehenderit 6</a> ––– <a>Cillum Dolore 7</a> ––– <a>Sint Occaecat 8</a> ––– <a>Cupidatat Non 9</a> –––
+  </span>
+</div>
+
+<div id="weather-strip" style="border-bottom:1px solid #000;padding:4px 12px;font-family:'Times New Roman',Times,serif;font-size:10px;letter-spacing:-0.01em;line-height:1.5;color:#000;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+  <span id="weather-text" style="opacity:0.7;">fetching weather…</span>
+</div>
+
+<div class="grid" aria-hidden="true">
+  <span class="gn n0">Prefaces 0</span>
+  <span class="gn n1">Lorem Ipsum 1</span>
+  <span class="gn n11">1.1 Dolor Sit</span>
+  <span class="gn n12">1.2 Amet Cons.</span>
+  <span class="gn n13">1.3 Ectetur</span>
+  <span class="gn n14">1.4 Adipiscing</span>
+  <span class="gn n4">Sed Do Eiusmod 4</span>
+  <span class="gn n41">4.1 Tempor</span>
+  <span class="gn n42">4.2 Incididunt</span>
+  <span class="gn n43">4.3 Ut Labore</span>
+  <span class="gn n44">4.4 Et Dolore</span>
+  <span class="gn n45">4.5 Magna</span>
+  <span class="gn n46">4.6 Aliqua Ut</span>
+  <span class="gn n47">4.7 Enim Ad</span>
+  <span class="gn n9">9</span>
+  <span class="gn n5">Minim Veniam 5</span>
+  <span class="gn n51">5.1 Quis Nostrud</span>
+  <span class="gn n52">5.2 Exercitation</span>
+  <span class="gn n53">5.3 Ullamco</span>
+  <span class="gn n7">Laboris Nisi 7</span>
+  <span class="gn n71">7.1 Ut Aliquip</span>
+  <span class="gn n72">7.2 Ex Ea</span>
+  <span class="gn n73">7.3 Commodo</span>
+  <span class="gn n74">7.4 Consequat</span>
+  <span class="gn n75">7.5 Duis Aute</span>
+  <span class="gn n76">7.6 Irure Dolor</span>
+  <span class="gn n6">Reprehenderit 6</span>
+  <span class="gn n61">6.1 In Voluptate</span>
+  <span class="gn n62">6.2 Velit Esse</span>
+  <span class="gn n3">Cillum Dolore 3</span>
+  <span class="gn n31">3.1 Eu Fugiat</span>
+  <span class="gn n32">3.2 Nulla</span>
+  <span class="gn n33">3.3 Pariatur</span>
+  <span class="gn n34">3.4 Excepteur</span>
+  <span class="gn n8">Sint Occaecat 8</span>
+  <span class="gn n2">Cupidatat Non 2</span>
+  <span class="gn n21">2.1 Proident</span>
+  <span class="gn n22">2.2 Sunt In</span>
+  <span class="gn n23">2.3 Culpa Qui</span>
+  <span class="gn n10">10</span>
+</div>
+
+<div class="sb sb-v" id="sb-right" style="right:6px;top:72px;bottom:22px;">
+  <div class="sb-thumb" id="sb-right-thumb" style="height:44px;top:0;"></div>
+</div>
+<div class="sb sb-h" id="sb-top" style="left:200px;right:22px;top:72px;">
+  <div class="sb-thumb" id="sb-top-thumb" style="width:60px;left:0;"></div>
+</div>
+<div class="sb sb-v" id="sb-left" style="left:200px;top:72px;bottom:22px;">
+  <div class="sb-thumb" id="sb-left-thumb" style="height:36px;top:0;"></div>
+</div>
+<div class="sb sb-h" id="sb-bottom-extra" style="left:200px;right:22px;bottom:22px;">
+  <div class="sb-thumb" id="sb-bot-thumb" style="width:48px;left:0;"></div>
+</div>
+
+<div id="win">
+  <div class="tbar">
+    <div class="tl tl-r"></div>
+    <div class="tl tl-y"></div>
+    <div class="tl tl-g"></div>
+    <div id="tbar-label">lorem ipsum — Prefaces</div>
+  </div>
+
+  <div class="toolbar" id="toolbar">
+    <button class="aq" id="btn-back">◀ Back</button>
+    <button class="aq" id="btn-fwd">Forward ▶</button>
+    <div class="tb-sep"></div>
+    <button class="aq" onclick="goSection(0)">Prefaces</button>
+    <button class="aq" onclick="goSection(1)">1. Dolor</button>
+    <button class="aq" onclick="goSection(2)">2. Tempor</button>
+    <div class="tb-sep"></div>
+    <button class="aq" id="btn-rand" onclick="randLayout()">⟳ Shuffle</button>
+    <button class="aq" id="btn-reset" onclick="resetLayout()">Reset</button>
+  </div>
+
+  <div id="main">
+    <div id="side">
+      <div style="padding:12px 12px 8px;border-bottom:1px solid #000;margin-bottom:6px;">
+        <div id="clock-date-text" style="font-family:'Times New Roman',serif;font-size:10px;letter-spacing:-0.01em;opacity:0.5;margin-bottom:6px;"></div>
+        <svg id="analog-clock" viewBox="0 0 80 80" width="80" height="80" style="display:block;">
+          <circle cx="40" cy="40" r="38" fill="none" stroke="#000" stroke-width="0.8"/>
+          <g id="ticks" stroke="#000" stroke-width="0.5" opacity="0.3"></g>
+          <line id="hand-h" x1="40" y1="40" x2="40" y2="18" stroke="#000" stroke-width="1.8" stroke-linecap="round"/>
+          <line id="hand-m" x1="40" y1="40" x2="40" y2="10" stroke="#000" stroke-width="1.2" stroke-linecap="round"/>
+          <line id="hand-s" x1="40" y1="40" x2="40" y2="8"  stroke="#000" stroke-width="0.6" stroke-linecap="round" opacity="0.5"/>
+          <circle cx="40" cy="40" r="1.5" fill="#000"/>
+        </svg>
+      </div>
+      <div class="sh">Contents</div>
+      <a class="si act" onclick="goSection(0)">Prefaces</a>
+      <a class="si" onclick="goSection(1)">1 Dolor Sit Amet</a>
+      <a class="si si-sub">1.1 Consectetur</a>
+      <a class="si si-sub">1.2 Sed Do Eiusmod</a>
+      <a class="si" onclick="goSection(2)">2 Tempor Incididunt</a>
+      <a class="si si-sub">2.1 Ut Labore</a>
+      <a class="si si-sub">2.2 Et Dolore Magna</a>
+      <div class="ss"></div>
+      <div class="sh">Index</div>
+      <a class="si si-sub">4 Sed Do Eiusmod</a>
+      <a class="si si-sub">5 Minim Veniam</a>
+      <a class="si si-sub">6 Reprehenderit</a>
+      <a class="si si-sub">7 Laboris Nisi</a>
+      <a class="si si-sub">8 Sint Occaecat</a>
+    </div>
+
+    <div id="content">
+      <div class="col" id="col">
+
+        <div class="section" data-sec="Prefaces" id="s0">
+          <div class="sec-head">Prefaces</div>
+          <div class="epigraph">Fortasse finis et initium unum idemque sunt.</div>
+          <div class="body-text">
+            <span class="par-break"></span>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+            <span class="par-break"></span>
+            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
+            <span class="par-break"></span>
+            Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.
+            <span class="par-break"></span>
+            Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur.
+            <span class="par-break"></span>
+            At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi.
+            <span class="par-break"></span>
+            Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est.
+          </div>
+        </div>
+
+        <div class="section sec-r" data-sec="1 Dolor Sit Amet" id="s1">
+          <div class="sec-head">1 &nbsp;Dolor Sit Amet</div>
+          <div class="sub-head">1.1 &nbsp;Consectetur Adipiscing</div>
+          <div class="body-text">
+            <span class="par-break"></span>
+            Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur.
+            <span class="par-break"></span>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper.
+            <span class="par-break"></span>
+            Quisque sit amet est et sapien ullamcorper pharetra. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui.
+          </div>
+          <div class="sub-head">1.2 &nbsp;Sed Do Eiusmod</div>
+          <div class="body-text">
+            <span class="par-break"></span>
+            Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium.
+            <span class="par-break"></span>
+            Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. Donec vitae sapien ut libero venenatis faucibus. Nullam quis ante.
+          </div>
+        </div>
+
+        <div class="hr-aq"></div>
+
+        <div class="section" data-sec="2 Tempor Incididunt" id="s2">
+          <div class="sec-head">2 &nbsp;Tempor Incididunt</div>
+          <div class="sub-head">2.1 &nbsp;Ut Labore</div>
+          <div class="body-text">
+            <span class="par-break"></span>
+            Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            <span class="par-break"></span>
+            Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus.
+            <span class="par-break"></span>
+            Nam nulla quam, gravida non, commodo a, sodales sit amet, nisi. Pellentesque fermentum dolor. Aliquam quam lectus, facilisis auctor, ultrices ut, elementum vulputate, nunc.
+          </div>
+          <div class="sub-head">2.2 &nbsp;Et Dolore Magna</div>
+          <div class="body-text">
+            <span class="par-break"></span>
+            Fusce fermentum. Nullam cursus lacinia erat. Praesent blandit laoreet nibh. Fusce convallis metus id felis luctus adipiscing. Pellentesque egestas neque sit amet convallis ullamcorper, nisl nonummy ultricies nisi.
+            <span class="par-break"></span>
+            In dui magna, posuere eget, vestibulum et, tempor auctor, justo. In ac felis quis tortor malesuada pretium. Pellentesque auctor neque. Nulla consequat massa quis enim.
+          </div>
+        </div>
+
+        <div class="end-pad"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sbar">
+  <div class="spill"><div class="sdot"></div> ready</div>
+  <span id="s-sec">Prefaces</span>
+  <span style="margin-left:auto" id="s-pct">0%</span>
+</div>
+
+<script>
+// ── SCROLLBARS ───────────────────────────────────────────────────
+const thumbs = {
+  right: { el:document.getElementById('sb-right-thumb'), track:null, pos:0, target:0, vel:0, dir:1, size:44, axis:'v' },
+  left:  { el:document.getElementById('sb-left-thumb'),  track:null, pos:0, target:0, vel:0, dir:1, size:36, axis:'v' },
+  top:   { el:document.getElementById('sb-top-thumb'),   track:null, pos:0, target:0, vel:0, dir:1, size:60, axis:'h' },
+  bot:   { el:document.getElementById('sb-bot-thumb'),   track:null, pos:0, target:0, vel:0, dir:1, size:48, axis:'h' },
+};
+thumbs.right.track=document.getElementById('sb-right');
+thumbs.left.track =document.getElementById('sb-left');
+thumbs.top.track  =document.getElementById('sb-top');
+thumbs.bot.track  =document.getElementById('sb-bottom-extra');
+
+function pickNewTarget(t){
+  const isV=t.axis==='v';
+  const trackLen=isV?(t.track.clientHeight-t.size):(t.track.clientWidth-t.size);
+  const bias=Math.random()<0.75?t.dir:-t.dir;
+  let next=t.pos+bias*(trackLen*(0.1+Math.random()*0.55));
+  next=Math.max(0,Math.min(trackLen,next));
+  if(next===t.pos) next=trackLen-next;
+  t.dir=next>t.pos?1:-1; t.target=next;
+  setTimeout(()=>pickNewTarget(t),800+Math.random()*2400);
+}
+function springTick(){
+  const k=0.045,damp=0.72;
+  Object.values(thumbs).forEach(t=>{
+    t.vel=t.vel*damp+(t.target-t.pos)*k; t.pos+=t.vel;
+    t.el.style[t.axis==='v'?'top':'left']=t.pos.toFixed(2)+'px';
+  });
+  requestAnimationFrame(springTick);
+}
+setTimeout(()=>pickNewTarget(thumbs.left),200);
+setTimeout(()=>pickNewTarget(thumbs.top),900);
+setTimeout(()=>pickNewTarget(thumbs.bot),1600);
+springTick();
+
+// ── BUTTON PULSE ─────────────────────────────────────────────────
+document.querySelectorAll('.aq').forEach(b=>{
+  (function pulse(){
+    setTimeout(()=>{
+      b.style.transition='filter .4s ease';
+      b.style.filter='brightness(1.15)';
+      setTimeout(()=>{ b.style.filter='brightness(1)'; pulse(); },350+Math.random()*600);
+    },300+Math.random()*2200);
+  })();
+});
+(function wiggle(){
+  const r=document.getElementById('btn-rand');
+  if(!r) return;
+  setTimeout(()=>{ r.style.transform='translateY(-1px) scale(1.04)';
+    setTimeout(()=>{ r.style.transform=''; wiggle(); },180); },2800+Math.random()*3000);
+})();
+
+// ── SCROLL + COLUMN ───────────────────────────────────────────────
+const col=document.getElementById('col');
+const sSec=document.getElementById('s-sec');
+const sPct=document.getElementById('s-pct');
+const tbarLabel=document.getElementById('tbar-label');
+const PHASES=[{at:0,vw:70,pl:5},{at:.35,vw:52,pl:8},{at:.75,vw:38,pl:12}];
+let curVW=70,curPL=5,rafId=null;
+const EASE=0.07;
+function lerp(a,b,t){return a+(b-a)*t;}
+function getTarget(){
+  const doc=document.documentElement.scrollHeight-window.innerHeight;
+  const prog=doc>0?Math.min(1,window.scrollY/doc):0;
+  let vw=PHASES[0].vw,pl=PHASES[0].pl;
+  for(let i=1;i<PHASES.length;i++){
+    const p=PHASES[i-1],c=PHASES[i];
+    if(prog<=c.at){const t=(prog-p.at)/(c.at-p.at);const e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;vw=lerp(p.vw,c.vw,e);pl=lerp(p.pl,c.pl,e);break;}
+    vw=c.vw;pl=c.pl;
+  }
+  return{vw,pl,prog};
+}
+function applyCol(){
+  col.style.width=curVW.toFixed(2)+'vw';
+  col.style.paddingLeft=curPL.toFixed(2)+'%';
+  const shift=(70-curVW)*.5;
+  document.querySelectorAll('.sec-r').forEach(s=>{s.style.paddingLeft=shift.toFixed(2)+'vw';});
+}
+function tick(){
+  const{vw,pl,prog}=getTarget();
+  const dvw=vw-curVW,dpl=pl-curPL;
+  if(Math.abs(dvw)>.004||Math.abs(dpl)>.004){curVW+=dvw*EASE;curPL+=dpl*EASE;applyCol();rafId=requestAnimationFrame(tick);}
+  else{curVW=vw;curPL=pl;applyCol();rafId=null;}
+  thumbs.right.target=prog*(thumbs.right.track.clientHeight-thumbs.right.size);
+  thumbs.left.target=Math.min(1,Math.max(0,prog-0.12))*(thumbs.left.track.clientHeight-thumbs.left.size);
+  thumbs.top.target=prog*(thumbs.top.track.clientWidth-thumbs.top.size);
+  thumbs.bot.target=(1-prog)*(thumbs.bot.track.clientWidth-thumbs.bot.size);
+  sPct.textContent=Math.round(prog*100)+'%';
+}
+window.addEventListener('scroll',()=>{if(!rafId)rafId=requestAnimationFrame(tick);},{passive:true});
+
+function randLayout(){
+  const tb=document.getElementById('toolbar');
+  const nodes=[...tb.querySelectorAll('.aq,.tb-sep')];
+  for(let i=nodes.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));tb.insertBefore(nodes[j],nodes[i]);}
+  document.querySelectorAll('.si').forEach(item=>{item.style.transition='transform .5s,opacity .5s';item.style.transform=`translateY(${(Math.random()-.5)*8}px)`;item.style.opacity=(0.4+Math.random()*.6).toFixed(2);});
+  document.querySelectorAll('.gn').forEach(g=>{g.style.transition='transform .7s';g.style.transform=`translate(${(Math.random()-.5)*18}px,${(Math.random()-.5)*12}px)`;});
+}
+function resetLayout(){
+  document.querySelectorAll('.si').forEach(i=>{i.style.transform='';i.style.opacity='';});
+  document.querySelectorAll('.gn').forEach(g=>{g.style.transform='';});
+}
+function goSection(i){const el=document.getElementById('s'+i);if(el)el.scrollIntoView({behavior:'smooth'});}
+
+// ── INTERSECTION OBSERVER ─────────────────────────────────────────
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('in');
+      if(e.target.dataset.sec){sSec.textContent=e.target.dataset.sec;tbarLabel.textContent='lorem ipsum — '+e.target.dataset.sec;}
+    }
+  });
+},{threshold:.08});
+document.querySelectorAll('.section,[data-obs]').forEach(el=>io.observe(el));
+
+// ── INDEX GRID PULSE ──────────────────────────────────────────────
+const gns=document.querySelectorAll('.gn');
+function pulseGrid(){gns.forEach(g=>{const d=Math.abs(g.getBoundingClientRect().top-window.innerHeight*.4);if(d<90){g.classList.add('bright');g.classList.remove('dim');}else if(d>220){g.classList.add('dim');g.classList.remove('bright');}else{g.classList.remove('bright','dim');}});}
+window.addEventListener('scroll',pulseGrid,{passive:true});
+
+applyCol();
+
+// ── TYPOGRAPHIC MUTATION ──────────────────────────────────────────
+const mutateTargets=document.querySelectorAll('.body-text,.epigraph,.sub-head');
+function getMutation(el){
+  const docH=document.documentElement.scrollHeight-window.innerHeight;
+  const sp=docH>0?window.scrollY/docH:0;
+  const elTop=el.getBoundingClientRect().top+window.scrollY;
+  const elDepth=docH>0?elTop/(docH+window.innerHeight):0;
+  return Math.max(0,Math.min(1,(sp-elDepth*0.4)*2.2));
+}
+function applyMutation(){
+  mutateTargets.forEach(el=>{
+    const m=getMutation(el);
+    el.style.fontSize=lerp(13.5,120,Math.pow(m,1.6)).toFixed(2)+'px';
+    el.style.lineHeight=lerp(1.28,0.88,Math.pow(m,1.4)).toFixed(3);
+    el.style.letterSpacing=lerp(-0.01,-0.04,m).toFixed(4)+'em';
+    el.style.transition='font-size .5s ease,letter-spacing .5s ease,line-height .5s ease';
+  });
+}
+window.addEventListener('scroll',applyMutation,{passive:true});
+applyMutation();
+
+// ── ANALOG CLOCK ──────────────────────────────────────────────────
+const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+(function drawTicks(){
+  const g=document.getElementById('ticks');
+  for(let i=0;i<12;i++){
+    const a=(i/12)*Math.PI*2-Math.PI/2;
+    const x1=40+Math.cos(a)*34,y1=40+Math.sin(a)*34,x2=40+Math.cos(a)*38,y2=40+Math.sin(a)*38;
+    const ln=document.createElementNS('http://www.w3.org/2000/svg','line');
+    ln.setAttribute('x1',x1);ln.setAttribute('y1',y1);ln.setAttribute('x2',x2);ln.setAttribute('y2',y2);
+    g.appendChild(ln);
+  }
+})();
+function rotateHand(id,deg){
+  const el=document.getElementById(id);
+  const rad=(deg-90)*Math.PI/180;
+  const lens={'hand-h':22,'hand-m':30,'hand-s':32};
+  el.setAttribute('x2',(40+Math.cos(rad)*lens[id]).toFixed(3));
+  el.setAttribute('y2',(40+Math.sin(rad)*lens[id]).toFixed(3));
+}
+function tickClock(){
+  const now=new Date();
+  const h=now.getHours(),m=now.getMinutes(),s=now.getSeconds();
+  rotateHand('hand-h',(h%12)*30+m*0.5);
+  rotateHand('hand-m',m*6+s*0.1);
+  rotateHand('hand-s',s*6);
+  const d=document.getElementById('clock-date-text');
+  if(d) d.textContent=DAYS[now.getDay()].toLowerCase()+' · '+now.getDate()+' '+MONTHS[now.getMonth()].toLowerCase()+' '+now.getFullYear();
+}
+tickClock();
+setInterval(tickClock,1000);
+
+// ── WEATHER ───────────────────────────────────────────────────────
+function weatherDesc(code){
+  if(code===0)return'clear sky';if(code<=2)return'partly cloudy';if(code===3)return'overcast';
+  if(code<=49)return'fog';if(code<=57)return'drizzle';if(code<=67)return'rain';
+  if(code<=77)return'snow';if(code<=82)return'showers';if(code<=99)return'thunderstorm';
+  return'cloudy';
+}
+async function fetchWeather(){
+  const el=document.getElementById('weather-text');
+  try{
+    const pos=await new Promise((res,rej)=>navigator.geolocation.getCurrentPosition(res,rej,{timeout:6000}));
+    const{latitude:lat,longitude:lon}=pos.coords;
+    const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,precipitation,wind_speed_10m,weather_code&wind_speed_unit=kmh&temperature_unit=celsius`);
+    const d=await r.json();const c=d.current;
+    el.textContent=`${weatherDesc(c.weather_code)} · ↓${c.temperature_2m.toFixed(1)}°C · ⚐ ${c.wind_speed_10m.toFixed(1)} km/h · ${c.precipitation.toFixed(1)} mm`;
+    el.style.opacity='0.7';
+    initPlants(c.weather_code,parseFloat(c.precipitation),parseFloat(c.wind_speed_10m));
+  }catch(e){
+    el.textContent='weather unavailable';
+    initPlants(0,0,0);
+  }
+}
+fetchWeather();
+
+// ── HAECKEL-STYLE PLANT SYSTEM ────────────────────────────────────
+// Fractal tree: smooth tapering trunk, tight symmetric branching,
+// like the paleontological tree of vertebrates.
+// Canvas is position:fixed — scroll never clears it.
+
+const PC=document.createElement('canvas');
+PC.id='plant-layer';
+PC.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:2;';
+document.body.appendChild(PC);
+const PCX=PC.getContext('2d');
+
+function resizePC(){PC.width=window.innerWidth;PC.height=window.innerHeight;}
+resizePC();
+window.addEventListener('resize',()=>{resizePC();if(window._lastProgress>0)window.drawPlants(window._lastSys||'clear',window._lastProgress);});
+
+// Draw one tree: smooth trunk that tapers, branches split symmetrically
+// depth 0 = trunk, higher = twigs. stroke-width and opacity taper with depth.
+function haeckelTree(x,y,angle,length,depth,maxDepth,spreadAngle,opacity){
+  if(depth>maxDepth||length<1.5)return;
+  const rad=a=>a*Math.PI/180;
+  // slight natural lean (small random angle keeps it from being perfectly symmetric)
+  const lean=(Math.random()-0.5)*6;
+  const nx=x+Math.cos(rad(angle+lean))*length;
+  const ny=y+Math.sin(rad(angle+lean))*length;
+
+  // stroke width tapers: thick at root, hairline at tips
+  const t=depth/maxDepth;
+  const sw=Math.max(0.4,(1-t*0.9)*6);
+
+  PCX.beginPath();
+  PCX.moveTo(x,y);
+  // very slight curve — control point barely offset from midpoint
+  const cpx=(x+nx)/2+(Math.random()-0.5)*length*0.12;
+  const cpy=(y+ny)/2+(Math.random()-0.5)*length*0.12;
+  PCX.quadraticCurveTo(cpx,cpy,nx,ny);
+  PCX.strokeStyle=`rgba(0,0,0,${opacity.toFixed(3)})`;
+  PCX.lineWidth=sw;
+  PCX.lineCap='round';
+  PCX.stroke();
+
+  // each branch splits into two children at ±spreadAngle
+  const childLen=length*(0.62+Math.random()*0.1);
+  const childAngle=spreadAngle*(0.9+Math.random()*0.2);
+  haeckelTree(nx,ny,angle+lean-childAngle,childLen,depth+1,maxDepth,spreadAngle*0.92,opacity);
+  haeckelTree(nx,ny,angle+lean+childAngle,childLen,depth+1,maxDepth,spreadAngle*0.92,opacity);
+  // occasional third branch for density at higher progress
+  if(depth<maxDepth-3&&Math.random()<0.18)
+    haeckelTree(nx,ny,angle+lean+(Math.random()-0.5)*childAngle,childLen*0.7,depth+2,maxDepth,spreadAngle*0.85,opacity*0.7);
+}
+
+const WEATHER_PARAMS={
+  rain:  {spread:28,trunkMult:1.1},
+  fog:   {spread:18,trunkMult:0.8},
+  clear: {spread:23,trunkMult:1.0},
+  wind:  {spread:16,trunkMult:1.2},
+  snow:  {spread:25,trunkMult:0.9},
+};
+window._lastSys='clear'; window._lastProgress=0;
+let _plantTimer=null,_plantAge=0;
+const PAGE_LIFETIME=600;
+
+window.drawPlants=function(sys,progress){
+  window._lastSys=sys; window._lastProgress=progress;
+  const vw=PC.width,vh=PC.height;
+  PCX.clearRect(0,0,vw,vh);
+  if(progress<=0.01)return;
+
+  const params=WEATHER_PARAMS[sys]||WEATHER_PARAMS.clear;
+  // depth and trunk scale with progress
+  const maxDepth=Math.floor(4+progress*6);      // 4 at start → 10 at full
+  const trunkLen=(40+progress*120)*params.trunkMult; // grows from short to tall
+  const opacity=0.06+progress*0.52;             // ghostlike → erosive
+  const count=Math.floor(progress*10)+3;         // more trees over time
+
+  // seed origins along bottom edge + sides
+  const origins=[
+    {x:vw*0.06,y:vh,a:-90},{x:vw*0.18,y:vh,a:-90},
+    {x:vw*0.32,y:vh,a:-90},{x:vw*0.46,y:vh,a:-90},
+    {x:vw*0.60,y:vh,a:-90},{x:vw*0.74,y:vh,a:-90},
+    {x:vw*0.88,y:vh,a:-90},
+    {x:vw,y:vh*0.72,a:-150},{x:vw,y:vh*0.48,a:-155},
+    {x:0, y:vh*0.70,a:-30}, {x:0, y:vh*0.46,a:-25},
+    {x:vw*0.25,y:vh,a:-88},{x:vw*0.52,y:vh*0.98,a:-92},
+  ].slice(0,count);
+
+  origins.forEach(({x,y,a})=>haeckelTree(x,y,a,trunkLen,0,maxDepth,params.spread,opacity));
+};
+
+window.initPlants=function(weatherCode,precipitation,windSpeed){
+  let sys='clear';
+  if(precipitation>1)sys='rain';
+  else if(windSpeed>20)sys='wind';
+  else if(weatherCode>=45&&weatherCode<=49)sys='fog';
+  else if(weatherCode>=71&&weatherCode<=77)sys='snow';
+  window._lastSys=sys;
+  if(_plantTimer)clearInterval(_plantTimer);
+  const rate=precipitation>2?3:precipitation>0.5?1.5:0.7;
+  _plantTimer=setInterval(()=>{
+    _plantAge+=rate;
+    window._lastProgress=Math.min(1,_plantAge/PAGE_LIFETIME);
+    window.drawPlants(window._lastSys,window._lastProgress);
+  },4000);
+  window.drawPlants(sys,0.1);
+};
+
+// Draw immediately on load — Haeckel-style trees visible right away
+window.addEventListener('load',()=>window.drawPlants('clear',0.45));
+</script>
+
+<style>
+#field{position:fixed;inset:0;pointer-events:none;z-index:100;opacity:0;}
+#field.visible{opacity:1;}
+#lines-svg{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:99;opacity:0;overflow:visible;}
+#lines-svg.visible{opacity:1;}
+.fb{position:fixed;pointer-events:all;cursor:grab;border:1px solid #000;border-radius:0;font-family:'Times New Roman',Times,serif;font-size:11px;font-weight:normal;letter-spacing:-0.02em;color:#000;text-decoration:none;padding:2px 8px;white-space:nowrap;background:#fff;box-shadow:none;line-height:1.35;user-select:none;}
+.fb:active{cursor:grabbing;}
+.fb.node-s{color:#0000ee;text-decoration:underline;}
+.fb.node-c{border-color:#888;font-style:italic;}
+.fb.node-main{font-weight:bold;box-shadow:1.5px 1.5px 0 #000;}
+.fb .none{display:inline;}.fb .hover{display:none;}
+.fb:hover .none{display:none;}.fb:hover .hover{display:inline;}
+.conn{stroke:#000;stroke-width:1.2;fill:none;opacity:0.65;}
+.conn-dash{stroke-width:1;stroke-dasharray:7 4;opacity:0.55;animation:flow-dash 2.2s linear infinite;}
+.conn-dash2{stroke-width:0.8;stroke-dasharray:2 5;opacity:0.38;animation:flow-dash 1.4s linear infinite;}
+@keyframes flow-dash{to{stroke-dashoffset:-44;}}
+</style>
+
+<svg id="lines-svg" aria-hidden="true">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#000" opacity="0.7"/></marker>
+    <marker id="arrow-dash" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L0,5 L7,2.5 z" fill="#000" opacity="0.5"/></marker>
+    <marker id="square-plug" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5"><rect width="4" height="4" x="0.5" y="0.5" fill="#000" opacity="0.7"/></marker>
+  </defs>
+</svg>
+
+<div id="field" aria-label="Diagram">
+  <button class="fb node-main" id="fb-main" style="left:42%;top:14%"><span class="none">lorem ipsum</span><span class="hover">root</span></button>
+  <button class="fb node-s" id="fb-s0" style="left:18%;top:24%" onclick="goSection(0)"><span class="none">§ 0</span><span class="hover">Prefaces</span></button>
+  <button class="fb node-s" id="fb-s1" style="left:62%;top:28%" onclick="goSection(1)"><span class="none">§ 1</span><span class="hover">Dolor Sit Amet</span></button>
+  <button class="fb node-s" id="fb-s2" style="left:34%;top:52%" onclick="goSection(2)"><span class="none">§ 2</span><span class="hover">Tempor Incididunt</span></button>
+  <button class="fb node-c" id="fb-a" style="left:22%;top:42%"><span class="none">a01</span><span class="hover">consectetur</span></button>
+  <button class="fb node-c" id="fb-b" style="left:54%;top:18%"><span class="none">b01</span><span class="hover">adipiscing</span></button>
+  <button class="fb node-c" id="fb-c" style="left:74%;top:44%"><span class="none">c01</span><span class="hover">sed do</span></button>
+  <button class="fb node-c" id="fb-d" style="left:46%;top:38%"><span class="none">d01</span><span class="hover">ut labore</span></button>
+  <button class="fb node-c" id="fb-e" style="left:28%;top:64%"><span class="none">e01</span><span class="hover">et dolore</span></button>
+  <button class="fb node-c" id="fb-f" style="left:60%;top:60%"><span class="none">f01</span><span class="hover">voluptatem</span></button>
+  <button class="fb node-c" id="fb-g" style="left:14%;top:56%"><span class="none">g01</span><span class="hover">accusantium</span></button>
+  <button class="fb node-c" id="fb-h" style="left:78%;top:26%"><span class="none">h01</span><span class="hover">incididunt</span></button>
+</div>
+
+<script>
+// ── DIAGRAM ───────────────────────────────────────────────────────
+setTimeout(()=>{
+  document.getElementById('field').classList.add('visible');
+  document.getElementById('lines-svg').classList.add('visible');
+  drawLines(); startAnimism();
+},1500);
+
+function centre(id){const el=document.getElementById(id);if(!el)return{x:0,y:0,l:0,t:0,r:0,b:0};const r=el.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2,l:r.left,t:r.top,r:r.right,b:r.bottom};}
+const CONNS=[
+  ['fb-main','fb-s0','solid','l','r'],['fb-main','fb-s1','solid','r','l'],
+  ['fb-main','fb-s2','solid','b','t'],['fb-main','fb-b','dash','r','t'],
+  ['fb-s0','fb-a','dash','b','t'],['fb-s0','fb-g','solid','b','l'],
+  ['fb-s1','fb-c','dash','r','t'],['fb-s1','fb-h','solid','r','l'],
+  ['fb-s2','fb-e','dash','b','t'],['fb-s2','fb-f','solid','r','l'],
+  ['fb-a','fb-d','dash2','r','l'],['fb-b','fb-d','solid','b','t'],
+  ['fb-d','fb-f','dash','b','t'],['fb-c','fb-h','dash2','t','b'],
+  ['fb-e','fb-g','solid','l','b'],
+];
+let pathEls=[],lblEls=[];
+function edgePt(c,edge){switch(edge){case'r':return{x:c.r,y:c.y};case'l':return{x:c.l,y:c.y};case't':return{x:c.x,y:c.t};case'b':return{x:c.x,y:c.b};default:return{x:c.x,y:c.y};}}
+function gridPath(p1,p2,fe){const{x:x1,y:y1}=p1,{x:x2,y:y2}=p2;if(fe==='r'||fe==='l'){const mx=(x1+x2)/2;return`M ${x1} ${y1} L ${mx} ${y1} L ${mx} ${y2} L ${x2} ${y2}`;}const my=(y1+y2)/2;return`M ${x1} ${y1} L ${x1} ${my} L ${x2} ${my} L ${x2} ${y2}`;}
+function drawLines(){
+  const svg=document.getElementById('lines-svg');
+  const defs=svg.querySelector('defs');svg.innerHTML='';if(defs)svg.appendChild(defs);
+  pathEls=[];lblEls=[];
+  CONNS.forEach(([a,b,style,fe,te],i)=>{
+    const ca=centre(a),cb=centre(b);
+    const p1=edgePt(ca,fe),p2=edgePt(cb,te);
+    const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d',gridPath(p1,p2,fe));
+    let cls='conn',me='url(#arrow)',ms='';
+    if(style==='dash'){cls='conn conn-dash';me='url(#arrow-dash)';ms='url(#square-plug)';}
+    if(style==='dash2'){cls='conn conn-dash2';me='url(#arrow-dash)';}
+    if(style==='solid')ms='url(#square-plug)';
+    path.setAttribute('class',cls);path.setAttribute('marker-end',me);
+    if(ms)path.setAttribute('marker-start',ms);
+    path._a=a;path._b=b;path._fe=fe;path._te=te;
+    svg.appendChild(path);pathEls.push(path);
+    const mx=(p1.x+p2.x)/2,my=(p1.y+p2.y)/2;
+    const lbl=document.createElementNS('http://www.w3.org/2000/svg','text');
+    lbl.setAttribute('x',mx);lbl.setAttribute('y',my-3);lbl.setAttribute('text-anchor','middle');
+    lbl.setAttribute('fill','rgba(0,0,0,.38)');lbl.setAttribute('font-size','8.5');
+    lbl.setAttribute('font-family','Times New Roman,serif');lbl.setAttribute('font-style','italic');
+    lbl.textContent='line '+(i+1);lbl._a=a;lbl._b=b;lbl._fe=fe;lbl._te=te;
+    svg.appendChild(lbl);lblEls.push(lbl);
+  });
+}
+function redrawLines(){
+  pathEls.forEach(el=>{if(!el._a||!el._b)return;const ca=centre(el._a),cb=centre(el._b);const p1=edgePt(ca,el._fe),p2=edgePt(cb,el._te);el.setAttribute('d',gridPath(p1,p2,el._fe));});
+  lblEls.forEach(el=>{if(!el._a||!el._b)return;const ca=centre(el._a),cb=centre(el._b);const p1=edgePt(ca,el._fe),p2=edgePt(cb,el._te);el.setAttribute('x',(p1.x+p2.x)/2);el.setAttribute('y',(p1.y+p2.y)/2-3);});
+}
+requestAnimationFrame(function loop(){redrawLines();requestAnimationFrame(loop);});
+
+const LIVE_IDS=['fb-main','fb-s0','fb-s1','fb-s2','fb-a','fb-b','fb-c','fb-d','fb-e','fb-f','fb-g','fb-h'];
+const agents={};
+function initAgents(){LIVE_IDS.forEach(id=>{const el=document.getElementById(id);if(!el)return;const r=el.getBoundingClientRect();agents[id]={el,x:r.left,y:r.top};});}
+function startAnimism(){initAgents();}
+document.querySelectorAll('.fb').forEach(btn=>{
+  let dragging=false,ox=0,oy=0;
+  btn.addEventListener('mousedown',e=>{dragging=true;const r=btn.getBoundingClientRect();ox=e.clientX-r.left;oy=e.clientY-r.top;e.preventDefault();});
+  window.addEventListener('mousemove',e=>{if(!dragging)return;const nx=e.clientX-ox,ny=e.clientY-oy;btn.style.left=nx+'px';btn.style.top=ny+'px';btn.style.right='auto';btn.style.bottom='auto';const ag=agents[btn.id];if(ag){ag.x=nx;ag.y=ny;}});
+  window.addEventListener('mouseup',()=>{dragging=false;});
+});
+</script>
+</body>
+</html>
