@@ -82,6 +82,13 @@
 .node-oval-close:hover{background:#000;color:#fff;border-color:#000;}
 /* ── PHOTOTROPISM — sidebar leans toward mouse ── */
 #side{transition:transform 0.8s ease;}
+
+/* footnotes */
+.fn{color:var(--blue);text-decoration:underline;cursor:pointer;font-size:0.75em;vertical-align:super;line-height:0;position:relative;font-style:normal;letter-spacing:0;white-space:nowrap;}
+.fn-text{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#fff;border:1px solid #000;padding:6px 10px;font-size:10px;line-height:1.5;width:240px;color:#000;font-style:normal;font-family:'Times New Roman',serif;letter-spacing:-0.01em;z-index:3000;text-decoration:none;pointer-events:none;}
+/* fn hover off */
+.fn.fn-left .fn-text{left:auto;right:0;transform:none;}
+.fn.fn-right .fn-text{left:0;transform:none;}
 </style>
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -247,14 +254,8 @@ body {
 .body-text a { color: var(--blue); text-decoration: underline; }
 
 /* ── GRID OVERLAY ── */
-.grid {
-  position:fixed; inset:0; pointer-events:none; z-index:1;
-  font-family:var(--ui); font-size:10px; line-height:1.2;
-  color:rgba(0,0,200,.18); letter-spacing:.01em;
-}
-.gn { position:absolute; white-space:nowrap; transition:opacity .8s,color .8s; }
-.gn.dim { opacity:.12; }
-.gn.bright { opacity:1; color:rgba(0,0,200,.6); }
+.grid { display:none; }
+.gn { display:none; }
 .gn.n0  { left:14px;  top:72px;  font-style:italic; }
 .gn.n1  { left:41%;   top:72px;  }
 .gn.n11 { left:41%;   top:85px;  font-style:italic; }
@@ -278,7 +279,22 @@ body {
 }
 .spill { display:inline-flex; align-items:center; gap:4px; font-size:10px; color:#000; }
 .sdot { width:5px; height:5px; border-radius:50%; background:#0000ee; }
-.end-pad { height:62vh; }
+.end-pad { height:16vh; }
+
+/* ── PLAIN LINK INDEX ── */
+.idx-link {
+  display: block;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 12px;
+  color: #0000ee;
+  text-decoration: underline;
+  cursor: pointer;
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+  line-height: 1.5;
+}
+.idx-link:hover { color: #551a8b; }
+
 
 /* ── MATTER.JS CANVAS ── */
 #matter-layer {
@@ -337,7 +353,7 @@ body {
   .body-text { font-size: 13px; }
   .epigraph { font-size: 12px; }
   .sbar { font-size: 9px; padding: 0 8px; gap: 6px; }
-  .end-pad { height: 30vh; }
+  .end-pad { height: 8vh; }
   #matter-layer { display: none; }
   /* diagram nodes smaller on mobile */
   .fb { font-size: 10px; padding: 2px 6px; }
@@ -428,7 +444,7 @@ body {
 
 <div id="win">
   <div class="tbar">
-    <div id="tbar-label">regional weather bulletin — Prefaces</div>
+    <div id="tbar-label">the mediated plant — teresa castro, 2019</div>
   </div>
 
   <div class="toolbar" id="toolbar">
@@ -436,11 +452,11 @@ body {
     <button class="aq" id="btn-fwd">Forward ▶</button>
     <div class="tb-sep"></div>
     <button class="aq" onclick="goSection(0)">Preface</button>
-    <button class="aq" onclick="goSection(1)">I. Sensing</button>
-    <button class="aq" onclick="goSection(2)">II. Mediation</button>
+    <button class="aq" onclick="goSection(1)">I. Seeing Plants Move</button>
+    <button class="aq" onclick="goSection(2)">II. Filmic Life</button>
     <button class="aq" onclick="goSection(3)">III. Time</button>
-    <button class="aq" onclick="goSection(4)">IV. Tropism</button>
-    <button class="aq" onclick="goSection(5)">V. Network</button>
+    <button class="aq" onclick="goSection(4)">IV. Queering Botanics</button>
+    <button class="aq" onclick="goSection(5)">V. Queer Kin</button>
     <div class="tb-sep"></div>
     <button class="aq" id="btn-rand" onclick="randLayout()">⟳ Shuffle</button>
     <button class="aq" id="btn-reset" onclick="resetLayout()">Reset</button>
@@ -475,113 +491,144 @@ body {
       <div class="col" id="col">
 
         <div class="section" data-sec="Preface" id="s0">
-          <div class="epigraph">Katalin Cseh-Varga and Adam Czirak, eds. <em>The Mediated Plant.</em> e-flux journal, 2018. On the nonhuman, the vegetal, and what it means to sense without a nervous system.</div>
+          <div class="epigraph">Teresa Castro, "The Mediated Plant," <em>e-flux Journal</em> #102 (September 2019).</div>
           <div class="body-text">
             <span class="par-break"></span>
-            What does it mean to mediate a plant? The question is not merely technological — it is ontological. To place a camera before a fern, to attach electrodes to a leaf, to translate the slow upward arc of a heliotropic stem into data, is to stage an encounter between two radically different temporalities: the human and the vegetal.
+            When I was a child, I was offered a book on forests. The book was filled with colorful illustrations: some were very intriguing, departing from the customary depiction of tree silhouettes and leaf shapes in which I otherwise reveled. Two images in particular caught my wandering eye. The first starred a houseplant resembling in every manner the philodendra that my mother had smartly arranged in our jungle-like living room. But instead of sitting quietly next to a velvet armchair, the book's philodendron was connected to a strange-looking machine by two bulky electrodes. As the machine scribbled jagged lines on a strip of scrolling paper, a woman hiding a pair of scissors behind her back appeared to watch the plant closely.
             <span class="par-break"></span>
-            Plants do not think. Or rather, they think differently — distributed across root networks, expressed through chemical signals, enacted over durations that exceed human attention. The mediated plant is always already a translation, a transformation, a betrayal of the original slowness.
+            Many years later, nurtured by a lifelong passion for both film and all things vegetal, I realized that the image of that leafy philodendron plugged into a lie detector accounted for much more than a wealth of wild, but incredibly popular, theses on the extrasensory perception of plants. At a time when our understanding of plant life and the vegetal world is being consistently and dramatically reshaped, when we've learned that orchids get jet lag too, the image of that wired plant begged both for a history of what I call the "mediated plant" and for a queering of botanics.
             <span class="par-break"></span>
-            The essay asks: when we make plants visible through technology, do we understand them better — or do we merely project our own desires for legibility onto forms of life that resist it?
+            The "sensitive," "sentient," or "intelligent" plant of our current time is necessarily a post-natural mediated plant, a plant interposed by visual and other technologies that make their awareness and in-tuneness with other plants and their surroundings discernible to the rationalist eye. These are technologies that invite us to conceive the plant-other in intentional and overtly <em>queer</em> terms; technologies, such as film, whose ultimate, paradoxical power has been, from its very beginning, the ability to re-enchant a disenchanted world, to enhance our perceptual possibilities and suggest alternative, counter-hegemonic ways of thinking about the world.
+            <span class="par-break"></span>
+            Such post-natural mediated plants are our <em>queer kin,</em> inviting us to abandon centuries-old conceptions of life and the living. As the mediated plant pushes us forward in this urgent "struggle to think differently" that Val Plumwood<span class="fn">[1]<span class="fn-text">Val Plumwood, "Nature in the Active Voice," <em>Australian Humanities Review,</em> no. 46 (2009): 127–28.</span></span> called us to join, mobilizing queerness means following a slightly defamiliarizing path. Indebted to ecofeminism and queer ecocriticism, this path will take us beyond the analytical category of gender and the battles of identity politics usually associated with queer theory.
           </div>
         </div>
 
         <div class="section sec-r" data-sec="I. Sensing" id="s1">
-          <div class="sub-head">On plant perception</div>
+          <div class="sub-head">Slowly Undoing Anthropocentrism: Seeing Plants Move (and Putting Them to Sleep)</div>
           <div class="body-text">
             <span class="par-break"></span>
-            Monica Gagliano's acoustic experiments revealed that plant roots grow toward the sound of water — even when no water is present, only vibration. This is sensing without nerves, recognition without a brain. A form of intelligence so alien to us that we had to invent new instruments merely to witness it.
+            Since at least the 1980s, the animal turn, propelled by the animal rights movement, has systematically put the question of animal difference, agency, conscience, and subjectivity on the agendas of the humanities and social sciences.<span class="fn">[2]<span class="fn-text">See, among others, Harriet Ritvo, "On the Animal Turn," <em>Daedalus</em> 136, no. 4 (2007); and Kari Weil, <em>Thinking Animals: Why Animal Studies Now?</em> (Columbia University Press, 2012).</span></span> Now a "plant turn" seems to be sweeping different fields of knowledge and creation. As botanists and geneticists lose their exclusive grip on the puzzles of vegetal life, philosophers invite us to think <em>about</em> and <em>with</em> plants, reclaiming a noninstrumental approach to plant life and taking plants' relational and nonhierarchical mode of being as an ethical and political model.<span class="fn">[3]<span class="fn-text">See, among others, Michael Marder's <em>Plant-Thinking: A Philosophy of Vegetal Life</em> (Columbia University Press, 2013); and Emanuele Coccia's <em>The Life of Plants: A Metaphysics of Mixture</em> (Polity Press, 2018).</span></span>
             <span class="par-break"></span>
-            The camera becomes a prosthesis. The microphone, a translator. Each device mediates not just the plant's behavior but our capacity to receive it. We are always reading the machine's reading of the plant — a double mediation that renders the original signal further and further from reach.
+            The spectacular examples of the <em>Mimosa pudica</em> (also known as the "sensitive" plant, or "touch-me-not"), whose leaves quickly fold inwards at the slightest shock (and which seems to remember and to organize learned behavioral responses<span class="fn">[4]<span class="fn-text">See Monica Gagliano, Michael Renton, Martial Depczynski, et al., "Experience Teaches Plants to Learn Faster and Forget Slower in Environments Where It Matters," <em>Oecologia</em> 175, no. 1 (2014): 63.</span></span>), or of the legendary <em>Dionaea muscipula,</em> the uncanny and animalesque "Venus flytrap" whose carnivorous appetite defied Linnaeus's taxonomy, demonstrated this well. Indeed, such plants haunted the botanical imagination of the time.
             <span class="par-break"></span>
-            What the apparatus shows us is not the plant sensing — it is the plant translated into something we can sense. The gap between these two things is where all the interesting questions live.
-          </div>
-          <div class="sub-head">Biofeedback and the body</div>
-          <div class="body-text">
+            Toward the end of the nineteenth century, scientists started using a plethora of motion analysis devices, such as graphic tracing techniques and eventually time-lapse cinematography, in order to demonstrate that apparently inert plants could move, "sleep," and were sensitive. Before cinema brought its own spectacular answers to the study of plant motion, manipulating scale and reconciling the dissonant temporalities of human and vegetal beings, revealing the full extent of "the non-conscious intentionality of vegetal life,"<span class="fn">[5]<span class="fn-text">Marder, <em>Plant-Thinking,</em> 153–62.</span></span> it was the graphic method, more than photography, which confirmed that plants are indeed the active agents of their own fate.
             <span class="par-break"></span>
-            Experiments in plant biofeedback — attaching galvanic sensors to leaves, monitoring electrical changes in response to human proximity — collapse the boundary between organism and instrument. The plant becomes a kind of readout; the human, an event in its environment.
-            <span class="par-break"></span>
-            This reversal is significant. We usually position ourselves as the observers, the analysts, the ones who read the world. But in these setups, the plant reads us. Our presence registers as a disturbance in its electrical field. We become the signal in someone else's data.
+            In 2008, a restaurant in Kamakura, Japan, hooked a sweetheart plant called Midori-san to sensors recording the plant's temperature and levels of light and moisture received throughout the day. An algorithm then translated the information into sentences posted on a blog.<span class="fn">[6]<span class="fn-text">See http://pinktentacle.com/2008/10/midori-san-the-blogging-houseplant/</span></span> The sentient plant is a mediated plant: a plant mediated by polygraphs and their electrode cables; a plant mediated by time-lapse cinematography, which exposes "the pain and the joy" expressed by and in plant motion.
           </div>
         </div>
 
         <div class="section" data-sec="II. Mediation" id="s2">
-          <div class="sub-head">Technology as translation</div>
+          <div class="sub-head">The Filmic Life of Plants</div>
           <div class="body-text">
             <span class="par-break"></span>
-            Every image of a plant is already a mediation. The herbarium specimen, pressed and dried, translates living tissue into archival matter. The botanical illustration, however precise, translates three-dimensional growth into two-dimensional representation. The time-lapse film translates vegetal duration into human-speed cinema.
+            In 1966, a polygraph expert working for the CIA hooked up one of his machines to the leaf of a dracaena. As Michael Pollan writes, "To his astonishment, Cleve Backster found that simply by imagining the plant being set on fire he could make it rouse the needle of a polygraph machine, registering a surge of electrical activity suggesting that the plant felt stress."<span class="fn">[7]<span class="fn-text">Michael Pollan, "The Intelligent Plant," <em>The New Yorker,</em> December 15, 2013.</span></span> In the years to come, Backster and his collaborators multiplied the experiments, plugging dozens of plants and vegetables into lie detectors.
             <span class="par-break"></span>
-            What changes with digital mediation is not the fact of translation but its velocity and its volume. We can now produce images of plants faster than plants can grow. We can generate more representations of a leaf than there are leaves on the plant. The archive threatens to overwhelm the organism it documents.
+            Indeed, images played an essential and versatile role in the mainstreaming of the plant sentience hypothesis. Even the images produced by Backster's polygraph have a heuristic power. The scribbling lines methodically inscribed by tiny needles on strips of scrolling paper open up theoretical horizons concerning plant's potential "agency," "awareness," "conscience," "intelligence," "intentionality," "sentience," or "thinking." Moreover, plant sentience and intelligence are now explicitly associated with the mediation of machines. Again, the sentient plant is a mediated plant.
             <span class="par-break"></span>
-            This excess of mediation is itself a form of violence — not intentional, but structural. The plant disappears beneath its representations, replaced by data, by spectacle, by the smooth surfaces of a screen.
-          </div>
-          <div class="sub-head">The apparatus of visibility</div>
-          <div class="body-text">
+            In the early twentieth century, critics and filmmakers marveled before scientific films that were capable of exposing, by virtue of cinema's expressive resources (time lapse, the close-up, editing, etc.), the secret life of plants. Tender shoots pierced the ground in seconds, stems feverishly burst toward the light, and flowers bloomed in the blink of an eye. The bindweed danced, the passionflower moved: in other words, plants had become animated, joining the army of inhuman existences that Jean Epstein<span class="fn">[8]<span class="fn-text">Jean Epstein, "Photogénie de l'impondérable" (1935), in <em>Écrits sur le cinéma,</em> vol. 1 (Seghers, 1974), 250–51.</span></span> recognized on screen.
             <span class="par-break"></span>
-            What kinds of plants become visible through technology, and which remain invisible? The photogenic specimen, the rare orchid, the carnivorous novelty — these are the plants that circulate through media. The weed, the grass, the unremarkable fern — these are plants whose lives pass entirely without technological witness.
-            <span class="par-break"></span>
-            Visibility is always political. The question of which organisms we choose to mediate — to make legible, to amplify, to grant technological attention — is also a question about which forms of life we value, which we study, which we protect.
+            As Epstein writes in 1935, with regards to time-lapse cinematography: "Slow motion and fast motion reveal a world where the kingdoms of nature know no boundaries. Everything lives." And: "A surprising animism is being reborn. We know now, because we have seen them, that we are surrounded by inhuman existences … The cinematographer extends the range of our senses, making perceptible to our sight and to our hearing individuals that we considered invisible and inaudible."
           </div>
         </div>
 
         <div class="section sec-r" data-sec="III. Time" id="s3">
-          <div class="sub-head">Vegetal duration</div>
+          <div class="sub-head">Temporal Scale and the Miracle of Flowers</div>
           <div class="body-text">
             <span class="par-break"></span>
-            Time-lapse photography was developed precisely to make plant movement visible to human eyes. In real time, a sunflower tracking the arc of the sun, a tendril spiraling toward a support, a seed cracking open and pushing upward through soil — these are all too slow for human perception. The camera speeds them up, compresses vegetal time into human time.
+            As French writer Colette wrote in 1924, making evident cinema's perilous <em>empathetic, emotional</em> powers: "A time-lapse film documented the germination of a bean … At the revelation of the intentional and intelligent movement of the plant, I saw children get up, imitate the extraordinary ascent of the plant climbing in a spiral, avoiding an obstacle, groping over its trellis: 'It's looking for something! It's looking for something!' cried a little boy, profoundly affected. He dreamt of a plant that night, and so did I."<span class="fn">[9]<span class="fn-text">Colette, "Cinéma (Magie des films d'enseignement)" (1924), in <em>Colette et le cinéma</em> (Fayard, 2004), 369.</span></span>
             <span class="par-break"></span>
-            But something is lost in this acceleration. The actual experience of plant growth — the slowness, the persistence, the indifference to our impatience — is exactly what the time-lapse erases. We see the movement, but we do not feel the duration. We receive the conclusion without living through the process.
+            Shot in Germany by Max Reichmann, <em>The Miracle of Flowers</em> (1926) tells the story of a fairy named Flora who, having surprised a group of children carelessly plucking "innocent" living beings (i.e., flowers), acquaints them, thanks to time-lapse images documenting the growth and withering of seventy-eight plant species, with the "sorrows" and "struggles" of plants, "the rhythm of their movements," their "feelings." The film's originality lies in the images that Reichmann intercuts with the time-lapse sequences: expressionist dance scenes, where human dancers interpret and mimic the gestures of plants.
             <span class="par-break"></span>
-            Slowness, in this sense, is not a deficiency in plants. It is a different relationship to time — one that our technologies systematically override in order to make the vegetal legible to beings who live at a different speed.
-          </div>
-          <div class="sub-head">Rhythm and interval</div>
-          <div class="body-text">
+            When Flora explains to the children that they "don't notice their [the flowers'] sorrows and struggles, because the rhythm of their movement operates under a different time measurement, and yet like you they flower and fade," she grabs a girl's wrist to take her pulse. The film cuts to micro-cinematographic images of human blood. A pulse beat equals a human second; soon after, a mechanical clock starts to race, disrupting human rhythms and compressing four years of growth into one hour of screen time. In other words, the technological wonder of time lapse accomplishes the miracle of relativizing human life-rhythms.
             <span class="par-break"></span>
-            Plants have circadian rhythms. They open and close on schedules calibrated to light and temperature. They produce chemicals in response to seasons, to drought, to the presence of herbivores. They communicate through the soil — through fungal networks that carry signals across distances.
-            <span class="par-break"></span>
-            These rhythms operate at scales that neither fully align with nor fully diverge from human rhythms. They are close enough to be recognizable, distant enough to be strange. The mediated plant — caught in time-lapse, monitored by sensor — is always being translated into our rhythm, our interval, our sense of what counts as an event.
+            The German plant physiologist Wilhelm Pfeffer<span class="fn">[10]<span class="fn-text">Pfeffer made four time-lapse films between 1898 and 1900, corroborating some of Darwin's contested ideas on plant sensitivity and irritability. The films are viewable at https://www.dailymotion.com/video/x1hp9q</span></span> made the first time-lapse films of plant motion. As Oliver Gaycken puts it, "The revelation of seeing plant movement accelerated to the point of visibility via a technical device opened up new pathways for thinking about the relationship between plants and animals."
           </div>
         </div>
 
         <div class="section" data-sec="IV. Tropism" id="s4">
-          <div class="sub-head">Toward the light</div>
+          <div class="sub-head">Queering Botanics</div>
           <div class="body-text">
             <span class="par-break"></span>
-            Phototropism — the bending of plants toward light — is perhaps the most legible form of plant behavior. It is movement organized by desire, or at least by what functions like desire: a differential sensitivity to light that causes cells on one side to elongate faster than cells on the other, producing a curve, a reaching, an orientation.
+            The mediated, sentient, and intelligent plant potentially invites us to think about nature, plants, technology, and ourselves-as-humans in different ways. Perhaps the mediated, sentient, intelligent plant can help us to queer nature, to queer botanics, to queer ourselves-as-humans as we "go onwards in a different mode of humanity." But why <em>to queer?</em> Why not "simply" to "decolonize"?
             <span class="par-break"></span>
-            What would it mean to design an interface that bends toward the user the way a plant bends toward light? Not instantly, not mechanically, but slowly — adjusting over time, responding to presence rather than to command. An interface that senses you without demanding your input.
+            Because queer has never been only human. Because queer can be a way to reimagine what it means to be "human" in the age of man-made ecological catastrophe, as we estrange ourselves from dualistic identities and an oppressive mode of being human. Because queer is a means to push forward the boundaries of our thinking about ourselves in relation to all the meaningful others who share the world with us. Because queer is about identity and inclusion.
             <span class="par-break"></span>
-            This is the speculative design question the essay opens up: not just how to represent plant intelligence, but how to embody it — how to build systems that operate by its logic rather than merely depicting it.
-          </div>
-          <div class="sub-head">Gravitropism and root logic</div>
-          <div class="body-text">
+            To queer botanics is to recognize plant nature is queer nature. A queer nature made of peculiar, twofold bodies: an aerial body that grows upwards and reaches for the light, and a subterranean body that pushes through the soil and recedes into the darkness. It is a nature based on autotroph lifestyles: unlike fungi, animals, or humans, plants do not (usually) feed on others. They produce their own nourishment, trapping energy from sunlight, processing carbon dioxide and water. Plants are not only mediated: they are the great mediators of our world, transforming solar energy into living matter, producing an oxygen-rich atmosphere.
             <span class="par-break"></span>
-            Roots grow downward through gravitropism — a response to gravity that requires no knowledge of direction, only a sensitivity to force. The root does not know it is going down. It simply responds, cell by cell, to the conditions it encounters.
-            <span class="par-break"></span>
-            This is a model of navigation without a map, growth without intention, intelligence without consciousness. It challenges every assumption we make about how knowing and doing relate to each other — and suggests that some of the most successful forms of problem-solving in the world operate entirely without a mind.
+            Swedish botanist Carl Linnaeus<span class="fn">[11]<span class="fn-text">As artist Pedro Neves Marques recalls in <em>Linnaeus and the Terminator Seed,</em> a 2017 film-essay connecting modern botany to contemporary transgenics, Linnaeus "made gender and sex the founding principles of nature."</span></span> "made gender and sex the founding principles of nature." Having established "maleness" and "femaleness" as the basis of the classification of plants, Linnaeus not only turned the sexualization of nature into the basis of his <em>Systema Naturae</em> (1735), but he <em>gendered nature,</em> metamorphosing plants into green homunculi trapped inside a highly patriarchal structure.
           </div>
         </div>
 
         <div class="section sec-r" data-sec="V. Network" id="s5">
-          <div class="sub-head">The wood wide web</div>
+          <div class="sub-head">The Mediated Plant as Queer Kin</div>
           <div class="body-text">
             <span class="par-break"></span>
-            Beneath a forest floor, a network. Mycorrhizal fungi thread through soil, connecting root systems of different trees, enabling the transfer of carbon, water, and chemical signals across distances of many meters. Suzanne Simard's research demonstrated that trees use this network to share resources — that a mother tree can send carbon to her seedlings growing in shade, that trees can warn their neighbors of insect attack.
+            In our current context, we should be wary of all forms of anthropocentrism, as in our Western context they seem to promote human remoteness from the living world, holding an aloof, escapist "anthropos" in his crumbling ivory tower. But as we endorse more caring, communicative, and attentive attitudes towards the earth and our other-than-human counterparts, maybe a critical and creative anthropomorphism is not only possible, but desirable, as a necessary step.
             <span class="par-break"></span>
-            This is a rhizomatic system in the Deleuzian sense: decentralized, without hierarchy, organized by connection rather than command. There is no brain, no center, no authority — only the network itself, and the flows that pass through it.
+            As anthropologist Natasha Myers<span class="fn">[12]<span class="fn-text">Natasha Myers, "Ungrid-able Ecologies: Decolonizing the Ecological Sensorium in a 10,000 year-old NaturalCultural Happening," <em>Catalyst: Feminism, Theory, Technoscience</em> 3, no. 2 (2017): 7.</span></span> justly observes, we need to reconsider animism (among other things an essential feature of film) and anthropomorphism since "the very taboos against [them] are grounded in colonial imaginations of nature and culture, and … this disavowal of nonhuman sentience is intimately bound up in colonial projects that have taken shape under the guise of the ecological sciences."
             <span class="par-break"></span>
-            The internet was once described with similar metaphors. But the internet has nodes and routers and servers — centers of a kind, hierarchies that emerged from apparent flatness. The mycorrhizal network resists this logic. It is genuinely distributed in ways that our technological networks only approximate.
-          </div>
-          <div class="sub-head">Toward a vegetal interface</div>
-          <div class="body-text">
+            To survive and resist means to adjust, to leave behind reductive stances, and to wrench ourselves loose from our monological, colonizing grip on "nature." Forests are not stocks of natural resources, nor are they the "lungs of the earth." Forests are life-forms and forms of life, from whom we must learn and with whom we need to forge alliances. We need to rebel against the deep-rooted, dualistic conceptions that have radically separated us from nature and more-than-human others.
             <span class="par-break"></span>
-            What would it mean to build a website that grows? Not one that loads quickly and presents information efficiently, but one that reveals itself slowly, that changes with each visit, that responds to the time of day, the weather at your location, the season in which you encounter it?
+            As philosopher Emanuele Coccia would put it: plants are our gardeners. Beyond gender(ing), to queer ourselves-as-humans is to make a step toward becoming other. Not to become plant, but to become otherly human, as the post-natural mediated plant is otherly plant.
             <span class="par-break"></span>
-            The mediated plant suggests an alternative model for digital design — one organized not around the user's convenience but around the plant's temporality. An interface that asks you to wait. That does not complete itself. That leaves some things permanently out of reach.
-            <span class="par-break"></span>
-            This website is that experiment. Content valid until conditions change. The site decays.
+            <em>In other words: free your mind.</em>
           </div>
         </div>
+
+                <!-- ── FOOTNOTES ── -->
+        <div id="footnotes" style="padding:40px 0 20px;margin-top:60px;font-family:'Times New Roman',serif;font-size:10px;line-height:1.55;letter-spacing:-0.01em;color:#0000ee;columns:2;column-gap:32px;">
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">1</span>&ensp;Jean Epstein, "Photogénie de l'impondérable" (1935), in <em>Écrits sur le cinéma,</em> vol. 1 (Seghers, 1974), 250.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">2</span>&ensp;Val Plumwood, "Nature in the Active Voice," <em>Australian Humanities Review,</em> no. 46 (2009): 127–28.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">3</span>&ensp;I warmly thank Margarida Mendes: it was during one of our many discussions on plant life that the notion of the "mediated plant" appeared to me. The exhibition <em>Plant Revolution!</em>, curated by Mendes, opens at Centro Internacional das Artes José Guimarães on October 19, 2019.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">4</span>&ensp;Val Plumwood, "Review of Deborah Bird Rose's Reports from a Wild Country," <em>Australian Humanities Review,</em> no. 42 (2007): 1.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">5</span>&ensp;See, among others, Harriet Ritvo, "On the Animal Turn," <em>Daedalus</em> 136, no. 4 (2007); and Kari Weil, <em>Thinking Animals: Why Animal Studies Now?</em> (Columbia University Press, 2012). See also the "Animal Turn Collection" at Michigan State University Press.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">6</span>&ensp;See Val Plumwood's <em>Environmental Culture: The Ecological Crisis of Reason</em> (Routledge, 2002) for an instructive comment on the environment's backgrounding and denial as a major rationalist strategy.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">7</span>&ensp;I'm thinking of Peter Wohlleben's <em>The Hidden Life of Trees</em> (Greystone Books, 2016); and of New Zealand's 2014 move to grant legal personhood to the Te Urewera forest, which now owns itself. Countries such as India and Colombia have granted rights to rivers, and in 2008 Ecuador conferred rights upon nature in its constitution.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">8</span>&ensp;See, among others, Mathew Hall's <em>Plants as Persons: A Philosophical Botany</em> (SUNY Press, 2011); Michael Marder's <em>Plant-Thinking: A Philosophy of Vegetal Life</em> (Columbia University Press, 2013); and Emanuele Coccia's <em>The Life of Plants: A Metaphysics of Mixture</em> (Polity Press, 2018). Marder rejects the idea of a "formal plant-intelligence," preferring to envisage the "non-conscious life of plants" as a "kind of 'thinking before thinking'" (p. 154).</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">9</span>&ensp;On chlorophyll transfusions, see the Spanish collective Quimera Rosa's performance "May the Chlorophyll Be With/In You." Austrian artist Georg Tremmel and Japanese artist Shiho Fukuhara reverse engineered a genetically modified variety of a carnation, the blue Moondust (<em>The Common Flowers Project,</em> 2009).</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">10</span>&ensp;See Eduardo Kohn's <em>How Forests Think: Toward an Anthropology Beyond the Human</em> (University of California Press, 2013); and Anna Tsing, <em>The Mushroom at the End of the World</em> (Princeton University Press, 2015).</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">11</span>&ensp;"Plant neurobiology" is associated with the work of Italian biologist Stefano Mancuso, who runs the International Laboratory of Plant Neurobiology in Florence, founded in 2005. See his book with Alessandra Viola, <em>Brilliant Green</em> (Insland Press, 2015). On plant "awareness," see Daniel Chamovitz's <em>What a Plant Knows</em> (Farrar, Straus and Giroux, 2012).</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">12</span>&ensp;Jeremy Narby, <em>Intelligence in Nature: An Inquiry into Knowledge</em> (Penguin, 2005).</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">13</span>&ensp;As Davi Kopenawa's words on the forest perfectly show — see Davi Kopenawa and Bruce Albert, <em>The Falling Sky: Words of a Yanomami Shaman</em> (Belknap Press, 2013).</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">14</span>&ensp;Peter Skafish, "The Metaphysic of Extra-Moderns: On the Decolonization of Thought — A Conversation with Eduardo Viveiros de Castro," <em>Common Knowledge</em> 22, no. 3 (September 2016), 412.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">15</span>&ensp;Catherine Lenne, Olivier Boudeau, and Bruno Moulia, "Percevoir et bouger: les plantes aussi," <em>Pour la Science,</em> no. 438 (April 2014), 47.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">16</span>&ensp;In 2008, a restaurant in Kamakura, Japan, hooked a sweetheart plant called Midori-san to sensors recording the plant's temperature and levels of light and moisture received throughout the day. An algorithm then translated the information into sentences posted on a blog.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">17</span>&ensp;See Monica Gagliano, Michael Renton, Martial Depczynski, et al., "Experience Teaches Plants to Learn Faster and Forget Slower in Environments Where It Matters," <em>Oecologia</em> 175, no. 1 (2014): 63. Chamovitz also discusses "plant memory" in his <em>What a Plant Knows.</em></p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">18</span>&ensp;Wendy Djin Geniusz, <em>Our Knowledge Is Not Primitive: Decolonizing Botanical Anishinaabe Teachings</em> (Syracuse University Press, 2009); and Robin Wall Kimmerer, <em>Braiding Sweetgrass</em> (Milkweed Editions, 2015).</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">19</span>&ensp;Marder, <em>Plant-Thinking,</em> 153–62.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">20</span>&ensp;Paul Bert, <em>Recherches sur le mouvement de la Sensitive (Mimosa Pudica, Linn.)</em> (Baillère et Fils, 1867).</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">21</span>&ensp;Women, whose upper-class representatives were eventually allowed to study botany during the nineteenth century after endless debates on the appropriateness of Linnaeus's highly sexual classification system to the decorum of the "female mind," were generally limited to the collection, preparation, and drawing of botanical specimens, with British botanist Henderina Victoria Scott providing at least one example of a female scientific film pioneer.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">22</span>&ensp;Charles Darwin, <em>The Power of Movement in Plants</em> (John Murray, 1880), 573.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">23</span>&ensp;See <em>Biocentrism and Modernism,</em> eds. Oliver A. I. Botar and Isabel Wünsche (Routledge, 2011).</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">24</span>&ensp;The German plant physiologist Wilhelm Pfeffer made four time-lapse films between 1898 and 1900, corroborating some of Darwin's contested ideas on plant sensitivity and irritability.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">25</span>&ensp;Oliver Gaycken, "The Secret Life of Plants: Visualizing Vegetative Movement 1880–1903," <em>Early Popular Visual Culture</em> 10, no. 1 (February 2012): 58.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">26</span>&ensp;Boris Bilinsky, "Le costume," in <em>L'Art Cinématographique</em> (Félix Alcan, 1929), 56.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">27</span>&ensp;Epstein, "Photogénie de l'impondérable," 251.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">28</span>&ensp;Jean Epstein, "Intelligence d'une machine" (1946), in <em>Écrits sur le cinéma,</em> vol. 2 (Seghers, 1974), 285.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">29</span>&ensp;Raoul Heinrich Francé, <em>Les Sens de la plante</em> (1911) (Adyar, 2003), 93.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">30</span>&ensp;Colette, "Cinéma (Magie des films d'enseignement)" (1924), in <em>Colette et le cinéma</em> (Fayard, 2004), 369.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">31</span>&ensp;The film, entitled <em>The Strangler</em> (1930), can be watched at britishpathe.com.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">32</span>&ensp;Plumwood, "Nature in the Active Voice," 127.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">33</span>&ensp;Aude Michelet and Charles Stépanoff, "Comment l'anthropomorphisme nous a rendus humains," in <em>Persona: Étrangement humain,</em> ed. Aude Gros de Beler (Actes Sud / Musée du quai Branly, 2015), 45–46.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">34</span>&ensp;Plumwood, <em>Environmental Culture,</em> 59.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">35</span>&ensp;Skafish, "Conversation with Eduardo Viveiros de Castro," 410.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">36</span>&ensp;I'm referring to the recent DC Comics web television adaptation of <em>The Swamp Thing</em> saga. The Swamp Thing is a vegetal monstrous body whose shape resembles a male human body. It can communicate with "the Green," a sort of vegetable consciousness connecting all plant life in the universe.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">37</span>&ensp;Natasha Myers, "Ungrid-able Ecologies: Decolonizing the Ecological Sensorium in a 10,000 year-old NaturalCultural Happening," <em>Catalyst: Feminism, Theory, Technoscience</em> 3, no. 2 (2017): 7.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">38</span>&ensp;Michael Pollan, "The Intelligent Plant," <em>The New Yorker,</em> December 15, 2013.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">39</span>&ensp;Arthur W. Galston and Clifford L. Slayman, "The Not-So-Secret Life of Plants," <em>American Scientist</em> 67, no. 3 (May–June 1979), 337–44.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">40</span>&ensp;Retallack mentions in her book having been intrigued by Franklin Loehr's <em>The Power of Prayer on Plants</em> (1959).</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">41</span>&ensp;Listen to "Same Old Story" on YouTube.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">42</span>&ensp;Among other places, this comeback is evident in the contemporary art scene, as illustrated by two different group exhibitions inspired by the book/film/Stevie Wonder record: "The Secret Life of Plants," held at the Linden Centre for Contemporary Arts, Melbourne, in 2009; and "The Secret Life of Plants," held at Freight + Volume, New York, in 2017. British artist Will J. Robinson has also conceived an installation inspired by Backster: "The Backster Experiment."</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">43</span>&ensp;On films such as <em>The Thing From Another World</em> (Christian Nyby, 1951), <em>It Came from Outer Space</em> (Jack Arnold, 1953), <em>Invasion of the Body Snatchers</em> (Don Siegel, 1956), <em>From Hell It Came</em> (Dan Milner, 1957), <em>The Little Shop of Horrors</em> (Roger Corman, 1960), <em>The Day of the Triffids</em> (Steve Sekely, 1963), etc., see Adam Knee, "Vegetable Discourses in 1950s Science Fiction Film," in <em>Plant Horror,</em> eds. Dawn Keetley and Angela Tenga (Palgrave MacMillan, 2016).</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">44</span>&ensp;This expression was preferred over "extrasensory perception" by "communist scientists," according to a CIA report on Soviet and Czechoslovakian parapsychology research, dated April 15, 1975.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">45</span>&ensp;Peter Tomkins and Christopher Bird, <em>The Secret Life of Plants</em> (Avon Books, 1974), 81.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">46</span>&ensp;The experience is documented in Walon Green's film. It's interesting to compare Mrs. Hashimoto's experiment with John Baldessari's 1972 video piece <em>Teaching the Alphabet to a Plant</em> (an exercise in futility and the absurd). See also Elise Florenty and Marcel Türkowsky's 2017 film <em>Conversation with a Cactus.</em></p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">47</span>&ensp;See Donna Haraway, "Teddy Bear Patriarchy: Taxidermy in the Garden of Eden, New York City, 1908–1936," <em>Social Text,</em> no. 11 (1984).</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">48</span>&ensp;With regard to Chile's nitrate fields, see Daniel A. Gross, "Caliche: The Conflict Mineral That Fuelled the First World War," <em>The Guardian,</em> June 2, 2014. On nitrogen as an execution method, see Denise Grady and Jan Hoffmann, "States Turn to an Unproven Method of Execution: Nitrogen Gas," <em>New York Times,</em> May 7, 2018.</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">49</span>&ensp;Matthew Vollgraff, "Vegetal Gestures: Cinema and the Knowledge of Life in Weimar Germany," <em>Grey Room,</em> no. 72 (Summer 2018). On <em>The Miracle of Flowers</em> see also Janelle Blankenship, "'Film-Symphonie von Leben und Sterben der Blumen': Plant Rhythm and Time-Lapse Vision in <em>Das Blumenwunder,</em>" <em>Intermédialités,</em> no. 16 (2010).</p>
+          <p style="margin-bottom:10px;break-inside:avoid;"><span style="color:#0000ee;text-decoration:underline;">50</span>&ensp;Plumwood, "Review of Deborah Bird Rose," 1.</p>
+          </div>
 
         <div class="end-pad"></div>
       </div>
@@ -652,7 +699,6 @@ updateScrollbarTargets();
 
 function springLoopSB(){
   const k=0.048, d=0.74;
-  // main bars
   Object.values(sbDefs).forEach(sb=>{
     if(!sb.el) return;
     sb.vel = sb.vel*d + (sb.target - sb.pos)*k;
@@ -660,33 +706,37 @@ function springLoopSB(){
     if(sb.axis==='v') sb.el.style.top = sb.pos.toFixed(1)+'px';
     else sb.el.style.left = sb.pos.toFixed(1)+'px';
   });
-  // ghost thumbs
-  ghostDefs.forEach(g=>{
-    if(!g.el) return;
-    g.vel = (g.vel||0)*d + (g.tgt - g.pos)*k;
-    g.pos += g.vel;
-    g.el.style.top = g.pos.toFixed(1)+'px';
-  });
+  // ghost thumbs — desktop only
+  if(window.innerWidth>700){
+    ghostDefs.forEach(g=>{
+      if(!g.el) return;
+      g.vel = (g.vel||0)*d + (g.tgt - g.pos)*k;
+      g.pos += g.vel;
+      g.el.style.top = g.pos.toFixed(1)+'px';
+    });
+  }
   requestAnimationFrame(springLoopSB);
 }
 springLoopSB();
 
-// ── BUTTON PULSE ────────────────────────────────────────────────
-document.querySelectorAll('.aq').forEach(b=>{
-  (function pulse(){
-    setTimeout(()=>{
-      b.style.transition='filter .4s ease';
-      b.style.filter='brightness(1.15)';
-      setTimeout(()=>{ b.style.filter='brightness(1)'; pulse(); },350+Math.random()*600);
-    },300+Math.random()*2200);
+// ── BUTTON PULSE — desktop only ──────────────────────────────────
+if(window.innerWidth>700){
+  document.querySelectorAll('.aq').forEach(b=>{
+    (function pulse(){
+      setTimeout(()=>{
+        b.style.transition='filter .4s ease';
+        b.style.filter='brightness(1.15)';
+        setTimeout(()=>{ b.style.filter='brightness(1)'; pulse(); },350+Math.random()*600);
+      },300+Math.random()*2200);
+    })();
+  });
+  (function wiggle(){
+    const r=document.getElementById('btn-rand');
+    if(!r) return;
+    setTimeout(()=>{ r.style.transform='translateY(-1px) scale(1.04)';
+      setTimeout(()=>{ r.style.transform=''; wiggle(); },180); },2800+Math.random()*3000);
   })();
-});
-(function wiggle(){
-  const r=document.getElementById('btn-rand');
-  if(!r) return;
-  setTimeout(()=>{ r.style.transform='translateY(-1px) scale(1.04)';
-    setTimeout(()=>{ r.style.transform=''; wiggle(); },180); },2800+Math.random()*3000);
-})();
+}
 
 // ── SCROLL + COLUMN (original logic preserved) ───────────────────
 const col=document.getElementById('col');
@@ -766,20 +816,19 @@ function updateSections(){
     }
     if(rect.top<vh*0.55&&rect.bottom>vh*0.1&&s.el.dataset.sec){
       sSec.textContent=s.el.dataset.sec;
-      tbarLabel.textContent='the mediated plant — '+s.el.dataset.sec;
+      tbarLabel.textContent='teresa castro, 2019 — '+s.el.dataset.sec;
     }
   });
 }
 sections.forEach(el=>{el.style.opacity='1';el.style.transition='none';});
 window.addEventListener('scroll',()=>{
+  if(isMobile()) return; // skip parallax entirely on mobile
   if(!secRafPending){secRafPending=true;requestAnimationFrame(updateSections);}
 },{passive:true});
 updateSections();
 
 // ── INDEX GRID PULSE ─────────────────────────────────────────────
-const gns=document.querySelectorAll('.gn');
-function pulseGrid(){gns.forEach(g=>{const d=Math.abs(g.getBoundingClientRect().top-window.innerHeight*.4);if(d<90){g.classList.add('bright');g.classList.remove('dim');}else if(d>220){g.classList.add('dim');g.classList.remove('bright');}else{g.classList.remove('bright','dim');}});}
-window.addEventListener('scroll',pulseGrid,{passive:true});
+// pulseGrid removed — grid is hidden, no need to run on scroll
 
 applyCol();
 
@@ -866,6 +915,52 @@ async function fetchWeather(){
 }
 fetchWeather();
 
+// ── LETTER DECAY — the longer you stay, the more text decays ─────
+// Every 8 seconds, a random character in a random paragraph
+// is replaced with a decay character, then eventually disappears.
+// Essay concept: "the site decays" — text becomes unstable over time.
+(function initLetterDecay(){
+  const DECAY_CHARS = ['·', '·', '_', '—', '·', ' ', '—'];
+  let decayCount = 0;
+
+  function decayOneLetter(){
+    const paras = [...document.querySelectorAll('.body-text, .epigraph')];
+    if(!paras.length) return;
+    // pick a random paragraph
+    const para = paras[Math.floor(Math.random()*paras.length)];
+    // walk text nodes
+    const walker = document.createTreeWalker(para, NodeFilter.SHOW_TEXT, null);
+    const nodes = [];
+    while(walker.nextNode()) nodes.push(walker.currentNode);
+    if(!nodes.length) return;
+    // pick a random text node with actual letters
+    const eligible = nodes.filter(n => /[a-zA-Z]/.test(n.textContent));
+    if(!eligible.length) return;
+    const node = eligible[Math.floor(Math.random()*eligible.length)];
+    const text = node.textContent;
+    // find a letter position
+    const letterPositions = [];
+    for(let i=0;i<text.length;i++){ if(/[a-zA-Z]/.test(text[i])) letterPositions.push(i); }
+    if(!letterPositions.length) return;
+    const pos = letterPositions[Math.floor(Math.random()*letterPositions.length)];
+    // decay: replace with decay char, then after 4s remove entirely
+    const decayChar = DECAY_CHARS[Math.floor(Math.random()*DECAY_CHARS.length)];
+    node.textContent = text.slice(0,pos) + decayChar + text.slice(pos+1);
+    decayCount++;
+    // after many decays, speed up slightly
+  }
+
+  // start slow — first decay after 20s, then every 8s
+  // accelerates slightly the longer you stay
+  let interval = 8000;
+  setTimeout(function scheduleDecay(){
+    decayOneLetter();
+    interval = Math.max(3000, interval - 50); // slowly accelerates
+    setTimeout(scheduleDecay, interval);
+  }, 20000);
+})();
+
+
 // ── SHUFFLE / RESET ───────────────────────────────────────────────
 function randLayout(){
   const tb=document.getElementById('toolbar');
@@ -897,10 +992,16 @@ function resetLayout(){
   const canvas=document.getElementById('vine-canvas');
   if(!canvas) return;
   const ctx=canvas.getContext('2d');
-  let W,H;
-  function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+  let W,H,DPR=1;
+  function resize(){
+    DPR=window.devicePixelRatio||1;
+    W=window.innerWidth; H=window.innerHeight;
+    canvas.width=W*DPR; canvas.height=H*DPR;
+    canvas.style.width=W+'px'; canvas.style.height=H+'px';
+    ctx.scale(DPR,DPR);
+  }
   resize();
-  window.addEventListener('resize',resize);
+  window.addEventListener('resize',()=>{resize();spawnRoots();});
 
   // Season params
   let maxDepth=7,branchChance=0.06,baseLen=4.5;
@@ -966,7 +1067,8 @@ function resetLayout(){
   function spawnRoots(){
     branches=[];
     // bottom — main stems, spread across full width
-    for(let i=0;i<9;i++){
+    const stemCount = window.innerWidth<=700 ? 3 : 9;
+    for(let i=0;i<stemCount;i++){
       branches.push(new Branch(
         Math.random()*W, H,
         -Math.PI/2+(Math.random()-0.5)*0.6,
@@ -1001,7 +1103,7 @@ function resetLayout(){
 
   let lastT=0;
   function loop(ts){
-    if(ts-lastT<40){requestAnimationFrame(loop);return;}
+    if(ts-lastT<(window.innerWidth<=700?120:40)){requestAnimationFrame(loop);return;}
     const dt=ts-lastT; lastT=ts;
 
     // clear canvas each frame — branches manage their own opacity for decay
@@ -1126,41 +1228,6 @@ function redrawLines(){
 // Redraw lines on RAF — lines only, no layout reads in main text loop
 requestAnimationFrame(function loop(){ redrawLines(); requestAnimationFrame(loop); });
 
-// ── DRAG — touch + mouse for all .fb nodes ────────────────────────
-document.querySelectorAll('.fb').forEach(btn=>{
-  let dragging=false, ox=0, oy=0, moved=false;
-
-  function startDrag(cx,cy){
-    dragging=true; moved=false;
-    const r=btn.getBoundingClientRect();
-    ox=cx-r.left; oy=cy-r.top;
-    btn.style.zIndex='700';
-  }
-  function moveDrag(cx,cy){
-    if(!dragging) return;
-    moved=true;
-    btn.style.left=(cx-ox)+'px';
-    btn.style.top=(cy-oy)+'px';
-    btn.style.right='auto'; btn.style.bottom='auto';
-  }
-  function endDrag(){ dragging=false; btn.style.zIndex=''; }
-
-  // mouse
-  btn.addEventListener('mousedown',e=>{ e.preventDefault(); startDrag(e.clientX,e.clientY); });
-  window.addEventListener('mousemove',e=>{ if(dragging) moveDrag(e.clientX,e.clientY); });
-  window.addEventListener('mouseup',endDrag);
-
-  // touch — preventDefault stops page scroll while dragging node
-  btn.addEventListener('touchstart',e=>{
-    e.preventDefault();
-    startDrag(e.touches[0].clientX, e.touches[0].clientY);
-  },{passive:false});
-  btn.addEventListener('touchmove',e=>{
-    e.preventDefault();
-    moveDrag(e.touches[0].clientX, e.touches[0].clientY);
-  },{passive:false});
-  btn.addEventListener('touchend',e=>{ e.preventDefault(); endDrag(); },{passive:false});
-});
 
 // ── PHOTOTROPISM — sidebar leans toward mouse ─────────────────────
 // ── 2. PHOTOTROPISM — sidebar leans toward mouse ──────────────────
@@ -1299,7 +1366,7 @@ document.querySelectorAll('.fb').forEach(btn=>{
 // ── TEXT SIZING — IntersectionObserver on all screens ───────────────
 (function initTextSizing(){
   const textEls=[...document.querySelectorAll('.body-text,.epigraph')];
-  const peak=window.innerWidth<=700?36:68;
+  const peak=window.innerWidth<=700?64:110;
   const base=13.5;
   textEls.forEach(el=>{
     el.style.fontSize=base+'px';
@@ -1311,11 +1378,13 @@ document.querySelectorAll('.fb').forEach(btn=>{
       const ratio=entry.intersectionRatio;
       const size=base+(peak-base)*Math.pow(ratio,2.2);
       entry.target.style.fontSize=size.toFixed(1)+'px';
-      if(size>38){entry.target.style.lineHeight='0.9';entry.target.style.letterSpacing='-0.035em';}
+      if(size>80){entry.target.style.lineHeight='0.78';entry.target.style.letterSpacing='-0.045em';}
+      else if(size>60){entry.target.style.lineHeight='0.82';entry.target.style.letterSpacing='-0.04em';}
+      else if(size>38){entry.target.style.lineHeight='0.88';entry.target.style.letterSpacing='-0.035em';}
       else if(size>20){entry.target.style.lineHeight='1.05';entry.target.style.letterSpacing='-0.02em';}
       else{entry.target.style.lineHeight='1.28';entry.target.style.letterSpacing='-0.01em';}
     });
-  },{threshold:[0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1],rootMargin:'-5% 0px -5% 0px'});
+  },{threshold:window.innerWidth<=700?[0,.25,.5,.75,1]:[0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1],rootMargin:'-5% 0px -5% 0px'});
   textEls.forEach(el=>obs.observe(el));
 })();
 
@@ -1382,6 +1451,22 @@ function resetLayout(){
 <div id="ovals-layer" style="position:fixed;inset:0;pointer-events:none;z-index:1500;"></div>
 
 <script>
+// footnote tap toggle
+document.querySelectorAll('.fn').forEach(fn=>{
+  fn.addEventListener('click',e=>{
+    e.stopPropagation();
+    const was=fn.classList.contains('open');
+    document.querySelectorAll('.fn.open').forEach(f=>f.classList.remove('open','fn-left','fn-right'));
+    if(!was){
+      fn.classList.add('open');
+      const r=fn.getBoundingClientRect();
+      if(r.left<120) fn.classList.add('fn-right');
+      else if(r.right>window.innerWidth-120) fn.classList.add('fn-left');
+    }
+  });
+});
+document.addEventListener('click',()=>document.querySelectorAll('.fn.open').forEach(f=>f.classList.remove('open','fn-left','fn-right')));
+
 // ── FLOATING OVAL IMAGES — tap node → oval floats over page ──────
 // Multiple can be open at once. Each is independently draggable.
 // To add your image: set src on the img inside each oval after spawn,
@@ -1392,21 +1477,21 @@ function resetLayout(){
 // Add image URLs below — paste src from the e-flux article page.
 // Each key matches a diagram node. Leave blank for placeholder.
 const NODE_IMAGES = {
-  'fb-main': 'images/plant.jpg',  // cover / title image
-  'fb-s0':   'images/plantdown2.jpg',  // preface — plant as philosophical problem
-  'fb-s1':   'images/cartoon.jpg',  // I. Sensing — Gagliano acoustic root experiments
-  'fb-s2':   'images/aesthetic.jpg',  // II. Mediation — technology as translation
-  'fb-s3':   'images/clock1.jpg',  // III. Time — time-lapse film stills
-  'fb-s4':   'images/new1.jpg',  // IV. Tropism — phototropism / gravitropism
-  'fb-s5':   'images/plantdown1.jpg',  // V. Network — mycorrhizal / Simard
-  'fb-a':    'images/finger.jpg',  // biofeedback — galvanic leaf sensors
-  'fb-b':    'images/diagram 1.jpg',  // time-lapse — plant movement compressed
-  'fb-c':    'images/rhizome.jpg',  // rhizome — root systems
-  'fb-d':    'images/fungal network.jpg',  // mycelium — fungal networks
-  'fb-e':    'images/last.jpg',  // phototropism — plant bending toward light
-  'fb-f':    'images/huh.jpg',  // vegetal time — nonhuman temporality
-  'fb-g':    'images/wtf.jpg',  // sensing — plant perception without nerves
-  'fb-h':    'images/humanplant.jpg',  // mediation — camera/apparatus/translation
+  'fb-main': 'images/plant.jpg',
+  'fb-s0':   'images/plantdown2.jpg',
+  'fb-s1':   'images/cartoon.jpg',
+  'fb-s2':   'images/aesthetic.jpg',
+  'fb-s3':   'images/clock1.jpg',
+  'fb-s4':   'images/new1.jpg',
+  'fb-s5':   'images/plantdown1.jpg',
+  'fb-a':    'images/finger.jpg',
+  'fb-b':    'images/diagram 1.jpg',
+  'fb-c':    'images/rhizome.jpg',
+  'fb-d':    'images/fungal network.jpg',
+  'fb-e':    'images/last.jpg',
+  'fb-f':    'images/huh.jpg',
+  'fb-g':    'images/wtf.jpg',
+  'fb-h':    'images/humanplant.jpg',
 };
 
 const NODE_LABELS = {
@@ -1572,22 +1657,54 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-// attach tap to each .fb node
-(function initNodeTaps(){
-  document.querySelectorAll('.fb').forEach(btn=>{
-    let tapStart=0,tapMoved=false,tapSX=0,tapSY=0;
-    function ts(cx,cy){ tapStart=Date.now();tapMoved=false;tapSX=cx;tapSY=cy; }
-    function tm(cx,cy){ if(Math.abs(cx-tapSX)>8||Math.abs(cy-tapSY)>8) tapMoved=true; }
-    function te(){ if(!tapMoved&&Date.now()-tapStart<350) spawnOval(btn.id,btn); }
+// ── DRAG + TAP — unified handler for all .fb nodes ───────────────
+// Tap (no movement, <350ms) → open oval image
+// Drag (moved >8px) → reposition node
+document.querySelectorAll('.fb').forEach(btn=>{
+  let sx=0,sy=0,startT=0,dragging=false,ox=0,oy=0,didMove=false;
 
-    btn.addEventListener('mousedown',e=>ts(e.clientX,e.clientY));
-    btn.addEventListener('mousemove',e=>tm(e.clientX,e.clientY));
-    btn.addEventListener('mouseup',te);
-    btn.addEventListener('touchstart',e=>{const t=e.touches[0];ts(t.clientX,t.clientY);},{passive:true});
-    btn.addEventListener('touchmove',e=>{const t=e.touches[0];tm(t.clientX,t.clientY);},{passive:true});
-    btn.addEventListener('touchend',te,{passive:true});
-  });
-})();
+  function onStart(cx,cy){
+    sx=cx; sy=cy; startT=Date.now(); dragging=true; didMove=false;
+    const r=btn.getBoundingClientRect();
+    ox=cx-r.left; oy=cy-r.top;
+    btn.style.zIndex='700';
+  }
+  function onMove(cx,cy){
+    if(!dragging) return;
+    if(!didMove && (Math.abs(cx-sx)>8||Math.abs(cy-sy)>8)) didMove=true;
+    if(didMove){
+      btn.style.left=(cx-ox)+'px';
+      btn.style.top=(cy-oy)+'px';
+      btn.style.right='auto'; btn.style.bottom='auto';
+    }
+  }
+  function onEnd(){
+    if(!dragging) return;
+    dragging=false;
+    btn.style.zIndex='';
+    // if didn't move and was short → it's a tap → open oval
+    if(!didMove && Date.now()-startT<350) spawnOval(btn.id,btn);
+  }
+
+  // mouse
+  btn.addEventListener('mousedown',e=>{ e.preventDefault(); onStart(e.clientX,e.clientY); },{passive:false});
+  window.addEventListener('mousemove',e=>{ onMove(e.clientX,e.clientY); });
+  window.addEventListener('mouseup',onEnd);
+
+  // touch
+  btn.addEventListener('touchstart',e=>{
+    e.preventDefault();
+    onStart(e.touches[0].clientX,e.touches[0].clientY);
+  },{passive:false});
+  btn.addEventListener('touchmove',e=>{
+    e.preventDefault();
+    onMove(e.touches[0].clientX,e.touches[0].clientY);
+  },{passive:false});
+  btn.addEventListener('touchend',e=>{
+    e.preventDefault();
+    onEnd();
+  },{passive:false});
+});
 </script>
 </body>
 </html>
