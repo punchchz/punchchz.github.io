@@ -3,7 +3,86 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>lorem ipsum</title>
+<title>the mediated plant</title>
+<style>
+/* ── VINE CANVAS ── */
+#vine-canvas{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  opacity:1;
+}
+/* ── DIAGRAM — fb nodes + SVG lines (doc3 system) ── */
+#field{position:fixed;inset:0;pointer-events:none;z-index:100;opacity:0;transition:opacity 1s;}
+#field.visible{opacity:1;}
+#lines-svg{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:99;opacity:0;overflow:visible;transition:opacity 1s;}
+#lines-svg.visible{opacity:1;}
+.fb{
+  position:fixed;pointer-events:all;cursor:grab;
+  border:1px solid #000;border-radius:0;
+  font-family:'Times New Roman',Times,serif;
+  font-size:11px;font-weight:normal;letter-spacing:-0.02em;
+  color:#000;text-decoration:none;
+  padding:3px 8px;white-space:nowrap;
+  background:#fff;box-shadow:none;line-height:1.4;user-select:none;
+}
+.fb:active{cursor:grabbing;}
+.fb.node-s{color:#0000ee;text-decoration:underline;font-size:11px;}
+.fb.node-c{border-color:#888;font-style:italic;font-size:10px;}
+.fb.node-main{font-weight:bold;box-shadow:1.5px 1.5px 0 #000;font-size:11px;}
+.fb .none{display:inline;}.fb .hover{display:none;}
+.fb:hover .none{display:none;}.fb:hover .hover{display:inline;}
+.conn{stroke:#000;stroke-width:1;fill:none;opacity:0.6;}
+.conn-dash{stroke-width:0.8;stroke-dasharray:6 4;opacity:0.5;animation:flow-dash 2.2s linear infinite;}
+.conn-dash2{stroke-width:0.7;stroke-dasharray:2 5;opacity:0.35;animation:flow-dash 1.4s linear infinite;}
+@keyframes flow-dash{to{stroke-dashoffset:-44;}}
+
+/* ── FLOATING OVAL IMAGES — multiple open, draggable, no backdrop ── */
+.node-oval{
+  position:fixed;
+  z-index:1500;
+  width:200px;
+  cursor:grab;
+  user-select:none;
+  pointer-events:all;
+}
+.node-oval:active{cursor:grabbing;}
+.node-oval-frame{
+  width:100%;
+  padding-bottom:148%;
+  position:relative;
+  border-radius:50%;
+  overflow:hidden;
+  background:#f8f8f6;
+  box-shadow:none;
+}
+.node-oval-frame img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center;
+}
+.node-oval-frame .oval-placeholder{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  font-family:'Times New Roman',serif;font-size:10px;
+  color:#bbb;text-align:center;padding:24px;line-height:1.6;
+}
+
+.node-oval-label{
+  text-align:center;margin-top:5px;
+  font-family:'Times New Roman',serif;font-size:9px;
+  font-style:italic;color:#555;letter-spacing:-0.01em;
+}
+.node-oval-close{
+  position:absolute;top:-8px;right:-8px;
+  width:18px;height:18px;border-radius:50%;
+  background:#fff;border:1px solid #ccc;
+  font-size:9px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  color:#555;z-index:10;padding:0;
+  box-shadow:none;
+}
+.node-oval-close:hover{background:#000;color:#fff;border-color:#000;}
+/* ── PHOTOTROPISM — sidebar leans toward mouse ── */
+#side{transition:transform 0.8s ease;}
+</style>
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -30,6 +109,7 @@ body {
   height: 18px; background: #fff; border-bottom: 1px solid #000;
   overflow: hidden; white-space: nowrap;
   font-family: var(--ui); font-size: 11px; color: #000;
+  display: flex; align-items: center;
 }
 #ticker-inner {
   display: inline-block; padding-left: 100%;
@@ -58,6 +138,7 @@ body {
 .aq:hover { filter: brightness(1.1); }
 .aq:active { filter: brightness(.9); transform: translateY(1px); }
 
+/* ── LIVING SCROLLBARS ── */
 .sb {
   position: fixed; z-index: 40;
   background: linear-gradient(180deg,#ddeefa 0%,#c8dff0 100%);
@@ -75,34 +156,34 @@ body {
 }
 .sb-v .sb-thumb { left:2px; right:2px; }
 .sb-h .sb-thumb { top:2px; bottom:2px; }
+/* ghost thumbs for "living" feel */
+.sb-ghost {
+  position: absolute; left: 2px; right: 2px; height: 24px; border-radius: 6px;
+  background: rgba(100,160,230,0.20); pointer-events: none;
+}
 
 #win { margin:0; max-width:100%; border-radius:0; overflow:visible; box-shadow:none; min-height:100vh; }
 
 .tbar {
   height: 20px;
-  position: sticky; top: 18px; z-index: 50;
+  position: sticky; top: 18px; z-index: 150;
   background: #fff; border-bottom: 1px solid #000;
   display: flex; align-items: center; padding: 0 8px; gap: 5px;
   user-select: none;
 }
-.tbar::after { display: none; }
-.tl { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.tl::after { display: none; }
-.tl-r { background: #d04040; border: 1px solid #a03030; }
-.tl-y { background: #d0a030; border: 1px solid #a07820; }
-.tl-g { background: #40a040; border: 1px solid #207820; }
+
 #tbar-label {
   position: absolute; left: 50%; transform: translateX(-50%);
   font-family: var(--ui); font-size: 11px; color: #000; letter-spacing: 0.02em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%;
 }
 
 .toolbar {
   background: #fff; border-bottom: 1px solid #000;
   padding: 4px 10px;
   display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
-  position: sticky; top: 38px; z-index: 50;
+  position: sticky; top: 38px; z-index: 140;
 }
-.toolbar::before { display: none; }
 .tb-sep { width: 1px; height: 16px; background: #ccc; margin: 0 3px; }
 
 #main { display: flex; background: #fff; min-height: calc(100vh - 58px); }
@@ -113,7 +194,6 @@ body {
   padding: 10px 0 10px;
   position: sticky; top: 0; height: 100vh; overflow-y: auto; overflow-x: hidden;
 }
-#side::before { display: none; }
 .sh {
   font-family: var(--ui); font-size: 9px; font-weight: bold; color: #000;
   letter-spacing: .1em; text-transform: uppercase; padding: 6px 12px 3px;
@@ -129,7 +209,6 @@ body {
 }
 .si:hover { color: var(--blue-vis); }
 .si.act { color: var(--blue-vis); font-weight: bold; }
-.si::before { display: none; }
 .si-sub { padding-left: 14px; font-size: 10.5px; }
 .ss { height: 1px; background: #ddd; margin: 4px 0; }
 
@@ -138,10 +217,8 @@ body {
 
 .section {
   padding-bottom: 52px; position: relative;
-  opacity: 1;
-  will-change: transform;
+  opacity: 1; will-change: transform;
 }
-.sec-r { /* offset handled by JS now */ }
 
 .sec-head {
   font-family: var(--ui); font-size: 13px; font-weight: normal; color: #000;
@@ -159,7 +236,7 @@ body {
 
 .epigraph {
   font-style: italic; font-size: 13px; line-height: 1.55; color: #000;
-  margin-bottom: 16px; padding: 0; border: none; background: none;
+  margin-bottom: 16px;
 }
 .body-text {
   font-family: var(--serif); font-size: 13.5px;
@@ -169,32 +246,15 @@ body {
 .par-break { display: block; margin-top: 0.65em; }
 .body-text a { color: var(--blue); text-decoration: underline; }
 
-.pull {
-  font-family: var(--serif);
-  font-size: clamp(72px, 15vw, 22vw);
-  font-style: normal; font-weight: normal;
-  line-height: 0.88; letter-spacing: -0.03em; color: #000;
-  margin: 16px 0; width: 200%; position: relative; left: -4%;
-  padding: 0; overflow: visible;
-  background: none; border: none; box-shadow: none;
-  opacity: 0; transform: translateX(-16px);
-  transition: opacity .7s ease, transform .7s ease;
-  word-break: break-word;
-}
-.pull.in { opacity: 1; transform: translateX(0); }
-.pull::before { display: none; }
-
-
-
+/* ── GRID OVERLAY ── */
 .grid {
   position:fixed; inset:0; pointer-events:none; z-index:1;
   font-family:var(--ui); font-size:10px; line-height:1.2;
   color:rgba(0,0,200,.18); letter-spacing:.01em;
 }
 .gn { position:absolute; white-space:nowrap; transition:opacity .8s,color .8s; }
-.gn.dim    { opacity:.12; }
+.gn.dim { opacity:.12; }
 .gn.bright { opacity:1; color:rgba(0,0,200,.6); }
-
 .gn.n0  { left:14px;  top:72px;  font-style:italic; }
 .gn.n1  { left:41%;   top:72px;  }
 .gn.n11 { left:41%;   top:85px;  font-style:italic; }
@@ -202,38 +262,12 @@ body {
 .gn.n13 { left:41%;   top:111px; font-style:italic; }
 .gn.n14 { left:41%;   top:124px; font-style:italic; }
 .gn.n4  { left:14px;  top:192px; }
-.gn.n41 { left:14px;  top:205px; font-style:italic; }
-.gn.n42 { left:14px;  top:218px; font-style:italic; }
-.gn.n43 { left:14px;  top:231px; font-style:italic; }
-.gn.n44 { left:14px;  top:244px; font-style:italic; }
-.gn.n45 { left:14px;  top:257px; font-style:italic; }
-.gn.n46 { left:14px;  top:270px; font-style:italic; }
-.gn.n47 { left:14px;  top:283px; font-style:italic; }
-.gn.n9  { left:43%;   top:246px; }
 .gn.n5  { left:62%;   top:232px; }
-.gn.n51 { left:62%;   top:245px; font-style:italic; }
-.gn.n52 { left:62%;   top:258px; font-style:italic; }
-.gn.n53 { left:62%;   top:271px; font-style:italic; }
 .gn.n7  { left:41%;   top:342px; }
-.gn.n71 { left:41%;   top:355px; font-style:italic; }
-.gn.n72 { left:41%;   top:368px; font-style:italic; }
-.gn.n73 { left:41%;   top:381px; font-style:italic; }
-.gn.n74 { left:41%;   top:394px; font-style:italic; }
-.gn.n75 { left:41%;   top:407px; font-style:italic; }
-.gn.n76 { left:41%;   top:420px; font-style:italic; }
 .gn.n6  { left:81%;   top:342px; }
-.gn.n61 { left:81%;   top:355px; font-style:italic; }
-.gn.n62 { left:81%;   top:368px; font-style:italic; }
 .gn.n3  { left:14px;  top:452px; }
-.gn.n31 { left:14px;  top:465px; font-style:italic; }
-.gn.n32 { left:14px;  top:478px; font-style:italic; }
-.gn.n33 { left:14px;  top:491px; font-style:italic; }
-.gn.n34 { left:14px;  top:504px; font-style:italic; }
 .gn.n8  { left:62%;   top:452px; }
 .gn.n2  { left:49%;   top:542px; }
-.gn.n21 { left:49%;   top:555px; font-style:italic; }
-.gn.n22 { left:49%;   top:568px; font-style:italic; }
-.gn.n23 { left:49%;   top:581px; font-style:italic; }
 .gn.n10 { right:14px; top:542px; }
 
 .sbar {
@@ -242,78 +276,113 @@ body {
   display:flex; align-items:center; padding:0 10px; gap:10px;
   font-family:var(--ui); font-size:10px; color:#000;
 }
-.sbar::before { display:none; }
 .spill { display:inline-flex; align-items:center; gap:4px; font-size:10px; color:#000; }
 .sdot { width:5px; height:5px; border-radius:50%; background:#0000ee; }
-
 .end-pad { height:62vh; }
 
-@media (max-width: 600px) {
-  position: fixed;
-  right: 28px;
-  top: 80px;
-  width: 140px;
-  pointer-events: none;
-  z-index: 3;
-  font-family: var(--serif);
-  font-size: 10px;
-  line-height: 1.4;
-  color: rgba(0,0,0,0.18);
-  letter-spacing: -0.01em;
-  overflow: hidden;
+/* ── MATTER.JS CANVAS ── */
+#matter-layer {
+  position: fixed; inset: 0; pointer-events: none; z-index: 3;
 }
-#ghost-col p {
-  margin-bottom: 1.2em;
-  transition: opacity 1s;
+#matter-canvas {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  pointer-events: all;
 }
 
-@media (max-width: 600px) {
-  #ticker { font-size: 10px; }
-  #weather-strip { padding: 3px 8px; font-size: 9.5px; }
-  #tbar-label { font-size: 9px; }
-  .toolbar { padding: 3px 6px; gap: 4px; top: 36px; }
-  .aq { font-size: 9.5px; padding: 2px 10px 3px; }
-  .sb { display: none; }
+/* ── MOBILE ── */
+@media (max-width: 700px) {
+  /* ALL 4 scrollbars visible on mobile — full edge, z above content */
+  .sb { z-index: 400; }
+  #sb-right  { right:0;  top:0; bottom:0; width:12px; }
+  #sb-left   { left:0;   top:0; bottom:0; width:12px; }
+  #sb-top    { left:0;  right:0; top:0; height:12px; }
+  #sb-bottom-extra { left:0; right:0; bottom:0; height:12px; }
   .grid { display: none; }
+  /* diagram VISIBLE on mobile */
+  #field { display: block !important; }
+  #lines-svg { display: block !important; }
+  #ticker { font-size: 10px; height: 16px; }
+  #weather-strip { padding: 3px 8px !important; font-size: 9.5px !important; }
+  .tbar { top: 16px; height: 18px; }
+  #tbar-label { font-size: 9.5px; max-width: 55%; }
+  .toolbar {
+    top: 34px; padding: 3px 8px; gap: 5px;
+    flex-wrap: nowrap; overflow-x: auto;
+    -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  }
+  .toolbar::-webkit-scrollbar { display: none; }
+  .aq { font-size: 10px; padding: 2px 10px 3px; flex-shrink: 0; }
+  .tb-sep { flex-shrink: 0; }
   #main { flex-direction: column; }
   #side {
     width: 100%; height: auto; border-right: none; border-bottom: 1px solid #000;
     position: relative; top: auto; overflow-y: hidden; overflow-x: auto;
-    padding: 6px 0; display: flex; flex-wrap: wrap; align-items: flex-start;
+    -webkit-overflow-scrolling: touch; padding: 0;
+    display: flex; flex-direction: row; align-items: stretch; scrollbar-width: none;
   }
-  #side > div:first-child {
-    padding: 6px 10px; border-bottom: none; border-right: 1px solid #000;
-    margin-bottom: 0; display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+  #side::-webkit-scrollbar { display: none; }
+  #side > div:first-child { display: none !important; }
+  .sh { display: none; }
+  .si {
+    padding: 6px 10px; font-size: 10.5px; white-space: nowrap;
+    border-top: none; border-right: 1px solid #eee;
+    display: flex; align-items: center; flex-shrink: 0;
   }
-  #analog-clock { width: 44px; height: 44px; }
-  #clock-date-text { font-size: 8px; margin-bottom: 0; }
-  .sh { padding: 2px 8px; font-size: 8px; border-top: none; margin-top: 0; }
-  .si { padding: 1px 8px; font-size: 10px; white-space: nowrap; }
   .si-sub { display: none; }
   .ss { display: none; }
-  #content { padding: 12px 0; }
-  .col { width: 100% !important; padding-left: 12px !important; padding-right: 12px; }
-  .sec-r { transform: none !important; }
+  #content { padding: 14px 0 0; }
+  .col { width: 100% !important; padding-left: 14px !important; padding-right: 18px; }
+  .section { transform: none !important; }
+  .sec-r { transform: none !important; padding-left: 0 !important; }
   .body-text { font-size: 13px; }
-  .pull { font-size: clamp(36px, 12vw, 72px); width: 110%; left: -2%; }
-  .fb { font-size: 9.5px; padding: 3px 7px; }
-  .sbar { font-size: 9px; padding: 0 6px; gap: 6px; }
+  .epigraph { font-size: 12px; }
+  .sbar { font-size: 9px; padding: 0 8px; gap: 6px; }
   .end-pad { height: 30vh; }
+  #matter-layer { display: none; }
+  /* diagram nodes smaller on mobile */
+  .fb { font-size: 10px; padding: 2px 6px; }
 }
 </style>
 </head>
 <body>
 
-<!-- ── GHOST MARGIN COLUMN ── -->
+<canvas id="vine-canvas"></canvas>
+
+<svg id="lines-svg" aria-hidden="true">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#000" opacity="0.7"/></marker>
+    <marker id="arrow-dash" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L0,5 L7,2.5 z" fill="#000" opacity="0.5"/></marker>
+    <marker id="square-plug" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5"><rect width="4" height="4" x="0.5" y="0.5" fill="#000" opacity="0.7"/></marker>
+  </defs>
+</svg>
+
+<div id="field" aria-label="Diagram">
+  <button class="fb node-main" id="fb-main" style="left:40%;top:12%"><span class="none">the mediated plant</span><span class="hover">Teresa Castro, 2019</span></button>
+  <button class="fb node-s" id="fb-s0" style="left:14%;top:26%" onclick="goSection(0)"><span class="none">§ preface</span><span class="hover">what does it mean to mediate a plant?</span></button>
+  <button class="fb node-s" id="fb-s1" style="left:63%;top:22%" onclick="goSection(1)"><span class="none">§ i. sensing</span><span class="hover">roots grow toward sound</span></button>
+  <button class="fb node-s" id="fb-s2" style="left:28%;top:50%" onclick="goSection(2)"><span class="none">§ ii. mediation</span><span class="hover">technology as translation</span></button>
+  <button class="fb node-s" id="fb-s3" style="left:68%;top:52%" onclick="goSection(3)"><span class="none">§ iii. time</span><span class="hover">time-lapse and vegetal duration</span></button>
+  <button class="fb node-s" id="fb-s4" style="left:16%;top:70%" onclick="goSection(4)"><span class="none">§ iv. tropism</span><span class="hover">bending toward light</span></button>
+  <button class="fb node-s" id="fb-s5" style="left:58%;top:74%" onclick="goSection(5)"><span class="none">§ v. network</span><span class="hover">mycorrhizal / wood wide web</span></button>
+  <button class="fb node-c" id="fb-a" style="left:20%;top:40%"><span class="none">biofeedback</span><span class="hover">galvanic leaf sensors</span></button>
+  <button class="fb node-c" id="fb-b" style="left:52%;top:16%"><span class="none">time-lapse</span><span class="hover">plant movement compressed into human time</span></button>
+  <button class="fb node-c" id="fb-c" style="left:76%;top:38%"><span class="none">rhizome</span><span class="hover">decentralised root logic</span></button>
+  <button class="fb node-c" id="fb-d" style="left:44%;top:36%"><span class="none">mycelium</span><span class="hover">fungal communication networks</span></button>
+  <button class="fb node-c" id="fb-e" style="left:30%;top:64%"><span class="none">phototropism</span><span class="hover">movement organized by desire</span></button>
+  <button class="fb node-c" id="fb-f" style="left:62%;top:64%"><span class="none">vegetal time</span><span class="hover">duration beyond human attention</span></button>
+  <button class="fb node-c" id="fb-g" style="left:8%;top:52%"><span class="none">sensing</span><span class="hover">without nerves or brain</span></button>
+  <button class="fb node-c" id="fb-h" style="left:80%;top:26%"><span class="none">mediation</span><span class="hover">the apparatus translates the plant</span></button>
+</div>
+
 <div id="ghost-col"></div>
 
 <div id="ticker" aria-hidden="true">
   <span id="ticker-inner">
-    <a>Prefaces</a> ––– <a>1. Surface Conditions</a> ––– <a>1.1 Temperature</a> ––– <a>1.2 Humidity</a> ––– <a>1.3 Wind</a> ––– <a>2. Upper Atmosphere</a> ––– <a>2.1 Pressure Systems</a> ––– <a>2.2 Jet Stream</a> ––– <a>3. Precipitation</a> ––– <a>3.1 Rainfall</a> ––– <a>3.2 Fog &amp; Visibility</a> ––– <a>4. Outlook</a> ––– <a>Prefaces</a> ––– <a>1. Surface Conditions</a> ––– <a>1.1 Temperature</a> ––– <a>1.2 Humidity</a> ––– <a>1.3 Wind</a> ––– <a>2. Upper Atmosphere</a> ––– <a>2.1 Pressure Systems</a> ––– <a>2.2 Jet Stream</a> ––– <a>3. Precipitation</a> ––– <a>3.1 Rainfall</a> ––– <a>3.2 Fog &amp; Visibility</a> ––– <a>4. Outlook</a> –––
+    <a>The Mediated Plant</a> ––– <a>phototropism</a> ––– <a>vegetal intelligence</a> ––– <a>time-lapse</a> ––– <a>biofeedback systems</a> ––– <a>rhizomatic archives</a> ––– <a>technological mediation</a> ––– <a>plant communication</a> ––– <a>nonhuman temporality</a> ––– <a>slow growth</a> ––– <a>The Mediated Plant</a> ––– <a>phototropism</a> ––– <a>vegetal intelligence</a> ––– <a>time-lapse</a> ––– <a>biofeedback systems</a> ––– <a>rhizomatic archives</a> ––– <a>technological mediation</a> ––– <a>plant communication</a> ––– <a>nonhuman temporality</a> ––– <a>slow growth</a> –––
   </span>
 </div>
 
-<div id="weather-strip" style="border-bottom:1px solid #000;padding:4px 12px;font-family:'Times New Roman',Times,serif;font-size:10px;letter-spacing:-0.01em;line-height:1.5;color:#000;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+<div id="weather-strip" style="border-bottom:1px solid #000;padding:4px 12px;font-family:'Times New Roman',Times,serif;font-size:10px;letter-spacing:-0.01em;line-height:1.5;color:#000;display:flex;align-items:center;gap:6px;flex-wrap:wrap;position:sticky;top:16px;z-index:145;background:#fff;">
   <span id="weather-text" style="opacity:0.7;">fetching weather…</span>
 </div>
 
@@ -325,59 +394,40 @@ body {
   <span class="gn n13">1.3 Wind</span>
   <span class="gn n14">1.4 Dew Point</span>
   <span class="gn n4">Precipitation 4</span>
-  <span class="gn n41">4.1 Rainfall</span>
-  <span class="gn n42">4.2 Intensity</span>
-  <span class="gn n43">4.3 Duration</span>
-  <span class="gn n44">4.4 Accumulation</span>
-  <span class="gn n45">4.5 Snow</span>
-  <span class="gn n46">4.6 Hail</span>
-  <span class="gn n47">4.7 Fog</span>
-  <span class="gn n9">9</span>
   <span class="gn n5">Upper Atmosphere 5</span>
-  <span class="gn n51">5.1 Jet Stream</span>
-  <span class="gn n52">5.2 Pressure</span>
-  <span class="gn n53">5.3 Fronts</span>
   <span class="gn n7">Outlook 7</span>
-  <span class="gn n71">7.1 48-Hour</span>
-  <span class="gn n72">7.2 Extended</span>
-  <span class="gn n73">7.3 Seasonal</span>
-  <span class="gn n74">7.4 Uncertainty</span>
-  <span class="gn n75">7.5 Anomalies</span>
-  <span class="gn n76">7.6 Advisories</span>
   <span class="gn n6">Marine Layer 6</span>
-  <span class="gn n61">6.1 Coastal</span>
-  <span class="gn n62">6.2 Offshore</span>
   <span class="gn n3">Visibility 3</span>
-  <span class="gn n31">3.1 Ground Level</span>
-  <span class="gn n32">3.2 Aviation</span>
-  <span class="gn n33">3.3 Smoke</span>
-  <span class="gn n34">3.4 Particulates</span>
   <span class="gn n8">UV Index 8</span>
   <span class="gn n2">Anomalies 2</span>
-  <span class="gn n21">2.1 Historical</span>
-  <span class="gn n22">2.2 Records</span>
-  <span class="gn n23">2.3 Deviations</span>
   <span class="gn n10">10</span>
 </div>
 
-<div class="sb sb-v" id="sb-right" style="right:6px;top:72px;bottom:22px;">
+<!-- LIVING SCROLLBARS — 4 edges, full window, work on mobile -->
+<div class="sb sb-v" id="sb-right" style="right:0;top:0;bottom:0;width:15px;border-radius:0;">
+  <div class="sb-ghost" id="sb-ghost-1" style="top:30px;"></div>
+  <div class="sb-ghost" id="sb-ghost-2" style="top:120px;opacity:0.12;"></div>
   <div class="sb-thumb" id="sb-right-thumb" style="height:44px;top:0;"></div>
 </div>
-<div class="sb sb-h" id="sb-top" style="left:200px;right:22px;top:72px;">
+<div class="sb sb-h" id="sb-top" style="left:0;right:0;top:0;height:15px;border-radius:0;">
+  <div class="sb-ghost" style="left:20px;right:auto;width:24px;height:auto;top:2px;bottom:2px;border-radius:6px;"></div>
   <div class="sb-thumb" id="sb-top-thumb" style="width:60px;left:0;"></div>
 </div>
-<div class="sb sb-v" id="sb-left" style="left:200px;top:72px;bottom:22px;">
+<div class="sb sb-v" id="sb-left" style="left:0;top:0;bottom:0;width:15px;border-radius:0;">
+  <div class="sb-ghost" id="sb-ghost-3" style="top:60px;opacity:0.15;"></div>
   <div class="sb-thumb" id="sb-left-thumb" style="height:36px;top:0;"></div>
 </div>
-<div class="sb sb-h" id="sb-bottom-extra" style="left:200px;right:22px;bottom:22px;">
+<div class="sb sb-h" id="sb-bottom-extra" style="left:0;right:0;bottom:0;height:15px;border-radius:0;">
   <div class="sb-thumb" id="sb-bot-thumb" style="width:48px;left:0;"></div>
+</div>
+
+<!-- MATTER.JS LAYER — floats over page, pointer passthrough -->
+<div id="matter-layer">
+  <canvas id="matter-canvas"></canvas>
 </div>
 
 <div id="win">
   <div class="tbar">
-    <div class="tl tl-r"></div>
-    <div class="tl tl-y"></div>
-    <div class="tl tl-g"></div>
     <div id="tbar-label">regional weather bulletin — Prefaces</div>
   </div>
 
@@ -385,12 +435,12 @@ body {
     <button class="aq" id="btn-back">◀ Back</button>
     <button class="aq" id="btn-fwd">Forward ▶</button>
     <div class="tb-sep"></div>
-    <button class="aq" onclick="goSection(0)">Prefaces</button>
-    <button class="aq" onclick="goSection(1)">1. Surface</button>
-    <button class="aq" onclick="goSection(2)">2. Atmosphere</button>
-    <button class="aq" onclick="goSection(3)">3. Precipitation</button>
-    <button class="aq" onclick="goSection(4)">4. Marine</button>
-    <button class="aq" onclick="goSection(5)">5. Outlook</button>
+    <button class="aq" onclick="goSection(0)">Preface</button>
+    <button class="aq" onclick="goSection(1)">I. Sensing</button>
+    <button class="aq" onclick="goSection(2)">II. Mediation</button>
+    <button class="aq" onclick="goSection(3)">III. Time</button>
+    <button class="aq" onclick="goSection(4)">IV. Tropism</button>
+    <button class="aq" onclick="goSection(5)">V. Network</button>
     <div class="tb-sep"></div>
     <button class="aq" id="btn-rand" onclick="randLayout()">⟳ Shuffle</button>
     <button class="aq" id="btn-reset" onclick="resetLayout()">Reset</button>
@@ -398,10 +448,14 @@ body {
 
   <div id="main">
     <div id="side">
-      <div style="padding:10px 12px 8px; border-bottom:1px solid #000; margin-bottom:6px;">
+      <div style="padding:10px 12px 10px; border-bottom:1px solid #000; margin-bottom:6px;">
         <div id="clock-day-big" style="font-family:'Times New Roman',serif;font-size:10px;letter-spacing:-0.01em;line-height:1.3;"></div>
-        <div id="clock-date-big" style="font-family:'Times New Roman',serif;font-size:10px;letter-spacing:-0.01em;margin-bottom:6px;line-height:1.3;"></div>
-        <svg id="analog-clock" viewBox="0 0 80 80" width="80" height="80" style="display:block;">
+        <div id="clock-date-big" style="font-family:'Times New Roman',serif;font-size:10px;letter-spacing:-0.01em;margin-bottom:8px;line-height:1.3;"></div>
+
+        <!-- timecode above clock -->
+        <div id="clock-tc-left" style="font-family:'Times New Roman',serif;font-size:8px;letter-spacing:0.01em;font-variant-numeric:tabular-nums;line-height:1.4;margin-bottom:6px;word-break:break-all;opacity:0.7;"></div>
+
+        <svg id="analog-clock" viewBox="0 0 80 80" width="160" height="160" style="display:block;margin:0 auto 6px;">
           <circle cx="40" cy="40" r="38" fill="none" stroke="#000" stroke-width="0.8"/>
           <g id="ticks" stroke="#000" stroke-width="0.5" opacity="0.3"></g>
           <line id="hand-h" x1="40" y1="40" x2="40" y2="18" stroke="#000" stroke-width="1.8" stroke-linecap="round"/>
@@ -409,172 +463,123 @@ body {
           <line id="hand-s" x1="40" y1="40" x2="40" y2="8"  stroke="#000" stroke-width="0.6" stroke-linecap="round" opacity="0.5"/>
           <circle cx="40" cy="40" r="1.5" fill="#000"/>
         </svg>
-        <div id="clock-digital" style="font-family:'Times New Roman',serif;font-size:10px;letter-spacing:-0.02em;margin-top:5px;font-variant-numeric:tabular-nums;"></div>
+
+        <!-- timecode below clock with PM -->
+        <div id="clock-tc-right" style="font-family:'Times New Roman',serif;font-size:8px;letter-spacing:0.01em;font-variant-numeric:tabular-nums;line-height:1.4;margin-bottom:4px;word-break:break-all;opacity:0.7;text-align:right;"></div>
+
+        <div id="clock-digital" style="font-family:'Times New Roman',serif;font-size:10px;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;"></div>
       </div>
-      <div class="sh">Contents</div>
-      <a class="si act" onclick="goSection(0)">Prefaces</a>
-      <a class="si" onclick="goSection(1)">1 Surface Conditions</a>
-      <a class="si si-sub">1.1 Temperature</a>
-      <a class="si si-sub">1.2 Humidity &amp; Wind</a>
-      <a class="si" onclick="goSection(2)">2 Upper Atmosphere</a>
-      <a class="si si-sub">2.1 Pressure Systems</a>
-      <a class="si si-sub">2.2 Jet Stream</a>
-      <a class="si" onclick="goSection(3)">3 Precipitation</a>
-      <a class="si si-sub">3.1 Rainfall Events</a>
-      <a class="si si-sub">3.2 Fog &amp; Visibility</a>
-      <a class="si" onclick="goSection(4)">4 Marine Layer</a>
-      <a class="si si-sub">4.1 Structure &amp; Depth</a>
-      <a class="si si-sub">4.2 Sea Surface Temps</a>
-      <a class="si" onclick="goSection(5)">5 Extended Outlook</a>
-      <a class="si si-sub">5.1 72–120 Hour Period</a>
-      <a class="si si-sub">5.2 Anomaly Assessment</a>
-      <a class="si si-sub">5.3 Footnotes</a>
-      <div class="ss"></div>
-      <div class="sh">Index</div>
-      <a class="si si-sub">6 Marine Forecast</a>
-      <a class="si si-sub">7 Aviation TAFs</a>
-      <a class="si si-sub">8 Hydrological</a>
     </div>
 
     <div id="content">
       <div class="col" id="col">
 
-        <div class="section" data-sec="Prefaces" id="s0">
-          <div class="sec-head">Prefaces</div>
-          <div class="epigraph">Issued by the National Weather Service, Regional Forecast Office. Valid from 06:00 UTC. Distribution: general public, aviation, marine, agricultural.</div>
+        <div class="section" data-sec="Preface" id="s0">
+          <div class="epigraph">Katalin Cseh-Varga and Adam Czirak, eds. <em>The Mediated Plant.</em> e-flux journal, 2018. On the nonhuman, the vegetal, and what it means to sense without a nervous system.</div>
           <div class="body-text">
             <span class="par-break"></span>
-            This bulletin constitutes the official surface and upper-air weather analysis for the greater regional area, incorporating observational data collected from 214 automated surface observation stations (ASOS),<sup>(1)</sup> 12 radiosonde launch sites, and three Doppler radar installations operating continuously at wavelengths of 10 centimetres. The integration of these datasets produces what is formally known as a gridded analysis field, from which the forecasts contained herein are derived.
+            What does it mean to mediate a plant? The question is not merely technological — it is ontological. To place a camera before a fern, to attach electrodes to a leaf, to translate the slow upward arc of a heliotropic stem into data, is to stage an encounter between two radically different temporalities: the human and the vegetal.
             <span class="par-break"></span>
-            It should be noted that all temperature values in this document are expressed in degrees Celsius unless otherwise stated. Wind speed is given in knots for aviation sections and kilometres per hour for general surface forecasts. Pressure readings are reported in hectopascals (hPa), which are numerically equivalent to millibars.<sup>(2)</sup> Precipitation accumulations are stated in millimetres of liquid equivalent, a convention that allows snowfall, rain, sleet, and freezing rain to be compared on a common scale.
+            Plants do not think. Or rather, they think differently — distributed across root networks, expressed through chemical signals, enacted over durations that exceed human attention. The mediated plant is always already a translation, a transformation, a betrayal of the original slowness.
             <span class="par-break"></span>
-            The forecast period covered by this bulletin extends from the time of issue through to 120 hours hence. Confidence in the forecast diminishes considerably beyond the 72-hour threshold, at which point the ensemble spread — a measure of disagreement among the 51 individual model runs comprising the global ensemble system — typically exceeds the signal of the predicted weather feature itself.<sup>(3)</sup> Readers are encouraged to consult the probabilistic products available through the regional digital forecast database for quantitative uncertainty estimates.
-            <span class="par-break"></span>
-            A note on the nature of weather forecasting as it is practiced today: the discipline occupies an unusual position among the sciences in that its outputs are consumed daily by virtually every member of the public, yet its internal methods — rooted in the numerical integration of partial differential equations across a discretised three-dimensional atmospheric grid — remain almost entirely opaque to those same consumers.<sup>(4)</sup> This bulletin makes no attempt to bridge that gap comprehensively. It does, however, endeavour to explain significant forecast features in plain language wherever such explanation does not sacrifice material accuracy.
-          </div>
-          <div class="sub-head">A note on sources</div>
-          <div class="body-text">
-            <span class="par-break"></span>
-            Footnotes in this document refer either to methodological conventions, instrument specifications, or the relevant sections of the World Meteorological Organization's technical regulations.<sup>(5)</sup> Where uncertainty exists in the observational record — as it inevitably does, particularly at stations operating in exposed coastal or mountainous terrain — the most conservative estimate has been adopted. Discrepancies between model output and observed conditions at verification time will be logged in the regional forecast discussion archive, which is publicly accessible.
+            The essay asks: when we make plants visible through technology, do we understand them better — or do we merely project our own desires for legibility onto forms of life that resist it?
           </div>
         </div>
 
-        <div class="section sec-r" data-sec="1 Surface Conditions" id="s1">
-          <div class="sec-head">1 &nbsp;Surface Conditions</div>
-          <div class="sub-head">1.1 &nbsp;Temperature</div>
+        <div class="section sec-r" data-sec="I. Sensing" id="s1">
+          <div class="sub-head">On plant perception</div>
           <div class="body-text">
             <span class="par-break"></span>
-            Surface temperatures at the time of observation ranged from 8.4°C at the inland valley floor stations to 14.1°C along exposed south-facing coastal slopes. The regional mean surface temperature of 11.2°C represents a departure of +1.8°C from the 1991–2020 climatological normal for this calendar date,<sup>(6)</sup> consistent with the broad pattern of above-normal temperatures that has characterised the past 14 consecutive months across this forecast region.
+            Monica Gagliano's acoustic experiments revealed that plant roots grow toward the sound of water — even when no water is present, only vibration. This is sensing without nerves, recognition without a brain. A form of intelligence so alien to us that we had to invent new instruments merely to witness it.
             <span class="par-break"></span>
-            The diurnal temperature range — the difference between the day's maximum and minimum readings — has been suppressed to approximately 6°C over the past 72 hours, compared to a climatological expectation of 9–11°C for this time of year. This suppression is attributable to the persistent low cloud deck described in Section 3.2, which limits both daytime solar heating through reflection and nocturnal radiative cooling through the emission of longwave radiation back toward the surface.<sup>(7)</sup>
+            The camera becomes a prosthesis. The microphone, a translator. Each device mediates not just the plant's behavior but our capacity to receive it. We are always reading the machine's reading of the plant — a double mediation that renders the original signal further and further from reach.
             <span class="par-break"></span>
-            Inland stations elevated above 400 metres reported overnight minima approaching 3°C, with one isolated site at 612 metres recording a brief period below freezing between 03:14 and 04:52 local time. No frost damage reports have been received from agricultural monitoring networks at the time of writing, though growers in exposed valley locations are advised to consult the specialist agricultural advisory issued separately under reference AGR-2024-0183.
+            What the apparatus shows us is not the plant sensing — it is the plant translated into something we can sense. The gap between these two things is where all the interesting questions live.
           </div>
-          <div class="sub-head">1.2 &nbsp;Humidity and Wind</div>
+          <div class="sub-head">Biofeedback and the body</div>
           <div class="body-text">
             <span class="par-break"></span>
-            Relative humidity values at the surface have remained elevated throughout the period, ranging from 78% at the driest inland locations to 96% along the immediate coastline.<sup>(8)</sup> The high humidity at coastal stations is reinforced by onshore flow from a sea surface temperature of approximately 13.6°C — itself 0.9°C above the seasonal average — which provides a persistent moisture source for low-level saturation. The dew point depression, a quantity expressing the difference between air temperature and dew point temperature, has been less than 2°C at coastal stations for the majority of the past 36 hours, indicating near-saturated conditions that are conducive to fog formation and low stratus maintenance.
+            Experiments in plant biofeedback — attaching galvanic sensors to leaves, monitoring electrical changes in response to human proximity — collapse the boundary between organism and instrument. The plant becomes a kind of readout; the human, an event in its environment.
             <span class="par-break"></span>
-            Surface winds have been predominantly from the west-southwest, with sustained speeds of 15–22 km/h and gusts reaching 38 km/h at exposed headlands. The fetch — the distance over open water across which the wind has blown — is sufficient at current speeds and directions to generate a moderate swell of 1.8–2.4 metres in the nearshore zone, with marine interests advised to consult the coastal waters forecast issued under separate cover.<sup>(9)</sup> Wind speeds are expected to decrease during the early evening hours as the synoptic pressure gradient relaxes ahead of the approaching frontal system.
-            <span class="par-break"></span>
-            At the 850 hPa level — approximately 1500 metres above mean sea level — temperatures of 2°C were observed on the 06:00 UTC radiosonde ascent, implying a lapse rate in the lower troposphere that is conditionally unstable with respect to saturated parcel ascent. In practical terms, this means that any convective initiation that breaks through the capping layer discussed in Section 2.1 could produce rapidly developing showers or, in the most favourable thermodynamic environments, brief thunderstorm activity.<sup>(10)</sup>
+            This reversal is significant. We usually position ourselves as the observers, the analysts, the ones who read the world. But in these setups, the plant reads us. Our presence registers as a disturbance in its electrical field. We become the signal in someone else's data.
           </div>
         </div>
 
-        
-
-        <div class="section" data-sec="2 Upper Atmosphere" id="s2">
-          <div class="sec-head">2 &nbsp;Upper Atmosphere</div>
-          <div class="sub-head">2.1 &nbsp;Pressure Systems</div>
+        <div class="section" data-sec="II. Mediation" id="s2">
+          <div class="sub-head">Technology as translation</div>
           <div class="body-text">
             <span class="par-break"></span>
-            A broad ridge of high pressure centred over the continent to the east is currently exerting a stabilising influence over the eastern portion of the forecast area, where surface pressures of 1022–1024 hPa have been recorded throughout the morning hours.<sup>(11)</sup> This ridge is expected to erode through the afternoon as an approaching mid-latitude cyclone — currently centred approximately 800 kilometres to the west-northwest, with a central pressure of 994 hPa — advances eastward at a forward speed of 45 km/h. The interaction between these two systems will determine the timing and intensity of the precipitation events described in Section 3.
+            Every image of a plant is already a mediation. The herbarium specimen, pressed and dried, translates living tissue into archival matter. The botanical illustration, however precise, translates three-dimensional growth into two-dimensional representation. The time-lapse film translates vegetal duration into human-speed cinema.
             <span class="par-break"></span>
-            The warm sector of the cyclone — a region of relatively warm, moist, unstable air bounded by the warm front to its poleward edge and the cold front to its equatorward edge — is presently located offshore.<sup>(12)</sup> Its arrival over land is anticipated between 18:00 and 21:00 local time, at which point temperatures will rise by 2–4°C and winds will veer from southwesterly to westerly. The passage of the subsequent cold front is expected between 02:00 and 06:00 the following morning, accompanied by a sharp temperature fall and a brief but potentially intense period of rainfall.
+            What changes with digital mediation is not the fact of translation but its velocity and its volume. We can now produce images of plants faster than plants can grow. We can generate more representations of a leaf than there are leaves on the plant. The archive threatens to overwhelm the organism it documents.
             <span class="par-break"></span>
-            A secondary trough of low pressure embedded within the broader cyclonic circulation may develop along the coast during the early evening, a phenomenon sometimes referred to as a coastal front.<sup>(13)</sup> If this feature materialises as indicated by the higher-resolution mesoscale model output, it could produce a narrow band of enhanced precipitation — potentially exceeding 20 mm in 2 hours — along a corridor roughly 30–50 kilometres inland from the coastline. The probability of this scenario has been assessed at 35%, insufficient to justify an immediate warning issuance but sufficient to warrant close monitoring and a heightened state of preparedness among emergency management partners.
+            This excess of mediation is itself a form of violence — not intentional, but structural. The plant disappears beneath its representations, replaced by data, by spectacle, by the smooth surfaces of a screen.
           </div>
-          <div class="sub-head">2.2 &nbsp;Jet Stream and Steering Flow</div>
+          <div class="sub-head">The apparatus of visibility</div>
           <div class="body-text">
             <span class="par-break"></span>
-            The polar jet stream — the fast-moving ribbon of upper-level winds that largely determines the track and intensity of surface weather systems across the mid-latitudes — is currently positioned at approximately 45°N latitude, which places it directly across the forecast region.<sup>(14)</sup> Jet maximum wind speeds of 140 knots were recorded at the 250 hPa level on the most recent rawinsonde data, indicating a vigorous, well-defined jet streak configuration. This configuration favours the development of strong divergence aloft on the cyclonically curved, poleward-exit region of the jet streak, which in turn promotes ascent, low-pressure development, and organised precipitation at the surface.
+            What kinds of plants become visible through technology, and which remain invisible? The photogenic specimen, the rare orchid, the carnivorous novelty — these are the plants that circulate through media. The weed, the grass, the unremarkable fern — these are plants whose lives pass entirely without technological witness.
             <span class="par-break"></span>
-            The upper-level trough associated with the approaching cyclone is negatively tilted — that is, the trough axis slopes from northwest to southeast with increasing latitude — a configuration known to meteorologists as a negative-tilt trough and associated with the most dynamically active and rapidly intensifying weather systems.<sup>(15)</sup> Such configurations typically produce the most significant precipitation events of any given season, as the combination of upper-level forcing, low-level moisture advection, and surface convergence along the frontal boundaries acts in a mutually reinforcing manner to produce organised, persistent ascent through the full depth of the troposphere.
+            Visibility is always political. The question of which organisms we choose to mediate — to make legible, to amplify, to grant technological attention — is also a question about which forms of life we value, which we study, which we protect.
           </div>
         </div>
 
-        
-
-        <div class="section sec-r" data-sec="3 Precipitation" id="s3">
-          <div class="sec-head">3 &nbsp;Precipitation</div>
-          <div class="sub-head">3.1 &nbsp;Rainfall Events</div>
+        <div class="section sec-r" data-sec="III. Time" id="s3">
+          <div class="sub-head">Vegetal duration</div>
           <div class="body-text">
             <span class="par-break"></span>
-            Rainfall is expected to develop across the forecast area in two distinct phases separated by a brief lull of 2–4 hours. The first phase, associated with the warm frontal passage, will consist of light to moderate stratiform rainfall — the type produced by organised large-scale ascent ahead of the warm front rather than convective overturning — with accumulations of 5–12 mm over 8–10 hours.<sup>(16)</sup> This rain will be widespread and persistent rather than showery, and the gradual onset means that surface runoff rates should remain manageable across most drainage basins, with the possible exception of catchments that are already saturated from the rainfall of the preceding 72 hours.
+            Time-lapse photography was developed precisely to make plant movement visible to human eyes. In real time, a sunflower tracking the arc of the sun, a tendril spiraling toward a support, a seed cracking open and pushing upward through soil — these are all too slow for human perception. The camera speeds them up, compresses vegetal time into human time.
             <span class="par-break"></span>
-            The second phase, associated with the cold front itself, is forecast to produce considerably heavier rainfall over a much shorter period. Accumulations of 15–25 mm in 2–3 hours are considered the most likely outcome, with localised totals potentially reaching 35 mm in areas where orographic enhancement — the uplift of moist air against elevated terrain — is most pronounced.<sup>(17)</sup> The catchments most at risk of flash flooding are those in which the soil moisture deficit has been reduced to near-zero by recent rainfall, and in which the drainage network has limited additional capacity. A flood watch is in effect for three sub-catchments in the upland areas; full details are contained in the separate Hydrological Outlook issued at 06:00 UTC.
+            But something is lost in this acceleration. The actual experience of plant growth — the slowness, the persistence, the indifference to our impatience — is exactly what the time-lapse erases. We see the movement, but we do not feel the duration. We receive the conclusion without living through the process.
             <span class="par-break"></span>
-            Total rainfall accumulations over the 24-hour period ending at 06:00 UTC tomorrow are forecast to range from 18 mm at the coast to 42 mm over the highest terrain, with a regional mean of approximately 27 mm. This would represent between 85% and 160% of the monthly climatological normal for the entire month compressed into a single day — a statistically unusual event, but not without precedent in the historical record for this region.<sup>(18)</sup>
+            Slowness, in this sense, is not a deficiency in plants. It is a different relationship to time — one that our technologies systematically override in order to make the vegetal legible to beings who live at a different speed.
           </div>
-          <div class="sub-head">3.2 &nbsp;Fog and Visibility</div>
+          <div class="sub-head">Rhythm and interval</div>
           <div class="body-text">
             <span class="par-break"></span>
-            Dense fog has been reported at seven coastal stations since approximately 23:00 local time, with visibility reduced to below 200 metres at three of those sites. The fog is of the advection type — formed when warm, moist air from the marine environment moves over a cooler land surface — rather than radiation fog, which forms on calm, clear nights through surface radiative cooling.<sup>(19)</sup> This distinction is significant because advection fog tends to be more persistent and resistant to morning solar heating than radiation fog, and is less easily dispersed by light winds. The fog is expected to persist through the morning hours along the immediate coastline, potentially not clearing until early afternoon when the approaching frontal cloud begins to replace the fog layer with an overcast of a different character.
+            Plants have circadian rhythms. They open and close on schedules calibrated to light and temperature. They produce chemicals in response to seasons, to drought, to the presence of herbivores. They communicate through the soil — through fungal networks that carry signals across distances.
             <span class="par-break"></span>
-            Aviation interests should note that instrument meteorological conditions (IMC) — defined as visibility below 5 kilometres or ceiling below 1000 feet — are expected to affect all coastal aerodromes until at least 14:00 local time.<sup>(20)</sup> The deterioration in visibility associated with the frontal passage will subsequently affect inland aerodromes from mid-afternoon onwards. Pilots operating under visual flight rules (VFR) are strongly advised to obtain the latest aerodrome meteorological reports (METARs) immediately prior to departure and to maintain contact with area control throughout their flight. Terminal aerodrome forecasts (TAFs) have been updated to reflect the current forecast and are valid through to 24:00 UTC.
-            <span class="par-break"></span>
-            Road transport authorities have been notified of the reduced visibility conditions along the coastal highway network. The combination of fog, wet road surfaces, and anticipated wind gusts exceeding 70 km/h on exposed coastal sections during the cold frontal passage creates conditions in which the likelihood of road traffic incidents is materially elevated relative to normal operating conditions.<sup>(21)</sup> Variable message signs have been activated on the principal arterial routes to advise of the conditions, and highway patrol resources have been deployed to the most exposed sections.
+            These rhythms operate at scales that neither fully align with nor fully diverge from human rhythms. They are close enough to be recognizable, distant enough to be strange. The mediated plant — caught in time-lapse, monitored by sensor — is always being translated into our rhythm, our interval, our sense of what counts as an event.
           </div>
         </div>
 
-        
-
-        <div class="section" data-sec="4 Marine Layer" id="s4">
-          <div class="sec-head">4 &nbsp;Marine Layer and Coastal Effects</div>
-          <div class="sub-head">4.1 &nbsp;Structure and Depth</div>
+        <div class="section" data-sec="IV. Tropism" id="s4">
+          <div class="sub-head">Toward the light</div>
           <div class="body-text">
             <span class="par-break"></span>
-            The marine layer — a shallow layer of cool, moist air capped by a temperature inversion — currently extends to approximately 380 metres above sea level along the immediate coastline, thinning to 220 metres some 25 kilometres inland where the terrain begins to exert a controlling influence on boundary layer depth.<sup>(22)</sup> The inversion itself, measured by the radiosonde ascent at 00:00 UTC, is characterised by a temperature increase of 5.4°C over a vertical distance of just 80 metres, which constitutes a particularly sharp and well-defined boundary. Such strong inversions act as a lid on vertical mixing, trapping moisture, pollutants, and low cloud beneath them while preventing their dilution into the free atmosphere above.
+            Phototropism — the bending of plants toward light — is perhaps the most legible form of plant behavior. It is movement organized by desire, or at least by what functions like desire: a differential sensitivity to light that causes cells on one side to elongate faster than cells on the other, producing a curve, a reaching, an orientation.
             <span class="par-break"></span>
-            The marine layer's current depth and strength can be attributed to the persistence of the Pacific high-pressure system to the west, which maintains a pattern of large-scale subsidence — the slow sinking of air from altitude — that warms and dries the air above the inversion while the surface layer beneath it remains cool and saturated from contact with the cold ocean surface.<sup>(23)</sup> This configuration is essentially self-reinforcing: the inversion prevents the cool surface air from mixing upward, while the cold sea surface continuously replenishes the moisture supply at the base of the marine layer through evaporation and turbulent heat exchange.
+            What would it mean to design an interface that bends toward the user the way a plant bends toward light? Not instantly, not mechanically, but slowly — adjusting over time, responding to presence rather than to command. An interface that senses you without demanding your input.
             <span class="par-break"></span>
-            The approaching frontal system is expected to erode the inversion by introducing synoptic-scale ascent through the full tropospheric column, effectively lifting and then destroying the capping layer.<sup>(24)</sup> This process, sometimes described as a marine layer breakdown event, typically occurs rapidly once the large-scale forcing overcomes the stabilising influence of the inversion. The transition from marine layer conditions to frontal overcast will be marked by a characteristic sequence: first the appearance of mid-level cloud at 3000–5000 metres moving in ahead of the warm front, then a gradual lowering and thickening of the cloud deck, and finally the onset of continuous precipitation as described in Section 3.
+            This is the speculative design question the essay opens up: not just how to represent plant intelligence, but how to embody it — how to build systems that operate by its logic rather than merely depicting it.
           </div>
-          <div class="sub-head">4.2 &nbsp;Sea Surface Temperatures and Heat Exchange</div>
+          <div class="sub-head">Gravitropism and root logic</div>
           <div class="body-text">
             <span class="par-break"></span>
-            Sea surface temperature (SST) data from the network of moored buoys, ships of opportunity, and satellite-derived retrievals indicates a regional mean of 13.6°C, with the coldest values of 11.8°C recorded in areas of active coastal upwelling — a process whereby prevailing winds drive surface water offshore, allowing colder, nutrient-rich water from depths of 50–100 metres to replace it at the surface.<sup>(25)</sup> The upwelling zones are confined to specific coastal orientations where the wind stress is most effective at driving the Ekman transport — the net movement of wind-driven surface water at right angles to the wind direction, a consequence of the Coriolis effect arising from the Earth's rotation.
+            Roots grow downward through gravitropism — a response to gravity that requires no knowledge of direction, only a sensitivity to force. The root does not know it is going down. It simply responds, cell by cell, to the conditions it encounters.
             <span class="par-break"></span>
-            The sensible heat flux — the transfer of heat energy between the ocean surface and the overlying atmosphere — is currently directed from ocean to atmosphere at a rate of approximately 18 watts per square metre in the coldest upwelling zones, indicating that the ocean is supplying heat to the atmosphere rather than receiving it.<sup>(26)</sup> This direction of heat flux is unusual for this time of year and reflects the anomalously cold SSTs in the upwelling zones relative to the air temperature above them. The latent heat flux — the energy transferred through evaporation of water from the ocean surface — is considerably larger, at 65–80 watts per square metre, and represents the primary mechanism by which oceanic moisture is supplied to the atmospheric boundary layer.
+            This is a model of navigation without a map, growth without intention, intelligence without consciousness. It challenges every assumption we make about how knowing and doing relate to each other — and suggests that some of the most successful forms of problem-solving in the world operate entirely without a mind.
           </div>
         </div>
 
-        
-
-        <div class="section sec-r" data-sec="5 Extended Outlook" id="s5">
-          <div class="sec-head">5 &nbsp;Extended Outlook and Anomaly Assessment</div>
-          <div class="sub-head">5.1 &nbsp;72-Hour to 120-Hour Period</div>
+        <div class="section sec-r" data-sec="V. Network" id="s5">
+          <div class="sub-head">The wood wide web</div>
           <div class="body-text">
             <span class="par-break"></span>
-            Beyond the 72-hour period, forecast confidence diminishes significantly, as indicated by the growing spread among the 51 ensemble members that comprise the operational global ensemble system.<sup>(27)</sup> Nevertheless, the broad synoptic pattern — a progressive westerly flow with a series of frontal systems moving across the region at intervals of 3–5 days — is sufficiently well established in the ensemble mean that some degree of useful guidance can be offered for the extended period, provided the attendant uncertainty is clearly communicated.
+            Beneath a forest floor, a network. Mycorrhizal fungi thread through soil, connecting root systems of different trees, enabling the transfer of carbon, water, and chemical signals across distances of many meters. Suzanne Simard's research demonstrated that trees use this network to share resources — that a mother tree can send carbon to her seedlings growing in shade, that trees can warn their neighbors of insect attack.
             <span class="par-break"></span>
-            The cold frontal passage expected in the 24–36 hour period will be followed by a brief ridge of high pressure lasting approximately 18–24 hours, during which conditions will improve markedly: skies will clear from the west, winds will decrease to 10–15 km/h from the northwest, and temperatures will recover to near-normal values following the post-frontal cooling.<sup>(28)</sup> This interlude will be welcome but short-lived. The ensemble mean indicates a 70% probability of a second, more vigorous frontal system entering the western edge of the forecast area between 84 and 96 hours from the time of this bulletin's issue.
+            This is a rhizomatic system in the Deleuzian sense: decentralized, without hierarchy, organized by connection rather than command. There is no brain, no center, no authority — only the network itself, and the flows that pass through it.
             <span class="par-break"></span>
-            The second system is associated with a deep mid-tropospheric trough that the global models are handling with considerable consistency — an encouraging sign for forecast confidence — and is expected to produce rainfall accumulations comparable to or exceeding those associated with the current event.<sup>(29)</sup> The precise track of this second system remains uncertain at the 96-hour range, however, and small errors in the predicted position of the upstream trough could translate into significant differences in the distribution of precipitation across the forecast area. Users with decisions dependent on weather conditions in the 96-120 hour window are strongly advised to consult updated forecast guidance as it becomes available over the coming 24-48 hours, rather than relying exclusively on the current bulletin.
+            The internet was once described with similar metaphors. But the internet has nodes and routers and servers — centers of a kind, hierarchies that emerged from apparent flatness. The mycorrhizal network resists this logic. It is genuinely distributed in ways that our technological networks only approximate.
           </div>
-          <div class="sub-head">5.2 &nbsp;Climatological Context and Anomalies</div>
+          <div class="sub-head">Toward a vegetal interface</div>
           <div class="body-text">
             <span class="par-break"></span>
-            When placed in historical context, the current weather pattern represents a continuation of anomalous conditions that have characterised the past several months. Regional mean temperature for the past 30-day period is running 1.6°C above the 1991–2020 baseline, consistent with the broader hemispheric signal of warming that has been documented extensively in the peer-reviewed literature.<sup>(30)</sup> Precipitation, by contrast, has been highly variable: the northern portions of the forecast area have received 140% of the climatological normal for the season to date, while the southern margins have received only 62%, reflecting a persistent southward displacement of the storm track relative to its historical mean position.
+            What would it mean to build a website that grows? Not one that loads quickly and presents information efficiently, but one that reveals itself slowly, that changes with each visit, that responds to the time of day, the weather at your location, the season in which you encounter it?
             <span class="par-break"></span>
-            The frequency of atmospheric river events — corridors of concentrated water vapour transport originating in subtropical oceanic regions and capable of delivering extreme precipitation over relatively short periods — has increased noticeably in the observational record over the past decade.<sup>(31)</sup> Whether the event described in this bulletin meets the formal definition of an atmospheric river, which requires integrated water vapour transport exceeding 250 kilogram metres per second per metre of cross-front width, will be assessed in the post-event analysis. Preliminary estimates based on satellite-derived total precipitable water fields suggest that the threshold may be marginally exceeded along the most active portion of the warm conveyor belt.
+            The mediated plant suggests an alternative model for digital design — one organized not around the user's convenience but around the plant's temporality. An interface that asks you to wait. That does not complete itself. That leaves some things permanently out of reach.
             <span class="par-break"></span>
-            Soil moisture conditions across the forecast area are currently at or above the 75th percentile for this date, reflecting the accumulated effect of above-normal precipitation over the preceding weeks.<sup>(32)</sup> Saturated or near-saturated soils have important implications for the hydrological response to the anticipated rainfall: when the soil has little remaining capacity to absorb water, a greater proportion of precipitation runs off immediately into streams and drainage channels rather than infiltrating into the soil matrix. This reduced infiltration, combined with the antecedent saturation of the channel network itself, means that flood thresholds may be exceeded at flows that would be unremarkable in drier antecedent conditions. Emergency management agencies have been briefed accordingly and pre-positioned resources in the catchments considered most at risk.
-          </div>
-          <div class="sub-head">5.3 &nbsp;Footnotes and Methodological Notes</div>
-          <div class="body-text">
-            <span class="par-break"></span>
-            <sup>(1)</sup> Automated Surface Observation Systems (ASOS) operate continuously and report at hourly intervals or more frequently when significant weather changes are detected. Each station measures temperature, dew point, wind speed and direction, visibility, cloud height and coverage, precipitation type and rate, and sea-level pressure. Station data undergoes automated quality control before ingestion into the analysis system. <sup>(2)</sup> The hectopascal (hPa) replaced the millibar (mb) as the standard unit of atmospheric pressure in meteorological practice following a WMO recommendation in 1986. Since 1 hPa = 1 mb, all historical pressure records remain directly comparable. <sup>(3)</sup> Ensemble spread is defined as the standard deviation of the ensemble member forecasts about the ensemble mean at a given forecast lead time. When the spread exceeds the root-mean-square error of the ensemble mean with respect to observations — a condition sometimes called ensemble calibration — the ensemble can be interpreted as a reliable probability distribution over possible future states. <sup>(4)</sup> The numerical weather prediction models used operationally solve the primitive equations of fluid dynamics on a global grid with horizontal resolutions of 9–13 km and 137 vertical levels. Each forecast run requires several petaflops of computing power and produces tens of terabytes of output data. <sup>(5)</sup> WMO Technical Regulations, Volume I (WMO-No. 49) and Volume II (WMO-No. 49, Part II) govern international standards for meteorological observations, data exchange, and forecast products. <sup>(6)</sup> The 1991–2020 reference period was adopted as the standard climatological normal by the WMO in 2021, replacing the previous 1981–2010 normal. The shift in the reference period itself produces apparent changes in anomaly values that are purely definitional rather than physical. <sup>(7)</sup> Longwave radiation — infrared radiation emitted by the Earth's surface and atmosphere — is the primary mechanism by which the surface loses energy to space during the night. Cloud cover intercepts this radiation and re-emits a portion of it back toward the surface, a process that warms the surface relative to what would occur under clear skies. <sup>(8)</sup> Relative humidity expresses the water vapour content of air as a percentage of the maximum water vapour that air at the same temperature could contain. A value of 100% indicates saturation; values above 100% are physically possible during the formation of cloud droplets. <sup>(9)</sup> Coastal waters forecasts are issued separately by the Marine Forecasting Centre and cover seas within 60 nautical miles of the coast. Offshore waters forecasts cover the region between 60 and 200 nautical miles. High seas forecasts are issued by the Ocean Forecasting Centre. <sup>(10)</sup> Conditional instability is the state of an atmosphere in which dry air parcels are stable with respect to vertical displacement but saturated air parcels are unstable. Convection requires a triggering mechanism — such as surface heating, frontal lifting, or orographic forcing — to initiate the initial ascent that saturates the rising parcel. <sup>(11)</sup> Surface pressure analysis is performed using a two-dimensional variational technique that optimally combines first-guess pressure fields from the numerical model with surface observations, weighted according to their estimated error characteristics. <sup>(12)</sup> The three-frontal structure of mid-latitude cyclones was first described systematically by the Bergen School of Meteorologists in the 1910s–1920s, building on the earlier work of Vilhelm Bjerknes. The conceptual model, though subsequently refined, remains the dominant framework for teaching and operational weather analysis. <sup>(13)</sup> Coastal fronts form when temperature contrast develops between relatively warm coastal waters and cold continental air masses, producing a density boundary that can act as a focus for precipitation and low-level wind shear. They are distinct from, but sometimes interact with, the primary cold front of the parent cyclone. <sup>(14)</sup> The polar jet stream forms along the boundary between cold polar air masses and warmer subtropical air, where the strong meridional (north-south) temperature gradient produces, through the thermal wind relationship, a concentrated maximum of upper-level westerly winds. <sup>(15)</sup> Trough tilt is assessed by comparing the position of the trough axis at different pressure levels. A positive tilt (NE-SW orientation) is associated with a stable, mature wave; a negative tilt (NW-SE) with an actively deepening, dynamically intense system. <sup>(16)</sup> Stratiform precipitation is produced by the systematic lifting of air over a wide area, rather than by intense convective overturning. It is characterised by a well-defined radar bright band — an enhanced reflectivity layer just below the melting level where partially melted snowflakes are large and wet. <sup>(17)</sup> Orographic enhancement occurs when moist air is forced to ascend over elevated terrain, cooling at the saturated adiabatic lapse rate and producing cloud and precipitation on the windward slope. Lee slopes typically receive far less precipitation as the descending air warms and dries. <sup>(18)</sup> Return period analysis of extreme precipitation events is complicated by the non-stationarity of the climate system: statistical relationships derived from the historical record may no longer adequately represent the probability of extreme events in a warming climate. <sup>(19)</sup> The distinction between radiation fog and advection fog has practical significance for forecast timing: radiation fog is most likely to clear in the mid-morning as solar heating evaporates the fog from above, while advection fog may persist throughout the day regardless of solar heating intensity. <sup>(20)</sup> Instrument meteorological conditions (IMC) require pilots to fly by instruments rather than by visual reference to the ground or horizon, and mandate the filing and adherence to instrument flight rules (IFR) flight plans. <sup>(21)</sup> The combination of reduced visibility, wet roads, and strong crosswinds constitutes a significantly elevated hazard for road transport operations, particularly for high-sided vehicles on exposed sections of the network. <sup>(22)</sup> Marine layer depth is measured by the height of the temperature inversion base above mean sea level, as determined by radiosonde ascent data or inferred from ceiling observations at surface stations. <sup>(23)</sup> The subsidence inversion associated with the Pacific high is the mechanism responsible for the persistent summer fog and low cloud of many western coastlines, most famously the summer fog of coastal California. <sup>(24)</sup> Marine layer breakdown events are sometimes dramatic and rapid: the transition from dense fog to clear skies can occur in less than an hour when strong synoptic forcing overrides the stabilising inversion. <sup>(25)</sup> Coastal upwelling is most intense where prevailing winds blow parallel to the coast with the land to the right of the wind direction (in the Northern Hemisphere), producing maximum offshore Ekman transport of surface waters. <sup>(26)</sup> Sensible heat flux is positive when directed from surface to atmosphere (upward) and negative when directed from atmosphere to surface (downward). The current positive flux from ocean to atmosphere reflects the fact that the cold upwelled water is actually warmer than the air immediately above it. <sup>(27)</sup> The European Centre for Medium-Range Weather Forecasts (ECMWF) ensemble prediction system uses 51 members: one control run and 50 perturbed members initialised with small perturbations to the initial conditions designed to sample the space of observational uncertainty. <sup>(28)</sup> Post-frontal ridging is a reliable feature of mid-latitude cyclone passage and represents the downstream flank of the departing trough. Its duration and intensity depend on the amplitude of the downstream ridge and the speed of the next approaching system. <sup>(29)</sup> Model consistency — the degree to which successive model runs agree on the predicted position and intensity of a forecast feature — is an informal but useful indicator of forecast confidence. High consistency increases confidence; large run-to-run changes indicate the presence of significant forecast uncertainty. <sup>(30)</sup> The current period of above-normal regional temperatures is consistent with the signal of anthropogenic climate change as projected by global climate models and observed in instrumental records extending back to the mid-nineteenth century. Attribution studies suggest that events of this magnitude and duration have become approximately 3–5 times more frequent than they would have been in a pre-industrial climate. <sup>(31)</sup> Atmospheric rivers are now formally defined using the Atmospheric River Scale (ARS), which ranks events from AR1 (weak and primarily beneficial) to AR5 (exceptional and primarily hazardous), analogous to the Saffir-Simpson scale for hurricanes. <sup>(32)</sup> Soil moisture monitoring is conducted through a combination of in-situ soil moisture sensors at agricultural monitoring sites, satellite-derived estimates from passive microwave and synthetic aperture radar instruments, and land surface model analyses that assimilate observational data.
+            This website is that experiment. Content valid until conditions change. The site decays.
           </div>
         </div>
 
@@ -590,43 +595,83 @@ body {
   <span style="margin-left:auto" id="s-pct">0%</span>
 </div>
 
+<!-- matter.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+
 <script>
-// ── SCROLLBARS ───────────────────────────────────────────────────
-const thumbs = {
-  right: { el:document.getElementById('sb-right-thumb'), track:null, pos:0, target:0, vel:0, dir:1, size:44, axis:'v' },
-  left:  { el:document.getElementById('sb-left-thumb'),  track:null, pos:0, target:0, vel:0, dir:1, size:36, axis:'v' },
-  top:   { el:document.getElementById('sb-top-thumb'),   track:null, pos:0, target:0, vel:0, dir:1, size:60, axis:'h' },
-  bot:   { el:document.getElementById('sb-bot-thumb'),   track:null, pos:0, target:0, vel:0, dir:1, size:48, axis:'h' },
+// ── SCROLLBARS — 4 living bars, desktop + mobile ─────────────────
+const sbDefs = {
+  right: { el:document.getElementById('sb-right-thumb'), track:document.getElementById('sb-right'), pos:0, vel:0, target:0, size:44, axis:'v', scrollSync:true, scrollDir:1 },
+  left:  { el:document.getElementById('sb-left-thumb'),  track:document.getElementById('sb-left'),  pos:0, vel:0, target:0, size:36, axis:'v', scrollSync:true, scrollDir:-1 },
+  top:   { el:document.getElementById('sb-top-thumb'),   track:document.getElementById('sb-top'),   pos:0, vel:0, target:0, size:60, axis:'h', scrollSync:true, scrollDir:1 },
+  bot:   { el:document.getElementById('sb-bot-thumb'),   track:document.getElementById('sb-bottom-extra'), pos:0, vel:0, target:0, size:48, axis:'h', scrollSync:true, scrollDir:-1 },
 };
-thumbs.right.track=document.getElementById('sb-right');
-thumbs.left.track =document.getElementById('sb-left');
-thumbs.top.track  =document.getElementById('sb-top');
-thumbs.bot.track  =document.getElementById('sb-bottom-extra');
+// ghost thumbs — pure autonomous spring
+const ghostDefs = [
+  { el:document.getElementById('sb-ghost-1'), track:document.getElementById('sb-right'), pos:30, vel:0, tgt:80, axis:'v' },
+  { el:document.getElementById('sb-ghost-2'), track:document.getElementById('sb-right'), pos:120, vel:0, tgt:40, axis:'v', opacity:0.12 },
+  { el:document.getElementById('sb-ghost-3'), track:document.getElementById('sb-left'),  pos:60, vel:0, tgt:180, axis:'v', opacity:0.15 },
+];
 
-function pickNewTarget(t){
-  const isV=t.axis==='v';
-  const trackLen=isV?(t.track.clientHeight-t.size):(t.track.clientWidth-t.size);
-  const bias=Math.random()<0.75?t.dir:-t.dir;
-  let next=t.pos+bias*(trackLen*(0.1+Math.random()*0.55));
-  next=Math.max(0,Math.min(trackLen,next));
-  if(next===t.pos) next=trackLen-next;
-  t.dir=next>t.pos?1:-1; t.target=next;
-  setTimeout(()=>pickNewTarget(t),800+Math.random()*2400);
+function pickAutonomousTarget(sb){
+  if(!sb.track) return;
+  const len = sb.axis==='v' ? sb.track.clientHeight-sb.size : sb.track.clientWidth-sb.size;
+  sb.tgt = Math.random()*Math.max(0,len);
+  setTimeout(()=>pickAutonomousTarget(sb), 700+Math.random()*2200);
 }
-function springTick(){
-  const k=0.045,damp=0.72;
-  Object.values(thumbs).forEach(t=>{
-    t.vel=t.vel*damp+(t.target-t.pos)*k; t.pos+=t.vel;
-    t.el.style[t.axis==='v'?'top':'left']=t.pos.toFixed(2)+'px';
+ghostDefs.forEach(g=>pickAutonomousTarget(g));
+
+// autonomous wandering for non-scroll-synced portion of main bars
+const autoTargets = {};
+function pickAutoTarget(key, sb){
+  if(!sb.track) return;
+  const len = sb.axis==='v' ? sb.track.clientHeight-sb.size : sb.track.clientWidth-sb.size;
+  autoTargets[key] = Math.random()*Math.max(0,len);
+  setTimeout(()=>pickAutoTarget(key,sb), 1200+Math.random()*2800);
+}
+// Only auto-wander left and bot (right and top track scroll)
+pickAutoTarget('left', sbDefs.left);
+pickAutoTarget('bot', sbDefs.bot);
+
+function updateScrollbarTargets(){
+  const doc = document.documentElement.scrollHeight - window.innerHeight;
+  const prog = doc>0 ? Math.min(1, window.scrollY/doc) : 0;
+  // right tracks scroll directly
+  const rt = sbDefs.right;
+  if(rt.track) rt.target = prog * Math.max(0, rt.track.clientHeight - rt.size);
+  // top tracks scroll directly
+  const tp = sbDefs.top;
+  if(tp.track) tp.target = prog * Math.max(0, tp.track.clientWidth - tp.size);
+  // left autonomous
+  if(autoTargets.left !== undefined) sbDefs.left.target = autoTargets.left;
+  // bot autonomous
+  if(autoTargets.bot !== undefined) sbDefs.bot.target = autoTargets.bot;
+}
+window.addEventListener('scroll', updateScrollbarTargets, {passive:true});
+updateScrollbarTargets();
+
+function springLoopSB(){
+  const k=0.048, d=0.74;
+  // main bars
+  Object.values(sbDefs).forEach(sb=>{
+    if(!sb.el) return;
+    sb.vel = sb.vel*d + (sb.target - sb.pos)*k;
+    sb.pos += sb.vel;
+    if(sb.axis==='v') sb.el.style.top = sb.pos.toFixed(1)+'px';
+    else sb.el.style.left = sb.pos.toFixed(1)+'px';
   });
-  requestAnimationFrame(springTick);
+  // ghost thumbs
+  ghostDefs.forEach(g=>{
+    if(!g.el) return;
+    g.vel = (g.vel||0)*d + (g.tgt - g.pos)*k;
+    g.pos += g.vel;
+    g.el.style.top = g.pos.toFixed(1)+'px';
+  });
+  requestAnimationFrame(springLoopSB);
 }
-setTimeout(()=>pickNewTarget(thumbs.left),200);
-setTimeout(()=>pickNewTarget(thumbs.top),900);
-setTimeout(()=>pickNewTarget(thumbs.bot),1600);
-springTick();
+springLoopSB();
 
-// ── BUTTON PULSE ─────────────────────────────────────────────────
+// ── BUTTON PULSE ────────────────────────────────────────────────
 document.querySelectorAll('.aq').forEach(b=>{
   (function pulse(){
     setTimeout(()=>{
@@ -643,18 +688,22 @@ document.querySelectorAll('.aq').forEach(b=>{
     setTimeout(()=>{ r.style.transform=''; wiggle(); },180); },2800+Math.random()*3000);
 })();
 
-// ── SCROLL + COLUMN ───────────────────────────────────────────────
+// ── SCROLL + COLUMN (original logic preserved) ───────────────────
 const col=document.getElementById('col');
 const sSec=document.getElementById('s-sec');
 const sPct=document.getElementById('s-pct');
 const tbarLabel=document.getElementById('tbar-label');
+const isMobile=()=>window.innerWidth<=700;
+
 const PHASES=[{at:0,vw:70,pl:5},{at:.28,vw:58,pl:7},{at:.50,vw:65,pl:5},{at:.72,vw:52,pl:9},{at:1,vw:60,pl:6}];
 let curVW=70,curPL=5,rafId=null;
 const EASE=0.07;
 function lerp(a,b,t){return a+(b-a)*t;}
+
 function getTarget(){
   const doc=document.documentElement.scrollHeight-window.innerHeight;
   const prog=doc>0?Math.min(1,window.scrollY/doc):0;
+  if(isMobile()) return{vw:100,pl:0,prog};
   let vw=PHASES[0].vw,pl=PHASES[0].pl;
   for(let i=1;i<PHASES.length;i++){
     const p=PHASES[i-1],c=PHASES[i];
@@ -663,120 +712,78 @@ function getTarget(){
   }
   return{vw,pl,prog};
 }
+
 function applyCol(){
+  if(isMobile()){col.style.width='100%';col.style.paddingLeft='14px';col.style.paddingRight='14px';document.querySelectorAll('.sec-r').forEach(s=>{s.style.paddingLeft='';});return;}
   col.style.width=curVW.toFixed(2)+'vw';
   col.style.paddingLeft=curPL.toFixed(2)+'%';
   const shift=(70-curVW)*.5;
   document.querySelectorAll('.sec-r').forEach(s=>{s.style.paddingLeft=shift.toFixed(2)+'vw';});
 }
+
 function tick(){
   const{vw,pl,prog}=getTarget();
-  const dvw=vw-curVW,dpl=pl-curPL;
-  if(Math.abs(dvw)>.004||Math.abs(dpl)>.004){curVW+=dvw*EASE;curPL+=dpl*EASE;applyCol();rafId=requestAnimationFrame(tick);}
-  else{curVW=vw;curPL=pl;applyCol();rafId=null;}
-  thumbs.right.target=prog*(thumbs.right.track.clientHeight-thumbs.right.size);
-  thumbs.left.target=Math.min(1,Math.max(0,prog-0.12))*(thumbs.left.track.clientHeight-thumbs.left.size);
-  thumbs.top.target=prog*(thumbs.top.track.clientWidth-thumbs.top.size);
-  thumbs.bot.target=(1-prog)*(thumbs.bot.track.clientWidth-thumbs.bot.size);
+  if(!isMobile()){
+    const dvw=vw-curVW,dpl=pl-curPL;
+    if(Math.abs(dvw)>.004||Math.abs(dpl)>.004){curVW+=dvw*EASE;curPL+=dpl*EASE;applyCol();rafId=requestAnimationFrame(tick);}
+    else{curVW=vw;curPL=pl;applyCol();rafId=null;}
+  } else { applyCol(); }
   sPct.textContent=Math.round(prog*100)+'%';
 }
 window.addEventListener('scroll',()=>{if(!rafId)rafId=requestAnimationFrame(tick);},{passive:true});
+window.addEventListener('resize',applyCol);
 
 function goSection(i){const el=document.getElementById('s'+i);if(el)el.scrollIntoView({behavior:'smooth'});}
 
-// ── SCROLL-DRIVEN SECTION PARALLAX ───────────────────────────────
-const SECTION_CHARS = [
-  { xBelow: -12, xAbove:  6,  speed: 0.06 },
-  { xBelow:  8,  xAbove: 14,  speed: 0.09 },
-  { xBelow: -6,  xAbove: -16, speed: 0.05 },
-  { xBelow: 10,  xAbove:  4,  speed: 0.11 },
-  { xBelow: -14, xAbove: -8,  speed: 0.07 },
-  { xBelow:  5,  xAbove: 18,  speed: 0.04 },
+// ── SECTION PARALLAX (desktop only) ─────────────────────────────
+const SECTION_CHARS=[
+  {xBelow:-12,xAbove:6,speed:0.06},{xBelow:8,xAbove:14,speed:0.09},
+  {xBelow:-6,xAbove:-16,speed:0.05},{xBelow:10,xAbove:4,speed:0.11},
+  {xBelow:-14,xAbove:-8,speed:0.07},{xBelow:5,xAbove:18,speed:0.04},
 ];
-
-const sections = document.querySelectorAll('.section');
-const secState = Array.from(sections).map((el, i) => {
-  const ch = SECTION_CHARS[i] || { xBelow: (i%2===0?-9:9), xAbove: (i%2===0?-5:12), speed: 0.07 };
-  return { el, ch, curX: 0 };
+const sections=document.querySelectorAll('.section');
+const secState=Array.from(sections).map((el,i)=>{
+  const ch=SECTION_CHARS[i]||{xBelow:(i%2===0?-9:9),xAbove:(i%2===0?-5:12),speed:0.07};
+  return{el,ch,curX:0};
 });
 
-function animateSections() {
-  const vh = window.innerHeight;
-  secState.forEach(s => {
-    const rect = s.el.getBoundingClientRect();
-    const elCenter = rect.top + rect.height / 2;
-    const prog = Math.max(-1.4, Math.min(1.4, (elCenter - vh / 2) / vh));
-    const ox = prog >= 0 ? s.ch.xBelow : s.ch.xAbove;
-    const curve = Math.sign(prog) * Math.pow(Math.abs(prog), 0.75);
-    const targetX = ox * curve;
-    s.curX += (targetX - s.curX) * s.ch.speed;
-    s.el.style.transform = `translateX(${s.curX.toFixed(3)}vw)`;
-
-    if (rect.top < vh * 0.55 && rect.bottom > vh * 0.1 && s.el.dataset.sec) {
-      sSec.textContent = s.el.dataset.sec;
-      tbarLabel.textContent = 'regional weather bulletin — ' + s.el.dataset.sec;
+// ── SECTION PARALLAX + LABEL — scroll event only, no continuous RAF ─
+let secRafPending=false;
+function updateSections(){
+  secRafPending=false;
+  const vh=window.innerHeight;
+  const mob=isMobile();
+  secState.forEach(s=>{
+    const rect=s.el.getBoundingClientRect();
+    if(!mob){
+      const elCenter=rect.top+rect.height/2;
+      const prog=Math.max(-1.4,Math.min(1.4,(elCenter-vh/2)/vh));
+      const ox=prog>=0?s.ch.xBelow:s.ch.xAbove;
+      const curve=Math.sign(prog)*Math.pow(Math.abs(prog),0.75);
+      s.el.style.transform=`translateX(${(ox*curve).toFixed(2)}vw)`;
+    } else {
+      s.el.style.transform='';
+    }
+    if(rect.top<vh*0.55&&rect.bottom>vh*0.1&&s.el.dataset.sec){
+      sSec.textContent=s.el.dataset.sec;
+      tbarLabel.textContent='the mediated plant — '+s.el.dataset.sec;
     }
   });
-  requestAnimationFrame(animateSections);
 }
+sections.forEach(el=>{el.style.opacity='1';el.style.transition='none';});
+window.addEventListener('scroll',()=>{
+  if(!secRafPending){secRafPending=true;requestAnimationFrame(updateSections);}
+},{passive:true});
+updateSections();
 
-sections.forEach(el => { el.style.opacity = '1'; el.style.transition = 'none'; });
-animateSections();
-
-// ── INDEX GRID PULSE ──────────────────────────────────────────────
+// ── INDEX GRID PULSE ─────────────────────────────────────────────
 const gns=document.querySelectorAll('.gn');
 function pulseGrid(){gns.forEach(g=>{const d=Math.abs(g.getBoundingClientRect().top-window.innerHeight*.4);if(d<90){g.classList.add('bright');g.classList.remove('dim');}else if(d>220){g.classList.add('dim');g.classList.remove('bright');}else{g.classList.remove('bright','dim');}});}
 window.addEventListener('scroll',pulseGrid,{passive:true});
 
 applyCol();
 
-// ── TYPOGRAPHIC SIZING ─────────────────────────────────────────────
-// Mostly readable body scale, with a few big-type moments for drama.
-// Big moments: epigraph, one body-text per section. Rest stays legible.
-const allTextEls = document.querySelectorAll('.body-text, .epigraph, .sub-head');
-// Hand-assign: index → [fontSize, lineHeight]
-// Pattern: big opener, readable body, occasional large paragraph, small sub-heads
-const SIZES = [
-  [13,  1.5 ],  // epigraph — same as body, slightly more open leading
-  [14,  1.38],
-  [14,  1.35],
-  [80,  0.88],  // first big moment
-  [14,  1.35],
-  [13,  1.3 ],  // sub-head
-  [14,  1.38],
-  [13,  1.35],
-  [13,  1.3 ],  // sub-head
-  [14,  1.35],
-  [14,  1.32],
-  [13,  1.3 ],  // sub-head
-  [14,  1.35],
-  [14,  1.38],
-  [13,  1.35],
-  [13,  1.3 ],  // sub-head
-  [14,  1.35],
-  [14,  1.38],
-  [13,  1.3 ],  // sub-head
-  [68,  0.88],  // second big moment
-  [14,  1.35],
-  [14,  1.38],
-  [14,  1.32],
-  [13,  1.3 ],  // sub-head
-  [14,  1.35],
-  [14,  1.38],
-  [13,  1.32],
-  [14,  1.35],
-  [56,  0.9 ],  // third big moment
-  [14,  1.32],
-];
-
-allTextEls.forEach((el, i) => {
-  const [sz, lh] = SIZES[i % SIZES.length];
-  el.style.fontSize = sz + 'px';
-  el.style.lineHeight = lh;
-  el.style.letterSpacing = sz >= 56 ? '-0.035em' : sz >= 32 ? '-0.02em' : sz >= 18 ? '-0.015em' : '-0.01em';
-});
-
-// ── ANALOG CLOCK ──────────────────────────────────────────────────
+// ── CLOCK ──
 const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 (function drawTicks(){
@@ -790,7 +797,7 @@ const MONTHS=['January','February','March','April','May','June','July','August',
   }
 })();
 function rotateHand(id,deg){
-  const el=document.getElementById(id);
+  const el=document.getElementById(id);if(!el)return;
   const rad=(deg-90)*Math.PI/180;
   const lens={'hand-h':22,'hand-m':30,'hand-s':32};
   el.setAttribute('x2',(40+Math.cos(rad)*lens[id]).toFixed(3));
@@ -799,21 +806,29 @@ function rotateHand(id,deg){
 function pad(n){return String(n).padStart(2,'0');}
 function tickClock(){
   const now=new Date();
-  const h=now.getHours(),m=now.getMinutes(),s=now.getSeconds();
+  const h=now.getHours(),m=now.getMinutes(),s=now.getSeconds(),ms=now.getMilliseconds();
   rotateHand('hand-h',(h%12)*30+m*0.5);
   rotateHand('hand-m',m*6+s*0.1);
   rotateHand('hand-s',s*6);
+  const fr=Math.floor(ms/41.67);
+  // single timecode — no repeats
+  const tc=`${pad(h)}:${pad(m)}:${pad(s)}:${pad(fr)}`;
+  const ampm=h>=12?'PM':'AM';
   const dayEl=document.getElementById('clock-day-big');
   const dateEl=document.getElementById('clock-date-big');
   const digEl=document.getElementById('clock-digital');
+  const tcL=document.getElementById('clock-tc-left');
+  const tcR=document.getElementById('clock-tc-right');
   if(dayEl) dayEl.textContent=DAYS[now.getDay()].toLowerCase();
   if(dateEl) dateEl.textContent=now.getDate()+' '+MONTHS[now.getMonth()].toLowerCase()+' '+now.getFullYear();
   if(digEl) digEl.textContent=pad(h)+':'+pad(m)+':'+pad(s);
+  if(tcL) tcL.textContent=tc;
+  if(tcR) tcR.textContent=tc+' '+ampm;
 }
 tickClock();
-setInterval(tickClock,1000);
+setInterval(tickClock,42);
 
-// ── WEATHER ───────────────────────────────────────────────────────
+// ── WEATHER ──────────────────────────────────────────────────────
 function weatherDesc(code){
   if(code===0)return'clear sky';if(code<=2)return'partly cloudy';if(code===3)return'overcast';
   if(code<=49)return'fog';if(code<=57)return'drizzle';if(code<=67)return'rain';
@@ -827,191 +842,253 @@ async function fetchWeather(){
     const{latitude:lat,longitude:lon}=pos.coords;
     const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,precipitation,wind_speed_10m,weather_code&wind_speed_unit=kmh&temperature_unit=celsius`);
     const d=await r.json();const c=d.current;
-    el.textContent=`${weatherDesc(c.weather_code)} · ↓${c.temperature_2m.toFixed(1)}°C · ⚐ ${c.wind_speed_10m.toFixed(1)} km/h · ${c.precipitation.toFixed(1)} mm`;
+    el.textContent=`${weatherDesc(c.weather_code)} · ${c.temperature_2m.toFixed(1)}°C · ${c.wind_speed_10m.toFixed(1)} km/h · ${c.precipitation.toFixed(1)} mm`;
     el.style.opacity='0.7';
-    initPlants(c.weather_code,parseFloat(c.precipitation),parseFloat(c.wind_speed_10m));
-  }catch(e){
-    el.textContent='weather unavailable';
-    initPlants(0,0,0);
-  }
+    // store for CSS weather visualizations
+    window._wxTemp = parseFloat(c.temperature_2m);
+    window._wxRain = parseFloat(c.precipitation);
+    window._wxWindSpd = parseFloat(c.wind_speed_10m);
+    window._wxCode = c.weather_code;
+    window._wxWindDir = 225; // open-meteo free tier doesn't include direction; set manually if needed
+    // ── SEASON → plant growth ──
+    const month=new Date().getMonth()+1; // 1-12
+    if(window._getSeason && window._applySeasonParams){
+      const season=window._getSeason(lat, month);
+      window._applySeasonParams(season);
+      window._wxSeason = season; // for CSS season viz
+      // append season to weather strip
+      const sEl=document.createElement('span');
+      sEl.style.cssText='opacity:0.45;margin-left:6px;font-style:italic;';
+      sEl.textContent='· '+season;
+      el.parentElement.appendChild(sEl);
+    }
+  }catch(e){el.textContent='weather unavailable';}
 }
 fetchWeather();
 
-// ── MOLD COLONY SYSTEM ────────────────────────────────────────────
-const PC=document.createElement('canvas');
-PC.id='plant-layer';
-PC.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:2;';
-document.body.appendChild(PC);
-const PCX=PC.getContext('2d');
-
-function resizePC(){PC.width=window.innerWidth;PC.height=window.innerHeight;}
-resizePC();
-window.addEventListener('resize',resizePC);
-
-function moldColony(cx, cy, radius, branches, depth, op, angleOffset){
-  const r = a => a * Math.PI/180;
-  PCX.beginPath();
-  PCX.arc(cx, cy, radius*0.18, 0, Math.PI*2);
-  PCX.fillStyle = `rgba(0,0,0,${(op*1.4).toFixed(3)})`;
-  PCX.fill();
-  for(let b=0; b<branches; b++){
-    const baseAngle = (b/branches)*360 + angleOffset + (Math.random()-0.5)*15;
-    drawRoot(cx, cy, baseAngle, radius, depth, op);
-  }
+// ── SHUFFLE / RESET ───────────────────────────────────────────────
+function randLayout(){
+  const tb=document.getElementById('toolbar');
+  const nodes=[...tb.querySelectorAll('.aq,.tb-sep')];
+  for(let i=nodes.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));tb.insertBefore(nodes[j],nodes[i]);}
+  document.querySelectorAll('.si').forEach(item=>{
+    item.style.transition='transform .5s,opacity .5s';
+    item.style.transform=`translateY(${(Math.random()-.5)*8}px)`;
+    item.style.opacity=(0.4+Math.random()*.6).toFixed(2);
+  });
+  document.querySelectorAll('.gn').forEach(g=>{
+    g.style.transition='transform .7s';
+    g.style.transform=`translate(${(Math.random()-.5)*18}px,${(Math.random()-.5)*12}px)`;
+  });
+}
+function resetLayout(){
+  document.querySelectorAll('.si').forEach(i=>{i.style.transform='';i.style.opacity='';});
+  document.querySelectorAll('.gn').forEach(g=>{g.style.transform='';});
 }
 
-function drawRoot(x, y, angle, len, depth, op){
-  if(depth <= 0 || len < 0.8) return;
-  const r = a => a*Math.PI/180;
-  const deviation = (Math.random()-0.5) * 38;
-  const newAngle = angle + deviation;
-  const segLen = len * (0.55 + Math.random()*0.3);
-  const nx = x + Math.cos(r(newAngle)) * segLen;
-  const ny = y + Math.sin(r(newAngle)) * segLen;
-  const t = 1 - (depth / 7);
-  const sw = Math.max(0.25, (1-t) * 4.5 + 0.25);
-  PCX.beginPath();
-  PCX.moveTo(x, y);
-  const cpx = (x+nx)/2 + (Math.random()-0.5)*segLen*0.35;
-  const cpy = (y+ny)/2 + (Math.random()-0.5)*segLen*0.35;
-  PCX.quadraticCurveTo(cpx, cpy, nx, ny);
-  PCX.strokeStyle = `rgba(0,0,0,${(op*(0.5+t*0.5)).toFixed(3)})`;
-  PCX.lineWidth = sw;
-  PCX.lineCap = 'round';
-  PCX.stroke();
-  const splits = Math.random() < 0.6 ? 2 : (Math.random() < 0.3 ? 3 : 1);
-  for(let i=0; i<splits; i++){
-    const spread = splits === 1 ? 12 : (28 + Math.random()*18);
-    const childAngle = newAngle + (i===0 ? -spread : i===1 ? spread : (Math.random()-0.5)*spread*0.5);
-    drawRoot(nx, ny, childAngle, len*(0.48+Math.random()*0.2), depth-1, op);
+// ── PLANT GROWTH — black thin lines, grow then decay ─────────────
+// ── PLANT GROWTH — doc4 Branch class, multi-edge, scroll-driven ──
+// Conceptual anchor (from the essay): "the act of mediation changes the organism."
+// Here: reading the essay (scroll progress) mediates the plant's growth.
+// The more you read → the faster and denser it grows → then decays.
+// Roots emerge from bottom, left, and right edges — like mycorrhizal spread.
+// Season from geolocation sets depth and branching density.
+(function initPlantGrowth(){
+  const canvas=document.getElementById('vine-canvas');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  let W,H;
+  function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+  resize();
+  window.addEventListener('resize',resize);
+
+  // Season params
+  let maxDepth=7,branchChance=0.06,baseLen=4.5;
+
+  function getSeason(lat,month){
+    const n=lat>=0;
+    if(n){if(month>=3&&month<=5)return'spring';if(month>=6&&month<=8)return'summer';if(month>=9&&month<=11)return'autumn';return'winter';}
+    else{if(month>=3&&month<=5)return'autumn';if(month>=6&&month<=8)return'winter';if(month>=9&&month<=11)return'spring';return'summer';}
   }
-}
-
-const WEATHER_PARAMS = {
-  rain:  { colonies:12, radiusRange:[30,90],  branches:9,  depth:6 },
-  fog:   { colonies:7,  radiusRange:[20,60],  branches:6,  depth:5 },
-  clear: { colonies:9,  radiusRange:[25,75],  branches:8,  depth:6 },
-  wind:  { colonies:14, radiusRange:[20,55],  branches:7,  depth:5 },
-  snow:  { colonies:6,  radiusRange:[15,45],  branches:5,  depth:4 },
-};
-
-window._lastSys = 'clear'; window._lastProgress = 0;
-let _plantTimer=null, _plantAge=0;
-const PAGE_LIFETIME=600;
-let _colonies = [];
-
-function seedColonies(sys, progress){
-  const params = WEATHER_PARAMS[sys]||WEATHER_PARAMS.clear;
-  const count = Math.max(2, Math.floor(progress * params.colonies));
-  const [minR, maxR] = params.radiusRange;
-  while(_colonies.length < count){
-    _colonies.push({
-      x: Math.random() * PC.width,
-      y: Math.random() * PC.height,
-      radius: minR + Math.random()*(maxR-minR),
-      branches: params.branches + Math.floor(Math.random()*4-2),
-      depth: params.depth,
-      angleOffset: Math.random()*360,
-    });
+  function applySeasonParams(season){
+    // essay: vegetal life operates at different temporalities across seasons
+    const P={
+      spring:{depth:9,chance:0.08,len:5.0},
+      summer:{depth:7,chance:0.06,len:4.5},
+      autumn:{depth:5,chance:0.04,len:3.5},
+      winter:{depth:4,chance:0.025,len:2.5},
+    };
+    const p=P[season]||P.summer;
+    maxDepth=p.depth;branchChance=p.chance;baseLen=p.len;
   }
-}
+  window._applySeasonParams=applySeasonParams;
+  window._getSeason=getSeason;
 
-window.drawPlants = function(sys, progress){
-  window._lastSys = sys; window._lastProgress = progress;
-  PCX.clearRect(0,0,PC.width,PC.height);
-  if(progress <= 0.01) return;
-  const op = 0.08 + progress * 0.72;
-  seedColonies(sys, progress);
-  _colonies.forEach(c => moldColony(c.x, c.y, c.radius, c.branches, c.depth, op, c.angleOffset));
-};
+  // Branch class — direct from doc4, adapted for multi-edge + scroll-driving
+  class Branch{
+    constructor(x,y,angle,length,depth){
+      this.x=x;this.y=y;
+      this.angle=angle;
+      this.length=length;
+      this.depth=depth;
+      this.alive=true;
+      this.segs=[]; // stored segments — each fades individually for decay effect
+    }
+    grow(readProgress,power=1.0){
+      if(!this.alive) return;
+      this.angle+=(Math.random()-0.5)*0.45;
+      const speed=this.length*(1+readProgress*1.5)*power;
+      const nx=this.x+Math.cos(this.angle)*speed;
+      const ny=this.y+Math.sin(this.angle)*speed;
+      this.segs.push({x1:this.x,y1:this.y,x2:nx,y2:ny,op:1.0});
+      this.x=nx; this.y=ny;
+      const bProb=branchChance*(0.5+readProgress*0.5)*power;
+      if(Math.random()<bProb&&this.depth<maxDepth){
+        branches.push(new Branch(this.x,this.y,this.angle+(Math.random()-0.5)*1.1,this.length*0.95,this.depth+1));
+      }
+      this.length*=0.999;
+      if(Math.random()<0.008||this.length<0.25) this.alive=false;
+    }
+    draw(){
+      const lw=Math.max(0.5,(1.8-this.depth*0.22));
+      ctx.lineWidth=lw; ctx.lineCap='round';
+      this.segs.forEach(s=>{
+        ctx.beginPath(); ctx.moveTo(s.x1,s.y1); ctx.lineTo(s.x2,s.y2);
+        ctx.strokeStyle=`rgba(0,0,0,${s.op.toFixed(3)})`; ctx.stroke();
+        if(!this.alive) s.op=Math.max(0,s.op-0.006); // decay when branch is dead
+      });
+      this.segs=this.segs.filter(s=>s.op>0);
+    }
+  }
 
-window.initPlants = function(weatherCode, precipitation, windSpeed){
-  let sys = 'clear';
-  if(precipitation>1) sys='rain';
-  else if(windSpeed>20) sys='wind';
-  else if(weatherCode>=45&&weatherCode<=49) sys='fog';
-  else if(weatherCode>=71&&weatherCode<=77) sys='snow';
-  window._lastSys=sys; _colonies=[];
-  if(_plantTimer) clearInterval(_plantTimer);
-  const rate = precipitation>2?3:precipitation>0.5?1.5:0.7;
-  _plantTimer = setInterval(()=>{
-    _plantAge += rate;
-    window._lastProgress = Math.min(1, _plantAge/PAGE_LIFETIME);
-    window.drawPlants(window._lastSys, window._lastProgress);
-  }, 5000);
-  window.drawPlants(sys, 0.12);
-};
+  let branches=[];
 
-window.addEventListener('load', ()=> window.drawPlants('clear', 0.4));
-</script>
+  function spawnRoots(){
+    branches=[];
+    // bottom — main stems, spread across full width
+    for(let i=0;i<9;i++){
+      branches.push(new Branch(
+        Math.random()*W, H,
+        -Math.PI/2+(Math.random()-0.5)*0.6,
+        baseLen*2+Math.random()*2.5, maxDepth
+      ));
+    }
+    // left edge — 2 lateral roots
+    for(let i=0;i<2;i++){
+      branches.push(new Branch(
+        0, H*0.25+Math.random()*H*0.55,
+        (Math.random()-0.5)*0.75,
+        baseLen*2+Math.random()*2, maxDepth-1
+      ));
+    }
+    // right edge — 2 lateral roots
+    for(let i=0;i<2;i++){
+      branches.push(new Branch(
+        W, H*0.25+Math.random()*H*0.55,
+        Math.PI+(Math.random()-0.5)*0.75,
+        baseLen*2+Math.random()*2, maxDepth-1
+      ));
+    }
+  }
 
-<style>
-#field{position:fixed;inset:0;pointer-events:none;z-index:100;opacity:0;}
-#field.visible{opacity:1;}
-#lines-svg{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:99;opacity:0;overflow:visible;}
-#lines-svg.visible{opacity:1;}
-.fb{position:fixed;pointer-events:all;cursor:grab;border:1px solid #000;border-radius:0;font-family:'Times New Roman',Times,serif;font-size:11px;font-weight:normal;letter-spacing:-0.02em;color:#000;text-decoration:none;padding:2px 8px;white-space:nowrap;background:#fff;box-shadow:none;line-height:1.35;user-select:none;}
-.fb:active{cursor:grabbing;}
-.fb.node-s{color:#0000ee;text-decoration:underline;}
-.fb.node-c{border-color:#888;font-style:italic;}
-.fb.node-main{font-weight:bold;box-shadow:1.5px 1.5px 0 #000;}
-.fb .none{display:inline;}.fb .hover{display:none;}
-.fb:hover .none{display:none;}.fb:hover .hover{display:inline;}
-.conn{stroke:#000;stroke-width:1.2;fill:none;opacity:0.65;}
-.conn-dash{stroke-width:1;stroke-dasharray:7 4;opacity:0.55;animation:flow-dash 2.2s linear infinite;}
-.conn-dash2{stroke-width:0.8;stroke-dasharray:2 5;opacity:0.38;animation:flow-dash 1.4s linear infinite;}
-@keyframes flow-dash{to{stroke-dashoffset:-44;}}
-</style>
+  // scroll velocity tracking — plant grows WITH scrolling
+  let lastScrollY=window.scrollY, scrollVel=0;
+  window.addEventListener('scroll',()=>{
+    const now=window.scrollY;
+    scrollVel=Math.abs(now-lastScrollY); // px moved since last check
+    lastScrollY=now;
+  },{passive:true});
 
-<svg id="lines-svg" aria-hidden="true">
-  <defs>
-    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#000" opacity="0.7"/></marker>
-    <marker id="arrow-dash" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L0,5 L7,2.5 z" fill="#000" opacity="0.5"/></marker>
-    <marker id="square-plug" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5"><rect width="4" height="4" x="0.5" y="0.5" fill="#000" opacity="0.7"/></marker>
-  </defs>
-</svg>
+  let lastT=0;
+  function loop(ts){
+    if(ts-lastT<40){requestAnimationFrame(loop);return;}
+    const dt=ts-lastT; lastT=ts;
 
-<div id="field" aria-label="Diagram">
-  <button class="fb node-main" id="fb-main" style="left:42%;top:14%"><span class="none">lorem ipsum</span><span class="hover">root</span></button>
-  <button class="fb node-s" id="fb-s0" style="left:18%;top:24%" onclick="goSection(0)"><span class="none">§ 0</span><span class="hover">Prefaces</span></button>
-  <button class="fb node-s" id="fb-s1" style="left:62%;top:28%" onclick="goSection(1)"><span class="none">§ 1</span><span class="hover">Dolor Sit Amet</span></button>
-  <button class="fb node-s" id="fb-s2" style="left:34%;top:52%" onclick="goSection(2)"><span class="none">§ 2</span><span class="hover">Tempor Incididunt</span></button>
-  <button class="fb node-c" id="fb-a" style="left:22%;top:42%"><span class="none">a01</span><span class="hover">consectetur</span></button>
-  <button class="fb node-c" id="fb-b" style="left:54%;top:18%"><span class="none">b01</span><span class="hover">adipiscing</span></button>
-  <button class="fb node-c" id="fb-c" style="left:74%;top:44%"><span class="none">c01</span><span class="hover">sed do</span></button>
-  <button class="fb node-c" id="fb-d" style="left:46%;top:38%"><span class="none">d01</span><span class="hover">ut labore</span></button>
-  <button class="fb node-c" id="fb-e" style="left:28%;top:64%"><span class="none">e01</span><span class="hover">et dolore</span></button>
-  <button class="fb node-c" id="fb-f" style="left:60%;top:60%"><span class="none">f01</span><span class="hover">voluptatem</span></button>
-  <button class="fb node-c" id="fb-g" style="left:14%;top:56%"><span class="none">g01</span><span class="hover">accusantium</span></button>
-  <button class="fb node-c" id="fb-h" style="left:78%;top:26%"><span class="none">h01</span><span class="hover">incididunt</span></button>
-</div>
+    // clear canvas each frame — branches manage their own opacity for decay
+    ctx.clearRect(0,0,W,H);
 
-<script>
-// ── DIAGRAM ───────────────────────────────────────────────────────
+    // readProgress = how far through the essay (0→1)
+    const docH=document.documentElement.scrollHeight-window.innerHeight;
+    const readProgress=docH>0?Math.min(1,window.scrollY/docH):0;
+
+    // scrollVel drives how many grow steps happen this frame
+    // fast scroll = many steps = dense growth; stopped = no growth
+    const vel=Math.min(scrollVel,80); // cap at 80px jump
+    scrollVel*=0.85; // decay velocity so it tapers off after stopping
+
+    const steps=Math.max(0,Math.floor(vel/4)); // 0 steps if not scrolling
+    for(let s=0;s<steps+1;s++){
+      // always do 1 slow ambient step even when still (barely visible)
+      const power=s===0?0.08:1.0; // ambient=slow, scroll-driven=full
+      branches.forEach(b=>{b.grow(readProgress,power);b.draw();});
+    }
+
+    // respawn when nearly all dead
+    const alive=branches.filter(b=>b.alive).length;
+    if(alive<3){
+      const rx=Math.random();
+      if(rx<0.5) branches.push(new Branch(Math.random()*W,H,-Math.PI/2+(Math.random()-0.5)*0.5,baseLen*2+Math.random()*2,maxDepth));
+      else if(rx<0.75) branches.push(new Branch(0,H*0.2+Math.random()*H*0.6,(Math.random()-0.5)*0.7,baseLen*2,maxDepth-1));
+      else branches.push(new Branch(W,H*0.2+Math.random()*H*0.6,Math.PI+(Math.random()-0.5)*0.7,baseLen*2,maxDepth-1));
+    }
+    if(branches.length>500) branches=branches.filter(b=>b.alive||b.segs.length>0).slice(-500);
+
+    requestAnimationFrame(loop);
+  }
+
+  spawnRoots();
+  requestAnimationFrame(loop);
+})();
+// ── DIAGRAM — doc3 fb/field/lines-svg system, touch + mouse drag ──
 setTimeout(()=>{
-  document.getElementById('field').classList.add('visible');
-  document.getElementById('lines-svg').classList.add('visible');
-  drawLines(); startAnimism();
-},1500);
+  const field = document.getElementById('field');
+  const svg   = document.getElementById('lines-svg');
+  if(field) field.classList.add('visible');
+  if(svg)   svg.classList.add('visible');
+  drawLines();
+}, 1500);
 
-function centre(id){const el=document.getElementById(id);if(!el)return{x:0,y:0,l:0,t:0,r:0,b:0};const r=el.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2,l:r.left,t:r.top,r:r.right,b:r.bottom};}
+function centre(id){
+  const el=document.getElementById(id);
+  if(!el) return{x:0,y:0,l:0,t:0,r:0,b:0};
+  const r=el.getBoundingClientRect();
+  return{x:r.left+r.width/2,y:r.top+r.height/2,l:r.left,t:r.top,r:r.right,b:r.bottom};
+}
+
 const CONNS=[
   ['fb-main','fb-s0','solid','l','r'],['fb-main','fb-s1','solid','r','l'],
-  ['fb-main','fb-s2','solid','b','t'],['fb-main','fb-b','dash','r','t'],
+  ['fb-main','fb-s2','solid','b','t'],['fb-main','fb-s3','dash','r','t'],
+  ['fb-main','fb-b','dash','r','t'],
   ['fb-s0','fb-a','dash','b','t'],['fb-s0','fb-g','solid','b','l'],
   ['fb-s1','fb-c','dash','r','t'],['fb-s1','fb-h','solid','r','l'],
   ['fb-s2','fb-e','dash','b','t'],['fb-s2','fb-f','solid','r','l'],
+  ['fb-s3','fb-f','dash2','b','t'],
+  ['fb-s4','fb-e','solid','l','b'],['fb-s5','fb-f','dash','r','l'],
   ['fb-a','fb-d','dash2','r','l'],['fb-b','fb-d','solid','b','t'],
   ['fb-d','fb-f','dash','b','t'],['fb-c','fb-h','dash2','t','b'],
-  ['fb-e','fb-g','solid','l','b'],
 ];
-let pathEls=[],lblEls=[];
-function edgePt(c,edge){switch(edge){case'r':return{x:c.r,y:c.y};case'l':return{x:c.l,y:c.y};case't':return{x:c.x,y:c.t};case'b':return{x:c.x,y:c.b};default:return{x:c.x,y:c.y};}}
-function gridPath(p1,p2,fe){const{x:x1,y:y1}=p1,{x:x2,y:y2}=p2;if(fe==='r'||fe==='l'){const mx=(x1+x2)/2;return`M ${x1} ${y1} L ${mx} ${y1} L ${mx} ${y2} L ${x2} ${y2}`;}const my=(y1+y2)/2;return`M ${x1} ${y1} L ${x1} ${my} L ${x2} ${my} L ${x2} ${y2}`;}
+
+let pathEls=[], lblEls=[];
+
+function edgePt(c,edge){
+  switch(edge){
+    case'r':return{x:c.r,y:c.y};case'l':return{x:c.l,y:c.y};
+    case't':return{x:c.x,y:c.t};case'b':return{x:c.x,y:c.b};
+    default:return{x:c.x,y:c.y};
+  }
+}
+function gridPath(p1,p2,fe){
+  const{x:x1,y:y1}=p1,{x:x2,y:y2}=p2;
+  if(fe==='r'||fe==='l'){const mx=(x1+x2)/2;return`M ${x1} ${y1} L ${mx} ${y1} L ${mx} ${y2} L ${x2} ${y2}`;}
+  const my=(y1+y2)/2;return`M ${x1} ${y1} L ${x1} ${my} L ${x2} ${my} L ${x2} ${y2}`;
+}
+
 function drawLines(){
   const svg=document.getElementById('lines-svg');
-  const defs=svg.querySelector('defs');svg.innerHTML='';if(defs)svg.appendChild(defs);
-  pathEls=[];lblEls=[];
+  if(!svg) return;
+  const defs=svg.querySelector('defs');
+  svg.innerHTML=''; if(defs) svg.appendChild(defs);
+  pathEls=[]; lblEls=[];
   CONNS.forEach(([a,b,style,fe,te],i)=>{
     const ca=centre(a),cb=centre(b);
     const p1=edgePt(ca,fe),p2=edgePt(cb,te);
@@ -1020,62 +1097,497 @@ function drawLines(){
     let cls='conn',me='url(#arrow)',ms='';
     if(style==='dash'){cls='conn conn-dash';me='url(#arrow-dash)';ms='url(#square-plug)';}
     if(style==='dash2'){cls='conn conn-dash2';me='url(#arrow-dash)';}
-    if(style==='solid')ms='url(#square-plug)';
-    path.setAttribute('class',cls);path.setAttribute('marker-end',me);
-    if(ms)path.setAttribute('marker-start',ms);
+    if(style==='solid') ms='url(#square-plug)';
+    path.setAttribute('class',cls);
+    path.setAttribute('marker-end',me);
+    if(ms) path.setAttribute('marker-start',ms);
     path._a=a;path._b=b;path._fe=fe;path._te=te;
-    svg.appendChild(path);pathEls.push(path);
-    const mx=(p1.x+p2.x)/2,my=(p1.y+p2.y)/2;
+    svg.appendChild(path); pathEls.push(path);
+    const mx=(p1.x+p2.x)/2, my2=(p1.y+p2.y)/2;
     const lbl=document.createElementNS('http://www.w3.org/2000/svg','text');
-    lbl.setAttribute('x',mx);lbl.setAttribute('y',my-3);lbl.setAttribute('text-anchor','middle');
-    lbl.setAttribute('fill','rgba(0,0,0,.38)');lbl.setAttribute('font-size','8.5');
+    lbl.setAttribute('x',mx);lbl.setAttribute('y',my2-3);
+    lbl.setAttribute('text-anchor','middle');
+    lbl.setAttribute('fill','rgba(0,0,0,.32)');lbl.setAttribute('font-size','7.5');
     lbl.setAttribute('font-family','Times New Roman,serif');lbl.setAttribute('font-style','italic');
-    lbl.textContent='line '+(i+1);lbl._a=a;lbl._b=b;lbl._fe=fe;lbl._te=te;
-    svg.appendChild(lbl);lblEls.push(lbl);
+    lbl.textContent=''; // no line labels — cleaner
+    lbl._a=a;lbl._b=b;lbl._fe=fe;lbl._te=te;
+    svg.appendChild(lbl); lblEls.push(lbl);
   });
 }
-function redrawLines(){
-  pathEls.forEach(el=>{if(!el._a||!el._b)return;const ca=centre(el._a),cb=centre(el._b);const p1=edgePt(ca,el._fe),p2=edgePt(cb,el._te);el.setAttribute('d',gridPath(p1,p2,el._fe));});
-  lblEls.forEach(el=>{if(!el._a||!el._b)return;const ca=centre(el._a),cb=centre(el._b);const p1=edgePt(ca,el._fe),p2=edgePt(cb,el._te);el.setAttribute('x',(p1.x+p2.x)/2);el.setAttribute('y',(p1.y+p2.y)/2-3);});
-}
-requestAnimationFrame(function loop(){redrawLines();requestAnimationFrame(loop);});
 
-const LIVE_IDS=['fb-main','fb-s0','fb-s1','fb-s2','fb-a','fb-b','fb-c','fb-d','fb-e','fb-f','fb-g','fb-h'];
-const agents={};
-function initAgents(){LIVE_IDS.forEach(id=>{const el=document.getElementById(id);if(!el)return;const r=el.getBoundingClientRect();agents[id]={el,x:r.left,y:r.top};});}
-function startAnimism(){initAgents();}
+function redrawLines(){
+  pathEls.forEach(el=>{
+    if(!el._a||!el._b) return;
+    const ca=centre(el._a),cb=centre(el._b);
+    const p1=edgePt(ca,el._fe),p2=edgePt(cb,el._te);
+    el.setAttribute('d',gridPath(p1,p2,el._fe));
+  });
+}
+// Redraw lines on RAF — lines only, no layout reads in main text loop
+requestAnimationFrame(function loop(){ redrawLines(); requestAnimationFrame(loop); });
+
+// ── DRAG — touch + mouse for all .fb nodes ────────────────────────
 document.querySelectorAll('.fb').forEach(btn=>{
-  let dragging=false,ox=0,oy=0;
-  btn.addEventListener('mousedown',e=>{dragging=true;const r=btn.getBoundingClientRect();ox=e.clientX-r.left;oy=e.clientY-r.top;e.preventDefault();});
-  window.addEventListener('mousemove',e=>{if(!dragging)return;const nx=e.clientX-ox,ny=e.clientY-oy;btn.style.left=nx+'px';btn.style.top=ny+'px';btn.style.right='auto';btn.style.bottom='auto';const ag=agents[btn.id];if(ag){ag.x=nx;ag.y=ny;}});
-  window.addEventListener('mouseup',()=>{dragging=false;});
+  let dragging=false, ox=0, oy=0, moved=false;
+
+  function startDrag(cx,cy){
+    dragging=true; moved=false;
+    const r=btn.getBoundingClientRect();
+    ox=cx-r.left; oy=cy-r.top;
+    btn.style.zIndex='700';
+  }
+  function moveDrag(cx,cy){
+    if(!dragging) return;
+    moved=true;
+    btn.style.left=(cx-ox)+'px';
+    btn.style.top=(cy-oy)+'px';
+    btn.style.right='auto'; btn.style.bottom='auto';
+  }
+  function endDrag(){ dragging=false; btn.style.zIndex=''; }
+
+  // mouse
+  btn.addEventListener('mousedown',e=>{ e.preventDefault(); startDrag(e.clientX,e.clientY); });
+  window.addEventListener('mousemove',e=>{ if(dragging) moveDrag(e.clientX,e.clientY); });
+  window.addEventListener('mouseup',endDrag);
+
+  // touch — preventDefault stops page scroll while dragging node
+  btn.addEventListener('touchstart',e=>{
+    e.preventDefault();
+    startDrag(e.touches[0].clientX, e.touches[0].clientY);
+  },{passive:false});
+  btn.addEventListener('touchmove',e=>{
+    e.preventDefault();
+    moveDrag(e.touches[0].clientX, e.touches[0].clientY);
+  },{passive:false});
+  btn.addEventListener('touchend',e=>{ e.preventDefault(); endDrag(); },{passive:false});
 });
 
-// ═══════════════════════════════════════════
-// SHUFFLE / RESET
-// ═══════════════════════════════════════════
-function randLayout() {
-  const tb = document.getElementById('toolbar');
-  const nodes = [...tb.querySelectorAll('.aq,.tb-sep')];
-  for (let i = nodes.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    tb.insertBefore(nodes[j], nodes[i]);
-  }
-  document.querySelectorAll('.si').forEach(item => {
-    item.style.transition = 'transform .5s,opacity .5s';
-    item.style.transform = `translateY(${(Math.random() - .5) * 8}px)`;
-    item.style.opacity = (0.4 + Math.random() * .6).toFixed(2);
+// ── PHOTOTROPISM — sidebar leans toward mouse ─────────────────────
+// ── 2. PHOTOTROPISM — sidebar leans toward mouse ──────────────────
+(function initPhototropism(){
+  const side=document.getElementById('side');
+  if(!side||window.innerWidth<=700) return;
+  document.addEventListener('mousemove',e=>{
+    const sideRect=side.getBoundingClientRect();
+    const sideCX=sideRect.left+sideRect.width/2;
+    const dx=e.clientX-sideCX;
+    // lean max ±4px, very gently
+    const lean=Math.max(-4,Math.min(4,dx*0.012));
+    side.style.transform=`translateX(${lean.toFixed(2)}px)`;
   });
-  document.querySelectorAll('.gn').forEach(g => {
-    g.style.transition = 'transform .7s';
-    g.style.transform = `translate(${(Math.random() - .5) * 18}px,${(Math.random() - .5) * 12}px)`;
+})();
+
+// ── DIAGRAM — bariscavusoglu style, scattered nodes + live lines ──
+(function initDiagram(){
+  const svg = document.getElementById('diagram-svg');
+  if(!svg) return;
+
+  // Connection definitions: [fromId, toId, style]
+  // style: 'solid' | 'dash' | 'curve'
+  const CONNS = [
+    ['dn-main','dn-s0','solid'],
+    ['dn-main','dn-s1','solid'],
+    ['dn-main','dn-s2','dash'],
+    ['dn-main','dn-s3','dash'],
+    ['dn-main','dn-s4','dash'],
+    ['dn-main','dn-s5','solid'],
+    ['dn-s0','dn-c2','dash'],
+    ['dn-s1','dn-c0','solid'],
+    ['dn-s1','dn-c1','dash'],
+    ['dn-s2','dn-c3','solid'],
+    ['dn-s3','dn-c1','dash'],
+    ['dn-s3','dn-c5','solid'],
+    ['dn-s4','dn-c4','solid'],
+    ['dn-s4','dn-c2','dash'],
+    ['dn-s5','dn-c3','solid'],
+    ['dn-s5','dn-c5','dash'],
+  ];
+
+  // Build SVG path elements
+  const paths = CONNS.map(([a,b,style])=>{
+    const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('fill','none');
+    p.setAttribute('stroke','#000');
+    if(style==='dash'){
+      p.setAttribute('stroke-dasharray','6 4');
+      p.setAttribute('stroke-width','0.9');
+      p.setAttribute('opacity','0.55');
+    } else {
+      p.setAttribute('stroke-width','1.1');
+      p.setAttribute('opacity','0.7');
+    }
+    p.setAttribute('marker-end','url(#arr)');
+    p._a=a; p._b=b;
+    svg.appendChild(p);
+    return p;
+  });
+
+  function nodeCenter(id){
+    const el=document.getElementById(id);
+    if(!el) return{x:0,y:0};
+    const r=el.getBoundingClientRect();
+    return{x:r.left+r.width/2, y:r.top+r.height/2};
+  }
+
+  function updateLines(){
+    paths.forEach(p=>{
+      const a=nodeCenter(p._a), b=nodeCenter(p._b);
+      // simple straight line — no orthogonal paths that span viewport
+      p.setAttribute('d',`M ${a.x.toFixed(1)} ${a.y.toFixed(1)} L ${b.x.toFixed(1)} ${b.y.toFixed(1)}`);
+    });
+  }
+
+  // Redraw lines throttled — not every frame, only on drag or every 200ms
+  let lineRaf=null;
+  function scheduleLines(){
+    if(!lineRaf) lineRaf=requestAnimationFrame(()=>{updateLines();lineRaf=null;});
+  }
+  // Initial draw + periodic refresh (200ms is enough — lines don't need 60fps)
+  updateLines();
+  setInterval(scheduleLines, 200);
+
+  // Drag — touch + mouse, works on all .dnode
+  document.querySelectorAll('.dnode').forEach(node=>{
+    let active=false, ox=0, oy=0;
+
+    function start(cx,cy){
+      active=true;
+      const r=node.getBoundingClientRect();
+      ox=cx-r.left; oy=cy-r.top;
+      node.style.zIndex='700';
+    }
+    function move(cx,cy){
+      if(!active) return;
+      node.style.left=(cx-ox)+'px';
+      node.style.top=(cy-oy)+'px';
+    }
+    function end(){ active=false; node.style.zIndex=''; }
+
+    node.addEventListener('mousedown',e=>{e.preventDefault();start(e.clientX,e.clientY);},{passive:false});
+    node.addEventListener('touchstart',e=>{e.preventDefault();start(e.touches[0].clientX,e.touches[0].clientY);},{passive:false});
+    node.addEventListener('touchmove',e=>{e.preventDefault();move(e.touches[0].clientX,e.touches[0].clientY);},{passive:false});
+    node.addEventListener('touchend',e=>{e.preventDefault();end();},{passive:false});
+
+    // Global mouse move/up so drag works outside node bounds
+    window.addEventListener('mousemove',e=>{move(e.clientX,e.clientY);});
+    window.addEventListener('mouseup',end);
+  });
+
+  // Section nodes navigate on tap (if not dragged)
+  const sectionMap = {
+    'dn-s0':0,'dn-s1':1,'dn-s2':2,'dn-s3':3,'dn-s4':4,'dn-s5':5
+  };
+  Object.entries(sectionMap).forEach(([id,idx])=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('click',()=>goSection(idx));
+  });
+})();
+
+// ── PHOTOTROPISM — sidebar leans toward mouse ─────────────────────
+(function initPhototropism(){
+  const side=document.getElementById('side');
+  if(!side||window.innerWidth<=700) return;
+  document.addEventListener('mousemove',e=>{
+    const sideRect=side.getBoundingClientRect();
+    const sideCX=sideRect.left+sideRect.width/2;
+    const dx=e.clientX-sideCX;
+    const lean=Math.max(-4,Math.min(4,dx*0.012));
+    side.style.transform=`translateX(${lean.toFixed(2)}px)`;
+  });
+})();
+
+// ── TEXT SIZING — IntersectionObserver on all screens ───────────────
+(function initTextSizing(){
+  const textEls=[...document.querySelectorAll('.body-text,.epigraph')];
+  const peak=window.innerWidth<=700?36:68;
+  const base=13.5;
+  textEls.forEach(el=>{
+    el.style.fontSize=base+'px';
+    el.style.lineHeight='1.28';
+    el.style.transition='font-size 1.4s ease, line-height 1.4s ease, letter-spacing 1.4s ease';
+  });
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+      const ratio=entry.intersectionRatio;
+      const size=base+(peak-base)*Math.pow(ratio,2.2);
+      entry.target.style.fontSize=size.toFixed(1)+'px';
+      if(size>38){entry.target.style.lineHeight='0.9';entry.target.style.letterSpacing='-0.035em';}
+      else if(size>20){entry.target.style.lineHeight='1.05';entry.target.style.letterSpacing='-0.02em';}
+      else{entry.target.style.lineHeight='1.28';entry.target.style.letterSpacing='-0.01em';}
+    });
+  },{threshold:[0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1],rootMargin:'-5% 0px -5% 0px'});
+  textEls.forEach(el=>obs.observe(el));
+})();
+
+// ── DEVICE ORIENTATION — vines tilt ──────────────────────────────
+if(window.DeviceOrientationEvent){
+  window.addEventListener('deviceorientation',e=>{
+    const vc=document.getElementById('vine-canvas');
+    if(vc) vc.style.transform=`rotate(${((e.gamma||0)*0.05).toFixed(2)}deg)`;
   });
 }
 
-function resetLayout() {
-  document.querySelectorAll('.si').forEach(i => { i.style.transform = ''; i.style.opacity = ''; });
-  document.querySelectorAll('.gn').forEach(g => { g.style.transform = ''; });
+// slow reveal removed — sections always full opacity
+
+// ── MATTER.JS — essay words, desktop only ────────────────────────
+(function initMatter(){
+  if(window.innerWidth<=700||typeof Matter==='undefined') return;
+  const{Engine,Render,Runner,Bodies,Composite,Body,Events,World}=Matter;
+  const W=window.innerWidth,H=window.innerHeight;
+  const canvas=document.getElementById('matter-canvas');
+  if(!canvas) return;
+  canvas.width=W;canvas.height=H;
+  const engine=Engine.create();
+  engine.world.gravity.y=0.12;
+  const render=Render.create({canvas,engine,options:{width:W,height:H,background:'transparent',wireframes:false}});
+  const wall=(x,y,w,h)=>Bodies.rectangle(x,y,w,h,{isStatic:true,render:{fillStyle:'transparent',strokeStyle:'transparent'}});
+  World.add(engine.world,[wall(W/2,H+30,W,60),wall(-30,H/2,60,H),wall(W+30,H/2,60,H)]);
+  const words=['sensing','rhizome','tropism','chlorophyll','mycelium','biofeedback','photosynthesis','vegetal','decay','network','symbiosis'];
+  words.forEach((word,i)=>{
+    const bw=word.length*7+14,bh=18;
+    const body=Bodies.rectangle(120+Math.random()*(W-240),-(i*35+20),bw,bh,
+      {restitution:0.5,friction:0.05,frictionAir:0.025,render:{fillStyle:'transparent',strokeStyle:'transparent',lineWidth:0},label:word});
+    Body.setVelocity(body,{x:(Math.random()-0.5)*1.2,y:Math.random()*0.5});
+    World.add(engine.world,body);
+  });
+  Events.on(render,'afterRender',()=>{
+    const ctx=render.context;
+    ctx.font='italic 10px Times New Roman,serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    Composite.allBodies(engine.world).forEach(b=>{
+      if(!b.label||b.isStatic) return;
+      ctx.save();ctx.translate(b.position.x,b.position.y);ctx.rotate(b.angle);
+      ctx.fillStyle='rgba(30,80,30,0.38)';ctx.fillText(b.label,0,0);ctx.restore();
+    });
+  });
+  canvas.style.pointerEvents='none';
+  Render.run(render);Runner.run(Runner.create(),engine);
+})();
+
+function randLayout(){
+  const tb=document.getElementById('toolbar');
+  const nodes=[...tb.querySelectorAll('.aq,.tb-sep')];
+  for(let i=nodes.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));tb.insertBefore(nodes[j],nodes[i]);}
+  document.querySelectorAll('.gn').forEach(g=>{
+    g.style.transition='transform .7s';
+    g.style.transform=`translate(${(Math.random()-.5)*18}px,${(Math.random()-.5)*12}px)`;
+  });
 }
+function resetLayout(){
+  document.querySelectorAll('.gn').forEach(g=>{g.style.transform='';});
+}
+</script>
+
+<!-- ── FLOATING OVALS container (ovals appended here by JS) ── -->
+<div id="ovals-layer" style="position:fixed;inset:0;pointer-events:none;z-index:1500;"></div>
+
+<script>
+// ── FLOATING OVAL IMAGES — tap node → oval floats over page ──────
+// Multiple can be open at once. Each is independently draggable.
+// To add your image: set src on the img inside each oval after spawn,
+// or pre-define in NODE_IMAGES below.
+
+// ── IMAGE SOURCES FROM THE ESSAY ─────────────────────────────────
+// Teresa Castro, "The Mediated Plant," e-flux journal 102, 2019.
+// Add image URLs below — paste src from the e-flux article page.
+// Each key matches a diagram node. Leave blank for placeholder.
+const NODE_IMAGES = {
+  'fb-main': 'images/plant.jpg',  // cover / title image
+  'fb-s0':   'images/plantdown2.jpg',  // preface — plant as philosophical problem
+  'fb-s1':   'images/cartoon.jpg',  // I. Sensing — Gagliano acoustic root experiments
+  'fb-s2':   'images/aesthetic.jpg',  // II. Mediation — technology as translation
+  'fb-s3':   'images/clock1.jpg',  // III. Time — time-lapse film stills
+  'fb-s4':   'images/new1.jpg',  // IV. Tropism — phototropism / gravitropism
+  'fb-s5':   'images/plantdown1.jpg',  // V. Network — mycorrhizal / Simard
+  'fb-a':    'images/finger.jpg',  // biofeedback — galvanic leaf sensors
+  'fb-b':    'images/diagram 1.jpg',  // time-lapse — plant movement compressed
+  'fb-c':    'images/rhizome.jpg',  // rhizome — root systems
+  'fb-d':    'images/fungal network.jpg',  // mycelium — fungal networks
+  'fb-e':    'images/last.jpg',  // phototropism — plant bending toward light
+  'fb-f':    'images/huh.jpg',  // vegetal time — nonhuman temporality
+  'fb-g':    'images/wtf.jpg',  // sensing — plant perception without nerves
+  'fb-h':    'images/humanplant.jpg',  // mediation — camera/apparatus/translation
+};
+
+const NODE_LABELS = {
+  'fb-main':'The Mediated Plant — Teresa Castro',
+  'fb-s0':  'Preface: what does it mean to mediate a plant?',
+  'fb-s1':  'I. Sensing — roots grow toward sound of water',
+  'fb-s2':  'II. Mediation — technology as translation',
+  'fb-s3':  'III. Time — time-lapse and vegetal duration',
+  'fb-s4':  'IV. Tropism — phototropism, gravitropism',
+  'fb-s5':  'V. Network — mycorrhizal / wood wide web',
+  'fb-a':   'biofeedback — galvanic leaf sensors',
+  'fb-b':   'time-lapse — plant movement made visible',
+  'fb-c':   'rhizome — decentralised root logic',
+  'fb-d':   'mycelium — fungal communication networks',
+  'fb-e':   'phototropism — bending toward light',
+  'fb-f':   'vegetal time — duration beyond human attention',
+  'fb-g':   'sensing — without nerves or brain',
+  'fb-h':   'mediation — the apparatus translates the plant',
+};
+
+const oLayer = document.getElementById('ovals-layer');
+let zTop = 1500;
+const openOvals = {}; // nodeId → oval element (latest spawned)
+
+// single consistent oval size
+const OVAL_SIZE = {w:180, pb:'148%'};
+
+function spawnOval(nodeId, anchorEl){
+  // if already open for this node, close it (toggle)
+  if(openOvals[nodeId] && oLayer.contains(openOvals[nodeId])){
+    openOvals[nodeId].remove();
+    delete openOvals[nodeId];
+    return;
+  }
+
+  const r = anchorEl.getBoundingClientRect();
+  // scatter position around the node with some randomness
+  const side = Math.random() < 0.5 ? 1 : -1;
+  const startX = Math.max(8, Math.min(window.innerWidth-280,
+    r.left + side*(r.width/2 + 20 + Math.random()*80) - 80
+  ));
+  const startY = Math.max(8, Math.min(window.innerHeight-300,
+    r.top + (Math.random()-0.5)*120
+  ));
+
+  // random size from palette
+  const sz = OVAL_SIZE;
+
+  const oval = document.createElement('div');
+  oval.className = 'node-oval';
+  oval.style.cssText = `left:${startX}px;top:${startY}px;z-index:${++zTop};pointer-events:all;width:${sz.w}px;`;
+
+  const imgSrc = NODE_IMAGES[nodeId] || '';
+  const label  = NODE_LABELS[nodeId] || nodeId;
+
+  // build inner content — image, weather CSS viz, or blank
+  function buildInner(){
+    if(imgSrc === '__clock__') return buildClockViz();
+    if(imgSrc) return `<img src="${imgSrc}" alt="${label}" />`;
+    return '<div class="oval-placeholder"></div>';
+  }
+
+  // ── CLOCK: live SVG clock, 1px stroke weight ──
+  function buildClockViz(){
+    const id = 'oval-clock-' + Math.random().toString(36).slice(2);
+    // will be updated by JS after insertion
+    setTimeout(()=>{
+      const svg = document.getElementById(id);
+      if(!svg) return;
+      function tickOvalClock(){
+        const now = new Date();
+        const h = now.getHours()%12, m = now.getMinutes(), s = now.getSeconds(), ms = now.getMilliseconds();
+        const sDeg = (s + ms/1000)*6 - 90;
+        const mDeg = (m + s/60)*6 - 90;
+        const hDeg = (h + m/60)*30 - 90;
+        function pt(deg, r){ return [50+r*Math.cos(deg*Math.PI/180), 50+r*Math.sin(deg*Math.PI/180)]; }
+        const [sx,sy] = pt(sDeg,42); const [mx,my] = pt(mDeg,36); const [hx,hy] = pt(hDeg,24);
+        const sh = svg.querySelector('.oc-s'); const mh = svg.querySelector('.oc-m'); const hh = svg.querySelector('.oc-h');
+        if(sh){ sh.setAttribute('x2',sx); sh.setAttribute('y2',sy); }
+        if(mh){ mh.setAttribute('x2',mx); mh.setAttribute('y2',my); }
+        if(hh){ hh.setAttribute('x2',hx); hh.setAttribute('y2',hy); }
+      }
+      tickOvalClock();
+      const iv = setInterval(tickOvalClock, 1000);
+      // clear interval when oval is removed
+      const obs = new MutationObserver(()=>{ if(!document.contains(svg)){ clearInterval(iv); obs.disconnect(); } });
+      obs.observe(document.body,{childList:true,subtree:true});
+    }, 0);
+    // 12 tick marks
+    const ticks = Array.from({length:12},(_,i)=>{
+      const a = (i/12)*360-90;
+      const r1=44, r2=i%3===0?39:41;
+      const x1=50+r1*Math.cos(a*Math.PI/180), y1=50+r1*Math.sin(a*Math.PI/180);
+      const x2=50+r2*Math.cos(a*Math.PI/180), y2=50+r2*Math.sin(a*Math.PI/180);
+      return `<line x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}" x2="${x2.toFixed(2)}" y2="${y2.toFixed(2)}" stroke="#000" stroke-width="1"/>`;
+    }).join('');
+    return `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#fff;">
+      <svg id="${id}" viewBox="0 0 100 100" width="75%" height="75%" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="46" fill="none" stroke="#000" stroke-width="1"/>
+        ${ticks}
+        <line class="oc-h" x1="50" y1="50" x2="74" y2="50" stroke="#000" stroke-width="1" stroke-linecap="round"/>
+        <line class="oc-m" x1="50" y1="50" x2="86" y2="50" stroke="#000" stroke-width="1" stroke-linecap="round"/>
+        <line class="oc-s" x1="50" y1="50" x2="92" y2="50" stroke="#000" stroke-width="0.5" stroke-linecap="round"/>
+        <circle cx="50" cy="50" r="1.5" fill="#000"/>
+      </svg>
+    </div>`;
+  }
+
+  oval.innerHTML = `
+    <div class="node-oval-frame" style="padding-bottom:${sz.pb};">
+      ${buildInner()}
+      <button class="node-oval-close" title="close">✕</button>
+    </div>
+  `;
+
+  function closeOval(){
+    oval.remove();
+    if(openOvals[nodeId]===oval) delete openOvals[nodeId];
+  }
+
+  oval.querySelector('.node-oval-close').addEventListener('click',e=>{
+    e.stopPropagation(); closeOval();
+  });
+  // double-tap oval to close
+  let lastTap=0;
+  oval.addEventListener('touchend',e=>{
+    const now=Date.now();
+    if(now-lastTap<300){ closeOval(); } else lastTap=now;
+  },{passive:true});
+
+  // drag
+  let dragging=false, ox=0, oy=0, didMove=false;
+  function startDrag(cx,cy){
+    dragging=true; didMove=false;
+    oval.style.zIndex=++zTop;
+    const rect=oval.getBoundingClientRect();
+    ox=cx-rect.left; oy=cy-rect.top;
+  }
+  function moveDrag(cx,cy){
+    if(!dragging) return;
+    didMove=true;
+    oval.style.left=(cx-ox)+'px';
+    oval.style.top=(cy-oy)+'px';
+  }
+  function endDrag(){ dragging=false; }
+
+  oval.addEventListener('mousedown',e=>{ e.preventDefault(); startDrag(e.clientX,e.clientY); });
+  window.addEventListener('mousemove',e=>{ if(dragging) moveDrag(e.clientX,e.clientY); });
+  window.addEventListener('mouseup',endDrag);
+  oval.addEventListener('touchstart',e=>{ e.stopPropagation(); startDrag(e.touches[0].clientX,e.touches[0].clientY); },{passive:true});
+  oval.addEventListener('touchmove',e=>{ e.stopPropagation(); moveDrag(e.touches[0].clientX,e.touches[0].clientY); },{passive:true});
+  oval.addEventListener('touchend',e=>{ e.stopPropagation(); endDrag(); },{passive:true});
+
+  oLayer.appendChild(oval);
+  openOvals[nodeId] = oval;
+}
+
+// Escape closes the most recently opened oval
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    const all=[...oLayer.querySelectorAll('.node-oval')];
+    if(all.length) all[all.length-1].remove();
+  }
+});
+
+// attach tap to each .fb node
+(function initNodeTaps(){
+  document.querySelectorAll('.fb').forEach(btn=>{
+    let tapStart=0,tapMoved=false,tapSX=0,tapSY=0;
+    function ts(cx,cy){ tapStart=Date.now();tapMoved=false;tapSX=cx;tapSY=cy; }
+    function tm(cx,cy){ if(Math.abs(cx-tapSX)>8||Math.abs(cy-tapSY)>8) tapMoved=true; }
+    function te(){ if(!tapMoved&&Date.now()-tapStart<350) spawnOval(btn.id,btn); }
+
+    btn.addEventListener('mousedown',e=>ts(e.clientX,e.clientY));
+    btn.addEventListener('mousemove',e=>tm(e.clientX,e.clientY));
+    btn.addEventListener('mouseup',te);
+    btn.addEventListener('touchstart',e=>{const t=e.touches[0];ts(t.clientX,t.clientY);},{passive:true});
+    btn.addEventListener('touchmove',e=>{const t=e.touches[0];tm(t.clientX,t.clientY);},{passive:true});
+    btn.addEventListener('touchend',te,{passive:true});
+  });
+})();
 </script>
 </body>
 </html>
