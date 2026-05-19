@@ -697,7 +697,11 @@ function updateScrollbarTargets(){
 window.addEventListener('scroll', updateScrollbarTargets, {passive:true});
 updateScrollbarTargets();
 
-function springLoopSB(){
+let _sbLast=0;
+function springLoopSB(ts){
+  const interval = window.innerWidth<=700 ? 60 : 16;
+  if(ts-_sbLast < interval){ requestAnimationFrame(springLoopSB); return; }
+  _sbLast=ts;
   const k=0.048, d=0.74;
   Object.values(sbDefs).forEach(sb=>{
     if(!sb.el) return;
@@ -706,7 +710,6 @@ function springLoopSB(){
     if(sb.axis==='v') sb.el.style.top = sb.pos.toFixed(1)+'px';
     else sb.el.style.left = sb.pos.toFixed(1)+'px';
   });
-  // ghost thumbs — desktop only
   if(window.innerWidth>700){
     ghostDefs.forEach(g=>{
       if(!g.el) return;
@@ -717,7 +720,7 @@ function springLoopSB(){
   }
   requestAnimationFrame(springLoopSB);
 }
-springLoopSB();
+requestAnimationFrame(springLoopSB);
 
 // ── BUTTON PULSE — desktop only ──────────────────────────────────
 if(window.innerWidth>700){
@@ -780,8 +783,13 @@ function tick(){
   } else { applyCol(); }
   sPct.textContent=Math.round(prog*100)+'%';
 }
-window.addEventListener('scroll',()=>{if(!rafId)rafId=requestAnimationFrame(tick);},{passive:true});
-window.addEventListener('resize',applyCol);
+if(window.innerWidth>700){
+  window.addEventListener('scroll',()=>{if(!rafId)rafId=requestAnimationFrame(tick);},{passive:true});
+  window.addEventListener('resize',applyCol);
+} else {
+  applyCol(); // just apply once on mobile, no animation needed
+  window.addEventListener('resize',applyCol,{passive:true});
+}
 
 function goSection(i){const el=document.getElementById('s'+i);if(el)el.scrollIntoView({behavior:'smooth'});}
 
@@ -875,7 +883,7 @@ function tickClock(){
   if(tcR) tcR.textContent=tc+' '+ampm;
 }
 tickClock();
-setInterval(tickClock,42);
+setInterval(tickClock, window.innerWidth<=700 ? 1000 : 42);
 
 // ── WEATHER ──────────────────────────────────────────────────────
 function weatherDesc(code){
@@ -1225,8 +1233,12 @@ function redrawLines(){
     el.setAttribute('d',gridPath(p1,p2,el._fe));
   });
 }
-// Redraw lines on RAF — lines only, no layout reads in main text loop
-requestAnimationFrame(function loop(){ redrawLines(); requestAnimationFrame(loop); });
+// Redraw lines — RAF on desktop, interval on mobile
+if(window.innerWidth>700){
+  requestAnimationFrame(function loop(){ redrawLines(); requestAnimationFrame(loop); });
+} else {
+  setInterval(redrawLines, 300);
+}
 
 
 // ── PHOTOTROPISM — sidebar leans toward mouse ─────────────────────
