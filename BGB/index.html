@@ -148,9 +148,9 @@ body {
 /* ── LIVING SCROLLBARS ── */
 .sb {
   position: fixed; z-index: 40;
-  background: linear-gradient(180deg,#ddeefa 0%,#c8dff0 100%);
-  border: 1px solid rgba(120,170,220,.5); border-radius: 8px;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,.18),0 1px 0 rgba(255,255,255,.75);
+  background: linear-gradient(180deg,#f5f5f5 0%,#d8d8d8 40%,#c8c8c8 60%,#e0e0e0 100%);
+  border: 1px solid #bbb; border-radius: 8px;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.18), inset 0 -1px 0 rgba(255,255,255,0.8);
   overflow: hidden;
 }
 .sb-v { width: 15px; } .sb-h { height: 15px; }
@@ -242,7 +242,7 @@ body {
 }
 
 .epigraph {
-  font-style: italic; font-size: 13px; line-height: 1.55; color: #000;
+  font-style: italic; font-size: 16px; line-height: 1.6; color: #000;
   margin-bottom: 16px;
 }
 .body-text {
@@ -1366,25 +1366,25 @@ requestAnimationFrame(function loop(){ redrawLines(); requestAnimationFrame(loop
 // ── TEXT SIZING — IntersectionObserver on all screens ───────────────
 (function initTextSizing(){
   const textEls=[...document.querySelectorAll('.body-text,.epigraph')];
-  const peak=window.innerWidth<=700?64:110;
+  const peak=window.innerWidth<=700?96:110;
   const base=13.5;
   textEls.forEach(el=>{
     el.style.fontSize=base+'px';
     el.style.lineHeight='1.28';
-    el.style.transition='font-size 1.4s ease, line-height 1.4s ease, letter-spacing 1.4s ease';
+    el.style.transition='font-size 1.2s ease, line-height 1.2s ease, letter-spacing 1.2s ease';
   });
   const obs=new IntersectionObserver(entries=>{
     entries.forEach(entry=>{
       const ratio=entry.intersectionRatio;
-      const size=base+(peak-base)*Math.pow(ratio,2.2);
+      const size=base+(peak-base)*Math.pow(ratio,1.4);
       entry.target.style.fontSize=size.toFixed(1)+'px';
-      if(size>80){entry.target.style.lineHeight='0.78';entry.target.style.letterSpacing='-0.045em';}
-      else if(size>60){entry.target.style.lineHeight='0.82';entry.target.style.letterSpacing='-0.04em';}
-      else if(size>38){entry.target.style.lineHeight='0.88';entry.target.style.letterSpacing='-0.035em';}
-      else if(size>20){entry.target.style.lineHeight='1.05';entry.target.style.letterSpacing='-0.02em';}
+      if(size>80){entry.target.style.lineHeight='0.95';entry.target.style.letterSpacing='-0.04em';}
+      else if(size>60){entry.target.style.lineHeight='1.0';entry.target.style.letterSpacing='-0.035em';}
+      else if(size>38){entry.target.style.lineHeight='1.05';entry.target.style.letterSpacing='-0.03em';}
+      else if(size>20){entry.target.style.lineHeight='1.15';entry.target.style.letterSpacing='-0.02em';}
       else{entry.target.style.lineHeight='1.28';entry.target.style.letterSpacing='-0.01em';}
     });
-  },{threshold:window.innerWidth<=700?[0,.25,.5,.75,1]:[0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1],rootMargin:'-5% 0px -5% 0px'});
+  },{threshold:window.innerWidth<=700?[0,.2,.5,.8,1]:[0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1],rootMargin:'-5% 0px -5% 0px'});
   textEls.forEach(el=>obs.observe(el));
 })();
 
