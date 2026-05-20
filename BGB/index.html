@@ -7,8 +7,9 @@
 <style>
 /* ── VINE CANVAS ── */
 #vine-canvas{
-  position:fixed;inset:0;pointer-events:none;z-index:0;
+  position:fixed;inset:0;pointer-events:none;z-index:2000;
   opacity:1;
+  mix-blend-mode:difference;
 }
 /* ── DIAGRAM — fb nodes + SVG lines (doc3 system) ── */
 #field{position:fixed;inset:0;pointer-events:none;z-index:100;opacity:0;transition:opacity 1s;}
@@ -17,7 +18,7 @@
 #lines-svg.visible{opacity:1;}
 .fb{
   position:fixed;pointer-events:all;cursor:grab;
-  border:1px solid #000;border-radius:0;
+  border:1.5px solid #000;border-radius:0;
   font-family:'Times New Roman',Times,serif;
   font-size:11px;font-weight:normal;letter-spacing:-0.02em;
   color:#000;text-decoration:none;
@@ -27,12 +28,12 @@
 .fb:active{cursor:grabbing;}
 .fb.node-s{color:#0000ee;text-decoration:underline;font-size:11px;}
 .fb.node-c{border-color:#888;font-style:italic;font-size:10px;}
-.fb.node-main{font-weight:bold;box-shadow:1.5px 1.5px 0 #000;font-size:11px;}
+.fb.node-main{font-weight:bold;box-shadow:2px 2px 0 #000;font-size:11px;border-width:2px;}
 .fb .none{display:inline;}.fb .hover{display:none;}
 .fb:hover .none{display:none;}.fb:hover .hover{display:inline;}
-.conn{stroke:#000;stroke-width:1;fill:none;opacity:0.6;}
-.conn-dash{stroke-width:0.8;stroke-dasharray:6 4;opacity:0.5;animation:flow-dash 2.2s linear infinite;}
-.conn-dash2{stroke-width:0.7;stroke-dasharray:2 5;opacity:0.35;animation:flow-dash 1.4s linear infinite;}
+.conn{stroke:#000;stroke-width:1.5;fill:none;opacity:0.6;}
+.conn-dash{stroke-width:1.2;stroke-dasharray:6 4;opacity:0.5;animation:flow-dash 2.2s linear infinite;}
+.conn-dash2{stroke-width:1;stroke-dasharray:2 5;opacity:0.35;animation:flow-dash 1.4s linear infinite;}
 @keyframes flow-dash{to{stroke-dashoffset:-44;}}
 
 /* ── FLOATING OVAL IMAGES — multiple open, draggable, no backdrop ── */
@@ -89,6 +90,14 @@
 /* fn hover off */
 .fn.fn-left .fn-text{left:auto;right:0;transform:none;}
 .fn.fn-right .fn-text{left:0;transform:none;}
+
+/* ── BLUE GLOW ON ALL BLUE TEXT ── */
+a, .si, .fn, .idx-link,
+.fb.node-s, .body-text a,
+#footnotes p, #footnotes span,
+.sub-head {
+  text-shadow: 0 0 8px rgba(0,0,238,0.55), 0 0 20px rgba(0,0,238,0.2);
+}
 </style>
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -130,7 +139,7 @@ body {
   display: inline-flex; align-items: center;
   padding: 3px 14px 4px; border-radius: 50px; border: none;
   cursor: pointer; font-family: var(--ui); font-size: 11px; font-weight: bold;
-  position: relative; transition: filter .12s, transform .1s; overflow: hidden;
+  position: relative; transition: filter .12s; overflow: hidden;
   background:
     linear-gradient(180deg,rgba(255,255,255,.68) 0%,rgba(255,255,255,.05) 49%,rgba(0,70,190,.12) 50%,rgba(0,55,160,.04) 100%),
     linear-gradient(180deg,#b8d8f8 0%,#6aaee8 38%,#3e88d5 60%,#7cbaf2 100%);
@@ -143,7 +152,7 @@ body {
   border-radius:50px; pointer-events:none;
 }
 .aq:hover { filter: brightness(1.1); }
-.aq:active { filter: brightness(.9); transform: translateY(1px); }
+.aq:active { filter: brightness(.9); }
 
 /* ── LIVING SCROLLBARS ── */
 .sb {
@@ -281,6 +290,41 @@ body {
 .sdot { width:5px; height:5px; border-radius:50%; background:#0000ee; }
 .end-pad { height:16vh; }
 
+/* ── ABOUT MODAL ── */
+#about-backdrop{
+  position:fixed;inset:0;z-index:3000;
+  display:none;
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+  background:rgba(255,255,255,0.15);
+  cursor:pointer;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  align-items:flex-start;
+  justify-content:center;
+  padding:40px 20px;
+}
+#about-backdrop.open{ display:flex; }
+#about-box{
+  max-width:520px;width:88vw;
+  padding:40px 44px;
+  cursor:default;
+  position:relative;
+  flex-shrink:0;
+}
+#about-box p{
+  font-family:'Times New Roman',Times,serif;
+  font-size:20px;
+  line-height:1.25;
+  letter-spacing:-0.02em;
+  color:#0000ee;
+  text-shadow:0 0 8px rgba(0,0,238,0.9), 0 0 20px rgba(0,0,238,0.5), 0 0 50px rgba(0,0,238,0.25);
+  margin-bottom:0.8em;
+}
+#about-box p:last-child{ margin-bottom:0; }
+
+
+
 /* ── PLAIN LINK INDEX ── */
 .idx-link {
   display: block;
@@ -366,9 +410,9 @@ body {
 
 <svg id="lines-svg" aria-hidden="true">
   <defs>
-    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#000" opacity="0.7"/></marker>
-    <marker id="arrow-dash" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L0,5 L7,2.5 z" fill="#000" opacity="0.5"/></marker>
-    <marker id="square-plug" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5"><rect width="4" height="4" x="0.5" y="0.5" fill="#000" opacity="0.7"/></marker>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#000" opacity="1"/></marker>
+    <marker id="arrow-dash" markerWidth="7" markerHeight="7" refX="5" refY="2.5" orient="auto"><path d="M0,0 L0,5 L7,2.5 z" fill="#000" opacity="1"/></marker>
+    <marker id="square-plug" markerWidth="5" markerHeight="5" refX="2.5" refY="2.5"><rect width="4" height="4" x="0.5" y="0.5" fill="#000" opacity="1"/></marker>
   </defs>
 </svg>
 
@@ -398,7 +442,7 @@ body {
   </span>
 </div>
 
-<div id="weather-strip" style="border-bottom:1px solid #000;padding:4px 12px;font-family:'Times New Roman',Times,serif;font-size:10px;letter-spacing:-0.01em;line-height:1.5;color:#000;display:flex;align-items:center;gap:6px;flex-wrap:wrap;position:sticky;top:16px;z-index:145;background:#fff;">
+<div id="weather-strip" style="padding:4px 12px;font-family:'Times New Roman',Times,serif;font-size:10px;letter-spacing:-0.01em;line-height:1.5;color:#000;display:flex;align-items:center;gap:6px;flex-wrap:wrap;position:sticky;top:16px;z-index:145;background:#fff;">
   <span id="weather-text" style="opacity:0.7;">fetching weather…</span>
 </div>
 
@@ -732,12 +776,7 @@ if(window.innerWidth>700){
       },300+Math.random()*2200);
     })();
   });
-  (function wiggle(){
-    const r=document.getElementById('btn-rand');
-    if(!r) return;
-    setTimeout(()=>{ r.style.transform='translateY(-1px) scale(1.04)';
-      setTimeout(()=>{ r.style.transform=''; wiggle(); },180); },2800+Math.random()*3000);
-  })();
+  // wiggle removed — conflicts with shy button transform
 }
 
 // ── SCROLL + COLUMN (original logic preserved) ───────────────────
@@ -922,49 +961,31 @@ async function fetchWeather(){
 }
 fetchWeather();
 
-// ── LETTER DECAY — the longer you stay, the more text decays ─────
-// Every 8 seconds, a random character in a random paragraph
-// is replaced with a decay character, then eventually disappears.
-// Essay concept: "the site decays" — text becomes unstable over time.
+// ── LETTER DECAY ─────────────────────────────────────────────────
 (function initLetterDecay(){
-  const DECAY_CHARS = ['·', '·', '_', '—', '·', ' ', '—'];
-  let decayCount = 0;
-
-  function decayOneLetter(){
-    const paras = [...document.querySelectorAll('.body-text, .epigraph')];
-    if(!paras.length) return;
-    // pick a random paragraph
-    const para = paras[Math.floor(Math.random()*paras.length)];
-    // walk text nodes
-    const walker = document.createTreeWalker(para, NodeFilter.SHOW_TEXT, null);
+  const DC = ['·', '_', '—', ' '];
+  function decay(){
     const nodes = [];
-    while(walker.nextNode()) nodes.push(walker.currentNode);
+    document.querySelectorAll('.body-text, .epigraph, .sub-head').forEach(el=>{
+      const walk = p => {
+        p.childNodes.forEach(n=>{
+          if(n.nodeType===3 && /[a-zA-Z]{4,}/.test(n.textContent)) nodes.push(n);
+          else if(n.nodeType===1 && !n.classList.contains("fn")) walk(n);
+        });
+      };
+      walk(el);
+    });
     if(!nodes.length) return;
-    // pick a random text node with actual letters
-    const eligible = nodes.filter(n => /[a-zA-Z]/.test(n.textContent));
-    if(!eligible.length) return;
-    const node = eligible[Math.floor(Math.random()*eligible.length)];
-    const text = node.textContent;
-    // find a letter position
-    const letterPositions = [];
-    for(let i=0;i<text.length;i++){ if(/[a-zA-Z]/.test(text[i])) letterPositions.push(i); }
-    if(!letterPositions.length) return;
-    const pos = letterPositions[Math.floor(Math.random()*letterPositions.length)];
-    // decay: replace with decay char, then after 4s remove entirely
-    const decayChar = DECAY_CHARS[Math.floor(Math.random()*DECAY_CHARS.length)];
-    node.textContent = text.slice(0,pos) + decayChar + text.slice(pos+1);
-    decayCount++;
-    // after many decays, speed up slightly
+    const n = nodes[Math.floor(Math.random()*nodes.length)];
+    const t = n.textContent;
+    const lp = [];
+    for(let i=1;i<t.length-1;i++) if(/[a-zA-Z]/.test(t[i])) lp.push(i);
+    if(!lp.length) return;
+    const p = lp[Math.floor(Math.random()*lp.length)];
+    n.textContent = t.slice(0,p) + DC[Math.floor(Math.random()*DC.length)] + t.slice(p+1);
   }
-
-  // start slow — first decay after 20s, then every 8s
-  // accelerates slightly the longer you stay
-  let interval = 8000;
-  setTimeout(function scheduleDecay(){
-    decayOneLetter();
-    interval = Math.max(3000, interval - 50); // slowly accelerates
-    setTimeout(scheduleDecay, interval);
-  }, 20000);
+  let iv=2000;
+  setTimeout(function run(){ decay(); iv=Math.max(600,iv-15); setTimeout(run,iv); }, 5000);
 })();
 
 
@@ -1062,7 +1083,7 @@ function resetLayout(){
       ctx.lineWidth=lw; ctx.lineCap='round';
       this.segs.forEach(s=>{
         ctx.beginPath(); ctx.moveTo(s.x1,s.y1); ctx.lineTo(s.x2,s.y2);
-        ctx.strokeStyle=`rgba(0,0,0,${s.op.toFixed(3)})`; ctx.stroke();
+        ctx.strokeStyle=`rgba(255,255,255,${s.op.toFixed(3)})`; ctx.stroke();
         if(!this.alive) s.op=Math.max(0,s.op-0.006); // decay when branch is dead
       });
       this.segs=this.segs.filter(s=>s.op>0);
@@ -1478,6 +1499,48 @@ document.querySelectorAll('.fn').forEach(fn=>{
 });
 document.addEventListener('click',()=>document.querySelectorAll('.fn.open').forEach(f=>f.classList.remove('open','fn-left','fn-right')));
 
+// ── SHY BUTTONS — smooth magnetic repulsion, Tiger Dingson style ──
+(function initShyButtons(){
+  if(window.innerWidth<=700) return;
+  const buttons = [...document.querySelectorAll('.toolbar .aq')].filter(b=>b.id!=='btn-about');
+
+  const FLEE_RADIUS = 160;  // starts moving when cursor is this close
+  const MAX_DIST    = 55;   // max displacement px
+  const LERP_FLEE   = 0.09; // how fast it moves away (lower = floatier)
+  const LERP_RETURN = 0.05; // how slowly it drifts back
+
+  const state = buttons.map(b => ({ b, cx:0, cy:0, tx:0, ty:0 }));
+  let mx=-9999, my=-9999;
+  document.addEventListener('mousemove', e=>{ mx=e.clientX; my=e.clientY; });
+
+  function tick(){
+    state.forEach(s=>{
+      const r = s.b.getBoundingClientRect();
+      const bx = r.left+r.width/2;
+      const by = r.top+r.height/2;
+      const dx = mx-bx, dy = my-by;
+      const dist = Math.sqrt(dx*dx+dy*dy);
+      if(dist < FLEE_RADIUS && dist > 0){
+        const strength = Math.pow(1-dist/FLEE_RADIUS, 2);
+        const push = strength * MAX_DIST;
+        s.tx = -(dx/dist)*push;
+        s.ty = -(dy/dist)*push;
+      } else {
+        s.tx = 0; s.ty = 0;
+      }
+      const lf = (s.tx===0&&s.ty===0) ? LERP_RETURN : LERP_FLEE;
+      s.cx += (s.tx-s.cx)*lf;
+      s.cy += (s.ty-s.cy)*lf;
+      const ox = Math.max(-MAX_DIST,Math.min(MAX_DIST,s.cx));
+      const oy = Math.max(-20,Math.min(20,s.cy));
+      s.b.style.transform = `translate(${ox.toFixed(2)}px,${oy.toFixed(2)}px)`;
+    });
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+
+
 // ── FLOATING OVAL IMAGES — tap node → oval floats over page ──────
 // Multiple can be open at once. Each is independently draggable.
 // To add your image: set src on the img inside each oval after spawn,
@@ -1490,7 +1553,7 @@ document.addEventListener('click',()=>document.querySelectorAll('.fn.open').forE
 const NODE_IMAGES = {
   'fb-main': 'images/plant.jpg',
   'fb-s0':   'images/plantdown2.jpg',
-  'fb-s1':   'images/cartoon.jpg',
+  'fb-s1':   'images/wireplant.jpg',
   'fb-s2':   'images/aesthetic.jpg',
   'fb-s3':   'images/clock1.jpg',
   'fb-s4':   'images/new1.jpg',
@@ -1501,7 +1564,7 @@ const NODE_IMAGES = {
   'fb-d':    'images/fungal network.jpg',
   'fb-e':    'images/last.jpg',
   'fb-f':    'images/huh.jpg',
-  'fb-g':    'images/wtf.jpg',
+  'fb-g':    'images/humanplant2.jpg',
   'fb-h':    'images/humanplant.jpg',
 };
 
@@ -1716,6 +1779,129 @@ document.querySelectorAll('.fb').forEach(btn=>{
     onEnd();
   },{passive:false});
 });
+</script>
+
+<!-- ── ABOUT MODAL ── -->
+<div id="about-backdrop">
+  <div id="about-box">
+    <p>I was reading Teresa Castro's "The Mediated Plant" on e-flux and it's a really interesting read. Castro argues that plants have never been purely natural. Every time we make a plant legible to human perception, through a lie detector, a time-lapse camera, a galvanic sensor, we are mediating it. The plant we see is always already a translation. We only started thinking of plants as intelligent, feeling beings once we had machines that could show us that. Without the technology, we couldn't perceive it.</p>
+    <p>I became interested in that intersection between nature and technology. The animism in the digital age. So this website behaves like the essay argues plants behave. The growing plant lines emerge as you scroll. The act of mediation changes the organism. The text grows and breathes as it enters the viewport, making the essay's temporality felt rather than just read. Characters decay over time. The longer you stay, the more the text loses stability. The diagram maps the essay's concepts as a draggable network without fixed reading order. Rhizomatic logic applied to interface design. The plant responds to your real season and weather conditions. It doesn't present Castro's argument. It operates according to its logic.</p>
+    <p style="margin-top:3.2em;font-style:normal;">Punch Kulphisanrat &nbsp;|&nbsp; Instructed by Leah Beeferman &nbsp;|&nbsp; Spring 2026</p>
+  </div>
+</div>
+<script>
+// ── ABOUT MODAL ──────────────────────────────────────────────────
+(function(){
+  const backdrop = document.getElementById('about-backdrop');
+  const btn      = document.getElementById('btn-about');
+  const close    = document.getElementById('about-close');
+  const box      = document.getElementById('about-box');
+  if(!backdrop||!btn) return;
+  btn.addEventListener('click', ()=> backdrop.classList.add('open'));
+  backdrop.addEventListener('click', ()=> backdrop.classList.remove('open'));
+  document.addEventListener('keydown', e=>{
+    if(e.key==='Escape') backdrop.classList.remove('open');
+  });
+})();
+
+// ── GHOST SELECTION — selects visible text like the web has free will ──
+(function initGhostCopy(){
+
+  function getVisibleTextNodes(){
+    const nodes = [];
+    const vh = window.innerHeight;
+    // collect ALL text nodes from body text
+    document.querySelectorAll('.body-text, .epigraph').forEach(el=>{
+      const walk = p => {
+        p.childNodes.forEach(n=>{
+          if(n.nodeType===3 && n.textContent.trim().length>20){
+            // use a Range to get the actual bounding rect of this specific text node
+            try {
+              const r = document.createRange();
+              r.selectNodeContents(n);
+              const rect = r.getBoundingClientRect();
+              // is any part of this text node visible?
+              if(rect.top < vh && rect.bottom > 0) nodes.push(n);
+            } catch(e) {}
+          } else if(n.nodeType===1 && !n.classList.contains('fn')) walk(n);
+        });
+      };
+      walk(el);
+    });
+    return nodes;
+  }
+
+  function doSelection(){
+    window.getSelection().removeAllRanges();
+    const nodes = getVisibleTextNodes();
+    if(!nodes.length) return;
+
+    const startNode = nodes[Math.floor(Math.random()*nodes.length)];
+    const fullText = startNode.textContent;
+    if(fullText.trim().length < 10) return;
+
+    // start at first capital letter
+    let startChar = 0;
+    for(let i=1;i<fullText.length-10;i++){
+      if(/[A-Z]/.test(fullText[i]) && /\s/.test(fullText[i-1])){
+        startChar=i; break;
+      }
+    }
+
+    // end 60-120 chars later at word boundary
+    let endChar = Math.min(fullText.length, startChar+60+Math.floor(Math.random()*60));
+    while(endChar < fullText.length-1 && !/[\s,.]/.test(fullText[endChar])) endChar++;
+    const pickedText = fullText.slice(startChar, endChar).trim();
+    if(pickedText.length < 10) return;
+
+    // create and grow the selection
+    const sel = window.getSelection();
+    const range = document.createRange();
+    try {
+      range.setStart(startNode, startChar);
+      range.setEnd(startNode, startChar);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    } catch(e){ return; }
+
+    let cur = startChar;
+    const grow = setInterval(()=>{
+      cur++;
+      if(cur >= endChar){
+        clearInterval(grow);
+        try {
+          navigator.clipboard.writeText(pickedText).catch(()=>{
+            const ta = document.createElement('textarea');
+            ta.value = pickedText;
+            ta.style.cssText = 'position:fixed;opacity:0;top:-9999px';
+            document.body.appendChild(ta);
+            ta.select(); document.execCommand('copy');
+            document.body.removeChild(ta);
+          });
+        } catch(e){}
+        setTimeout(()=>window.getSelection().removeAllRanges(), 8000);
+        return;
+      }
+      try {
+        range.setEnd(startNode, cur);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      } catch(e){ clearInterval(grow); }
+    }, 10);
+  }
+
+  setTimeout(doSelection, 1500);
+
+  let t = null;
+  window.addEventListener('scroll', ()=>{
+    clearTimeout(t);
+    t = setTimeout(doSelection, 1000);
+  }, {passive:true});
+})();
+
+
+
+
 </script>
 </body>
 </html>
